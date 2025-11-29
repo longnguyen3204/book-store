@@ -1,6 +1,6 @@
 backend-bookstore/
 │
-├── database/             # Lưu CSDL
+├── database/                 # Lưu CSDL
 ├── node_modules/             # Thư viện tải về (không đụng vào)
 ├── src/                      # Source code chính nằm ở đây
 │   ├── config/               # Cấu hình hệ thống
