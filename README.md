@@ -12,7 +12,7 @@ Bước 3:
 Bước 4:
   git push
 
-
+-------------------------------------------------------
 Một số tình huống thường gặp
 ✔️ 1. Bạn sửa file nhưng Git không thấy?
 
@@ -32,4 +32,15 @@ Thêm vào .gitignore, rồi chạy:
 git rm --cached backend/.env
 git rm -r --cached backend/node_modules
 git commit -m "Remove sensitive files"
+git push
+
+-------------------------------------------------------
+Nếu bị lỗi “non-fast-forward”
+Pull về trước:
+
+git pull --rebase
+
+2️⃣ Giải quyết xung đột (nếu có)
+3️⃣ Rồi push lại:
+
 git push
