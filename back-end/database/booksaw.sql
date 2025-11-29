@@ -1,5 +1,5 @@
 -- Tạo Database và thiết lập bảng mã tiếng Việt
-CREATE DATABASE IF NOT EXISTS bookstore_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS booksaw CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE booksaw;
 
 -- ==========================================
