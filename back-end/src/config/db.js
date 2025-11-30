@@ -16,4 +16,4 @@ db.connect(err => {
     console.log("Kết nối MySQL thành công!");
 });
 
-module.exports = db;
+module.exports = db.promise();

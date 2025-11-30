@@ -11,16 +11,24 @@ app.use(cors()); // Cho phép Frontend gọi API
 app.use(express.json()); // Để server đọc được dữ liệu JSON (quan trọng khi Login/Register)
 
 // 4. Kết nối Database
-// Chỉ cần gọi file db.js vào, đoạn code db.connect() bên trong đó sẽ tự chạy
 const db = require('./src/config/db'); 
 
-// 5. Tạo đường dẫn test (Route)
-// Để vào trình duyệt gõ localhost:3000 xem server sống hay chết
+// 5. KHAI BÁO CÁC ROUTES (ĐƯỜNG DẪN API)
+
+// Đường dẫn cho Auth (Đăng ký/Đăng nhập)
+// Khi ai đó vào /api/auth... thì chuyển sang authRoutes xử lý
+app.use('/api/auth', require('./src/routes/authRoutes'));
+
+// Đường dẫn cho Sách (Nếu đã tạo bookRoutes thì bỏ comment dòng dưới)
+// app.use('/api/books', require('./src/routes/bookRoutes'));
+
+
+// 6. Tạo đường dẫn test (Route gốc)
 app.get('/', (req, res) => {
     res.send("<h1>Chào mừng! Server Backend Sách đang chạy ổn định.</h1>");
 });
 
-// 6. Chạy Server
+// 7. Chạy Server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`-------------------------------------------`);
