@@ -13,6 +13,17 @@ app.use(express.json()); // Để server đọc được dữ liệu JSON (quan 
 // 4. Kết nối Database
 const db = require('./src/config/db'); 
 
+// --- TEST KẾT NỐI POOL ---
+db.getConnection()
+    .then(connection => {
+        console.log("✅ Database connected successfully (Pool mode)!");
+        connection.release(); // Trả kết nối lại cho bể
+    })
+    .catch(err => {
+        console.error("❌ Database connection failed:", err.message);
+    });
+// ------------------------------------------
+
 // 5. KHAI BÁO CÁC ROUTES (ĐƯỜNG DẪN API)
 
 // Đường dẫn cho Auth (Đăng ký/Đăng nhập)

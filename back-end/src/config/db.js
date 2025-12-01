@@ -1,19 +1,14 @@
 require('dotenv').config(); 
 const mysql = require('mysql2');
 
-const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME
+const pool = mysql.createPool({
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASS || '',
+    database: process.env.DB_NAME || 'booksaw',
+    waitForConnections: true,
+    connectionLimit: 10, // Tối đa 10 kết nối cùng lúc
+    queueLimit: 0
 });
 
-db.connect(err => {
-    if (err) {
-        console.log("Kết nối thất bại! Kiểm tra lại file .env.");
-        return;
-    }
-    console.log("Kết nối MySQL thành công!");
-});
-
-module.exports = db.promise();
+module.exports = pool.promise();
