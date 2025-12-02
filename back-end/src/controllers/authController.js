@@ -1,4 +1,4 @@
-const db = require('../config/db');
+const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -15,8 +15,8 @@ exports.register = async (req, res) => {
         }
 
         // 2. Kiểm tra xem email đã tồn tại trong DB chưa
-        const [checkUser] = await db.query('SELECT email FROM users WHERE email = ?', [email]);
-        if (checkUser.length > 0) {
+        const existingUser = await User.findByEmail(email);
+        if (existingUser) {
             return res.status(409).json({ message: "Email này đã được sử dụng!" });
         }
 
@@ -30,16 +30,13 @@ exports.register = async (req, res) => {
         const role_id = 2;
 
         // 5. Lưu vào Database
-        // Nếu phone_number không có thì lưu là NULL
-        const sql = `INSERT INTO users (role_id, fullname, email, password, phone_number) VALUES (?, ?, ?, ?, ?)`;
-        
-        await db.query(sql, [
-            role_id, 
-            fullname, 
-            email, 
-            hashedPassword, 
-            phone_number || null // Nếu không nhập sđt thì để null
-        ]);
+        await User.create({
+            role_id,
+            fullname,
+            email,
+            password: hashedPassword,
+            phone_number
+        });
 
         res.status(201).json({ message: "Đăng ký tài khoản thành công!" });
 
@@ -60,8 +57,7 @@ exports.login = async (req, res) => {
         }
 
         // 2. Tìm user trong Database theo email
-        const [users] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
-        const user = users[0];
+        const user = await User.findByEmail(email);
 
         // Nếu không tìm thấy user
         if (!user) {
