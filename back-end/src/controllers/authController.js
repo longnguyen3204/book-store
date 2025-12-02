@@ -101,5 +101,3 @@ exports.login = async (req, res) => {
         res.status(500).json({ message: "Lỗi Server khi đăng nhập" });
     }
 };
-
-// --- 3. QUÊN MẬT KHẨU ---
