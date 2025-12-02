@@ -23,5 +23,24 @@ class User {
         
         return result;
     }
+
+    // 3. Tìm user theo ID (Dùng cho xem Profile - vì Token lưu ID chứ không lưu email)
+    static async findById(id) {
+        const [rows] = await db.query('SELECT * FROM users WHERE id = ?', [id]);
+        return rows[0];
+    }
+
+    // 4. Cập nhật thông tin cá nhân (Không đụng đến password/email)
+    static async updateProfile(id, data) {
+        const { fullname, phone_number, address, avatar } = data;
+        const sql = `UPDATE users SET fullname = ?, phone_number = ?, address = ?, avatar = ? WHERE id = ?`;
+        await db.query(sql, [fullname, phone_number, address, avatar, id]);
+    }
+
+    // 5. Cập nhật mật khẩu riêng biệt
+    static async updatePassword(id, newPassword) {
+        const sql = 'UPDATE users SET password = ? WHERE id = ?';
+        await db.query(sql, [newPassword, id]);
+    }
 }
 module.exports = User;

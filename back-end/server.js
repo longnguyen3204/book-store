@@ -30,6 +30,9 @@ db.getConnection()
 // Khi ai đó vào /api/auth... thì chuyển sang authRoutes xử lý
 app.use('/api/auth', require('./src/routes/authRoutes'));
 
+// Đường dẫn cho User(Đổi mk, thông tin tài khoản)
+app.use('/api/users', require('./src/routes/userRoutes'));
+
 // Đường dẫn cho Sách (Nếu đã tạo bookRoutes thì bỏ comment dòng dưới)
 // app.use('/api/books', require('./src/routes/bookRoutes'));
 
