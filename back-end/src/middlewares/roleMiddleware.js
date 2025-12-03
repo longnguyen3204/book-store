@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-const authMiddleware = (req, res, next) => {
+const roleMiddleware = (req, res, next) => {
     // 1. Lấy token từ header (Frontend gửi lên dạng: "Bearer <token>")
     const authHeader = req.header('Authorization');
     const token = authHeader && authHeader.split(' ')[1]; // Lấy phần chuỗi token phía sau chữ Bearer
@@ -14,6 +14,11 @@ const authMiddleware = (req, res, next) => {
         // 2. Giải mã token để lấy thông tin user (id, role_id)
         const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret_key_tam_thoi');
         
+        // 3. Kiểm tra quyền Admin
+        if (decoded.role_id !== 1) {
+            return res.status(403).json({ message: "Bạn không có quyền Admin để thực hiện chức năng này!" });
+        }
+
         // 3. Gán thông tin user vào biến req để Controller dùng
         req.user = decoded; 
         
@@ -24,4 +29,4 @@ const authMiddleware = (req, res, next) => {
     }
 };
 
-module.exports = authMiddleware;
+module.exports = roleMiddleware;

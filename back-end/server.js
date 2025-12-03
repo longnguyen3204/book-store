@@ -33,8 +33,8 @@ app.use('/api/auth', require('./src/routes/authRoutes'));
 // Đường dẫn cho User(Đổi mk, thông tin tài khoản)
 app.use('/api/users', require('./src/routes/userRoutes'));
 
-// Đường dẫn cho Sách (Nếu đã tạo bookRoutes thì bỏ comment dòng dưới)
-// app.use('/api/books', require('./src/routes/bookRoutes'));
+// Đường dẫn cho Sách
+app.use('/api/books', require('./src/routes/bookRoutes'));
 
 
 // 6. Tạo đường dẫn test (Route gốc)
