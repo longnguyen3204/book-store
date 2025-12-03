@@ -42,5 +42,11 @@ class Book {
         await db.query(sql, [publisher_id, name, isbn, description, original_price, price, quantity, sold_count, publish_year, page_count, id]);
     }
     
+    // Hàm xóa sách
+    static async delBook(id) {
+        const [deleted] = await db.query('DELETE FROM books WHERE id = ?', [id]);
+        return deleted;
+    }
+
 }
 module.exports = Book;
