@@ -41,3 +41,47 @@ exports.addBook = async(req, res) => {
         res.status(500).json({ message: "Lỗi Server khi thêm sách" });
     }
 }
+
+// Cập nhật thông tin sách
+exports.updateBook = async(req, res) => {
+    try {
+        const bookId = req.params.id; // Lấy ID từ đường dẫn (số 1, 2...)
+        const updateData = req.body;  // Lấy dữ liệu mới từ Postman gửi lên
+
+        // Kiểm tra xem sách có tồn tại không
+        const existingBook = await Book.findById(bookId);
+        if (!existingBook) {
+            return res.status(404).json({ message: "Không tìm thấy cuốn sách này!" });
+        }
+
+        // Cập nhật thông tin sách 
+        const dataToUpdate = {
+            ...existingBook, // Copy toàn bộ dữ liệu cũ
+            ...updateData    // Đè dữ liệu mới lên
+        };
+        
+        await Book.updateBookInfo(bookId, dataToUpdate);
+        
+        res.json({ message: "Cập nhật thông tin sách thành công!" });
+    } catch(error) {
+        console.error(error);
+        res.status(500).json({ message: "Lỗi server" });
+    }
+}
+
+// Xem thông tin chi tiết của 1 quyển sách
+exports.getBookDetail = async (req, res) => {
+    try {
+        const bookId = req.params.id;
+        const book = await Book.findById(bookId);
+
+        if (!book) {
+            return res.status(404).json({ message: "Không tìm thấy sách" });
+        }
+
+        res.status(200).json(book);
+    } catch (error) {
+        console.error("Lỗi xem chi tiết sách:", error);
+        res.status(500).json({ message: "Lỗi Server" });
+    }
+};
