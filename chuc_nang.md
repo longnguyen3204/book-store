@@ -46,8 +46,7 @@ Chức năng cần có trong website bán sách
 
 2. Chức năng quản trị (Admin Panel)
 2.1. Quản lý sách
-- Thêm ✅ 
-- sửa
+- Thêm, sửa ✅
 - xóa sách
 - Upload ảnh
 
