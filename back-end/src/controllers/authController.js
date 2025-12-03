@@ -15,8 +15,8 @@ exports.register = async (req, res) => {
         }
 
         // 2. Kiểm tra xem email đã tồn tại trong DB chưa
-        const existingUser = await User.findByEmail(email);
-        if (existingUser) {
+        const user = await User.findByEmail(email);
+        if (user) {
             return res.status(409).json({ message: "Email này đã được sử dụng!" });
         }
 
@@ -58,8 +58,6 @@ exports.login = async (req, res) => {
 
         // 2. Tìm user trong Database theo email
         const user = await User.findByEmail(email);
-
-        // Nếu không tìm thấy user
         if (!user) {
             return res.status(401).json({ message: "Email hoặc mật khẩu không đúng!" });
         }

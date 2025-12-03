@@ -4,7 +4,6 @@ const Book = require('../models/Book');
 exports.getBooks = async (req, res) => {
     try {
         const books = await Book.getAll();
-        
         res.status(200).json(books);
     } catch (error) {
         console.error("Lỗi lấy danh sách sách:", error);
@@ -23,6 +22,15 @@ exports.addBook = async(req, res) => {
 
         if (!name || !original_price || !price) {
             return res.status(400).json({ message: "Vui lòng nhập tên sách, giá gốc và giá bán!" });
+        }
+
+        // Kiểm tra trường giá và năm xuất bản 
+        if (isNaN(original_price) || isNaN(price)) {
+            return res.status(400).json({ message: "Giá phải là số hợp lệ." });
+        }
+
+        if (publish_year && isNaN(publish_year)) {
+            return res.status(400).json({ message: "Năm phát hành phải là số." });
         }
 
         const result = await Book.create({
@@ -48,6 +56,11 @@ exports.updateBook = async(req, res) => {
         const bookId = req.params.id; // Lấy ID từ đường dẫn (số 1, 2...)
         const updateData = req.body;  // Lấy dữ liệu mới từ Postman gửi lên
 
+        // Kiểm tra id có phải số không
+        if (isNaN(bookId)) {
+            return res.status(400).json({ message: "ID sách không hợp lệ." });
+        }
+        
         // Kiểm tra xem sách có tồn tại không
         const existingBook = await Book.findById(bookId);
         if (!existingBook) {
@@ -74,6 +87,10 @@ exports.getBookDetail = async (req, res) => {
     try {
         const bookId = req.params.id;
 
+        if (isNaN(bookId)) {
+            return res.status(400).json({ message: "ID sách không hợp lệ." });
+        }
+
         // Kiểm tra xem sách có tồn tại không
         const existingBook = await Book.findById(bookId);
         if (!existingBook) {
@@ -91,6 +108,10 @@ exports.getBookDetail = async (req, res) => {
 exports.delBook = async(req, res) => {
     try {
         const bookId = req.params.id;
+
+        if (isNaN(bookId)) {
+            return res.status(400).json({ message: "ID sách không hợp lệ." });
+        }
 
         const existingBook = await Book.findById(bookId);
         if (!existingBook) {
