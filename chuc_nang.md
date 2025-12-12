@@ -8,7 +8,7 @@ Chức năng cần có trong website bán sách
 
 1.2. Danh mục sách
 - Hiển thị sách ✅
-- Bộ lọc theo thể loại, tác giả, nhà xuất bản, đánh giá, năm xuất bản
+- Bộ lọc theo thể loại ✅, tác giả, nhà xuất bản, đánh giá, năm xuất bản
 - Sắp xếp theo giá, mới nhất, bán chạy
 
 1.3. Chi tiết sách
@@ -47,7 +47,7 @@ Chức năng cần có trong website bán sách
 - Thêm, sửa, xóa sách ✅
 
 2.2. Quản lý thể loại
-- Thêm, sửa, xóa thể loại
+- Thêm, sửa, xóa thể loại ✅
 
 2.3. Quản lý đơn hàng
 - Xem danh sách
