@@ -26,16 +26,10 @@ db.getConnection()
 
 // 5. KHAI BÁO CÁC ROUTES (ĐƯỜNG DẪN API)
 
-// Đường dẫn cho Auth (Đăng ký/Đăng nhập)
-// Khi ai đó vào /api/auth... thì chuyển sang authRoutes xử lý
-app.use('/api/auth', require('./src/routes/authRoutes'));
-
-// Đường dẫn cho User(Đổi mk, thông tin tài khoản)
-app.use('/api/users', require('./src/routes/userRoutes'));
-
-// Đường dẫn cho Sách
-app.use('/api/books', require('./src/routes/bookRoutes'));
-
+app.use('/api/auth', require('./src/routes/authRoutes')); // Đường dẫn cho Auth (Đăng ký/Đăng nhập)
+app.use('/api/users', require('./src/routes/userRoutes')); // Đường dẫn cho User(Đổi mk, thông tin tài khoản)
+app.use('/api/books', require('./src/routes/bookRoutes')); // Đường dẫn cho Sách
+app.use('/api/categories', require('./src/routes/categoryRoutes')); // Đường dẫn cho Thể loại
 
 // 6. Tạo đường dẫn test (Route gốc)
 app.get('/', (req, res) => {
