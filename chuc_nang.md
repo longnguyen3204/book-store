@@ -8,8 +8,8 @@ Chức năng cần có trong website bán sách
 
 1.2. Danh mục sách
 - Hiển thị sách ✅
-- Bộ lọc theo thể loại ✅, tác giả, nhà xuất bản, đánh giá, năm xuất bản
-- Sắp xếp theo giá, mới nhất, bán chạy
+- Bộ lọc theo thể loại ✅, tác giả ✅, nhà xuất bản ✅, đánh giá, năm xuất bản ✅
+- Sắp xếp theo giá ✅, mới nhất, bán chạy
 
 1.3. Chi tiết sách
 - Hình ảnh
@@ -18,11 +18,11 @@ Chức năng cần có trong website bán sách
 - Giá (giá cũ + giảm giá) ✅
 - Đánh giá
 - Sách tương tự
-- Thêm vào giỏ hàng
+- Thêm vào giỏ hàng ✅
 
 1.4. Giỏ hàng
-- Thêm / xóa / sửa số lượng
-- Tính tổng tiền
+- Thêm / xóa / sửa số lượng ✅
+- Tính tổng tiền ✅
 - Mã giảm giá
 - Thanh toán
 
@@ -34,12 +34,9 @@ Chức năng cần có trong website bán sách
 1.6. Tài khoản người dùng
 - Đăng kí, đăng nhập, đổi mật khẩu ✅
 - Hồ sơ cá nhân (cập nhật thông tin tài khoản) ✅
-- Xem giỏ hàng, lịch sử đơn hàng
+- Xem giỏ hàng, lịch sử đơn hàng ✅
 
-1.7. Tìm kiếm sách
-- Tìm theo tên hoặc tác giả
-
-1.8. Đánh giá & bình luận
+1.7. Đánh giá & bình luận
 - Người đã mua được đánh giá và bình luận
 
 2. Chức năng quản trị (Admin Panel)
@@ -69,7 +66,6 @@ Chức năng cần có trong website bán sách
 
 3. Chức năng nâng cao (Tính sau)
 1.7.1 Gợi ý khi nhập
-1.7.2 Lọc kết quả
 3.1. Gợi ý sách theo hành vi người dùng
 3.2. Chatbot hỗ trợ
 3.3. Thống kê doanh thu
