@@ -3,7 +3,40 @@ const Book = require('../models/Book');
 //Hiển thị danh sách các sách hiện có
 exports.getBooks = async (req, res) => {
     try {
-        const books = await Book.getAll();
+        const { author, publisher, year, category, category_id, sort, ...rest } = req.query;
+
+        // Nếu có tham số lạ -> trả lỗi để tránh hiểu nhầm
+        const allowedKeys = ['author', 'publisher', 'year', 'category', 'category_id', 'sort'];
+        const extraKeys = Object.keys(rest || {});
+        if (extraKeys.length) {
+            return res.status(400).json({ message: `Tham số không hỗ trợ: ${extraKeys.join(', ')}` });
+        }
+
+        if (year && isNaN(Number(year))) {
+            return res.status(400).json({ message: "Năm xuất bản phải là số." });
+        }
+
+        if (category_id && isNaN(Number(category_id))) {
+            return res.status(400).json({ message: "category_id phải là số." });
+        }
+
+        if (sort && !['price_asc', 'price_desc'].includes(sort)) {
+            return res.status(400).json({ message: "sort chỉ hỗ trợ: price_asc, price_desc" });
+        }
+
+        const hasFilter = author || publisher || year || category || category_id;
+        const useSearch = hasFilter || !!sort; // dùng search nếu có filter hoặc cần sắp xếp
+
+        const books = useSearch
+            ? await Book.search({
+                author,
+                publisher,
+                publish_year: year ? Number(year) : undefined,
+                category,
+                category_id: category_id ? Number(category_id) : undefined,
+                sort
+            })
+            : await Book.getAll();
         res.status(200).json(books);
     } catch (error) {
         console.error("Lỗi lấy danh sách sách:", error);

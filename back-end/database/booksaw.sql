@@ -134,6 +134,27 @@ CREATE TABLE vouchers (
 -- 4. NHÓM ĐƠN HÀNG & ĐÁNH GIÁ
 -- ==========================================
 
+-- Giỏ hàng (1 user 1 giỏ, chứa nhiều item)
+CREATE TABLE carts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE cart_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    cart_id INT NOT NULL,
+    book_id INT NOT NULL,
+    quantity INT NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_cart_book (cart_id, book_id),
+    FOREIGN KEY (cart_id) REFERENCES carts(id) ON DELETE CASCADE,
+    FOREIGN KEY (book_id) REFERENCES books(id)
+);
+
 -- Bảng Phương thức thanh toán
 CREATE TABLE payment_methods (
     id INT AUTO_INCREMENT PRIMARY KEY,
