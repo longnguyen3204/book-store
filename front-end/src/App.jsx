@@ -44,7 +44,7 @@ const ProductCard = ({ title, author, price, image, prevPrice }) => (
   </div>
 )
 
-function App() {
+function App({ onAccountClick }) {
   const [activeTab, setActiveTab] = useState('all-genre')
   const [isMenuOpen, setMenuOpen] = useState(false)
   const [isSearchOpen, setSearchOpen] = useState(false)
@@ -80,6 +80,11 @@ function App() {
     document.addEventListener('click', handleClick)
     return () => document.removeEventListener('click', handleClick)
   }, [isSearchOpen])
+
+  const handleAccount = (event) => {
+    if (event) event.preventDefault()
+    if (onAccountClick) onAccountClick()
+  }
 
   const heroSettings = useMemo(
     () => ({
@@ -149,7 +154,7 @@ function App() {
               </div>
               <div className="col-md-6">
                 <div className="right-element">
-                  <a href="#" className="user-account for-buy">
+                  <a href="#" className="user-account for-buy" onClick={handleAccount}>
                     <i className="icon icon-user"></i>
                     <span>Account</span>
                   </a>
@@ -604,7 +609,9 @@ function App() {
                 <h5>My account</h5>
                 <ul className="menu-list">
                   <li className="menu-item">
-                    <a href="#">Sign In</a>
+                    <a href="#" onClick={handleAccount}>
+                      Sign In
+                    </a>
                   </li>
                   <li className="menu-item">
                     <a href="#">View Cart</a>
