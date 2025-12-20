@@ -1,0 +1,88 @@
+#root {
+  width: 100%;
+}
+
+/*
+  Hero slider overrides (React Slick):
+  - Force text + image on the same row (all breakpoints)
+  - Prevent arrows overlapping content
+  - Slightly reduce headline/image sizing
+*/
+
+/* Always keep a single row (override template's <= 999px column-reverse) */
+#billboard .main-slider {
+  /* reserve space so arrows don't overlap banner text/image */
+  padding-left: 90px;
+  padding-right: 90px;
+  box-sizing: border-box;
+}
+
+#billboard .main-slider .slider-item {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  flex-direction: row !important;
+  align-items: center;
+  justify-content: center;
+  text-align: left !important;
+  gap: 48px;
+}
+
+#billboard .main-slider .banner-content {
+  width: 35% !important;
+  margin-top: 60px;
+  margin-right: 0 !important;
+  margin-bottom: 0 !important;
+  flex: 0 1 420px;
+}
+
+#billboard .main-slider .banner-title {
+  font-size: clamp(2.4rem, 3.2vw, 3.6rem);
+  line-height: 1.05;
+}
+
+#billboard .main-slider .banner-image {
+  width: auto;
+  max-width: min(460px, 100%);
+  height: auto;
+  flex: 0 1 460px;
+}
+
+#billboard button.prev.slick-arrow {
+  left: 20px;
+}
+
+#billboard button.next.slick-arrow {
+  right: 20px;
+}
+
+@media screen and (max-width: 999px) {
+  #billboard .main-slider {
+    /* still keep some breathing room for arrows on smaller screens */
+    padding-left: 56px;
+    padding-right: 56px;
+    box-sizing: border-box;
+  }
+
+  #billboard .main-slider .slider-item {
+    gap: 24px;
+  }
+
+  #billboard .main-slider .banner-content {
+    width: 50% !important;
+    margin-top: 0;
+    flex-basis: 360px;
+  }
+
+  #billboard button.slick-arrow {
+    width: 42px;
+    height: 42px;
+  }
+
+  #billboard button.prev.slick-arrow {
+    left: 10px;
+  }
+
+  #billboard button.next.slick-arrow {
+    right: 10px;
+  }
+}
