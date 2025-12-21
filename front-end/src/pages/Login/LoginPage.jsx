@@ -65,7 +65,7 @@ export default function LoginPage({ onLogin }) {
 
         <form className="login-form" onSubmit={handleSubmit}>
           <label className="form-label" htmlFor="email">
-            Email Address
+            Email
           </label>
           <input
             id="email"
@@ -79,7 +79,7 @@ export default function LoginPage({ onLogin }) {
           />
 
           <label className="form-label" htmlFor="password">
-            Password
+            Mật khẩu
           </label>
           <input
             id="password"
