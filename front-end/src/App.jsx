@@ -6,6 +6,8 @@ import HomePage from "./pages/Home/HomePage";
 import LoginPage from "./pages/Login/LoginPage";
 import RegisterPage from "./pages/Register/RegisterPage";
 import ProfilePage from "./pages/Client/Profile/ProfilePage";
+import DetailProduct from "./pages/Client/BookDetailPage";
+import SearchPage from "./pages/Client/SearchPage";
 
 function AdminPlaceholder() {
   return (
@@ -54,6 +56,8 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<HomePage user={user} />} />
+      <Route path="/product/:id" element={<DetailProduct />} />
+      <Route path="/search" element={<SearchPage />} />
       <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route
