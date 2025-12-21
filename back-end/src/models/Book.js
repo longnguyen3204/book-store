@@ -1,15 +1,55 @@
 const db = require('../config/db');
 
 class Book {
-    // Hàm tìm book bằng id
+    // Lấy ảnh: ưu tiên ảnh trong DB, nếu không có thì dùng ảnh tĩnh trong public/images theo id (harrypotter.jpg cho id=2)
+    static thumbnailSql = `
+        SELECT image_url 
+        FROM book_images 
+        WHERE book_id = b.id 
+        ORDER BY is_thumbnail DESC, id ASC 
+        LIMIT 1
+    `;
+
     static async findById(id) {
-        const [rows] = await db.query('SELECT * FROM books WHERE id = ?', [id]);
-        return rows[0]; // Trả về book tìm thấy, hoặc undefined nếu không có
+        const sql = `
+            SELECT 
+                b.id,
+                b.name,
+                b.description,
+                b.original_price,
+                b.price,
+                b.quantity,
+                b.publish_year,
+                (SELECT a.name 
+                 FROM book_authors ba 
+                 JOIN authors a ON a.id = ba.author_id 
+                 WHERE ba.book_id = b.id 
+                 LIMIT 1) AS author,
+                (${Book.thumbnailSql}) AS image
+            FROM books b
+            WHERE b.id = ?`;
+        const [rows] = await db.query(sql, [id]);
+        return rows[0];
     }
 
-    // Hàm lấy tất cả các sách
     static async getAll() {
-        const [rows] = await db.query('SELECT id, name, original_price, price, quantity FROM books');
+        const sql = `
+            SELECT 
+                b.id,
+                b.name,
+                b.description,
+                b.original_price,
+                b.price,
+                b.quantity,
+                b.publish_year,
+                (SELECT a.name 
+                 FROM book_authors ba 
+                 JOIN authors a ON a.id = ba.author_id 
+                 WHERE ba.book_id = b.id 
+                 LIMIT 1) AS author,
+                (${Book.thumbnailSql}) AS image
+            FROM books b`;
+        const [rows] = await db.query(sql);
         return rows;
     }
 
@@ -21,15 +61,17 @@ class Book {
         const conditions = [];
         const params = [];
 
+        joins.push('LEFT JOIN book_authors ba ON b.id = ba.book_id');
+        joins.push('LEFT JOIN authors a ON a.id = ba.author_id');
+        joins.push('LEFT JOIN book_images i ON b.id = i.book_id');
+
         if (author) {
-            joins.push('JOIN book_authors ba ON b.id = ba.book_id');
-            joins.push('JOIN authors a ON a.id = ba.author_id');
             conditions.push('a.name LIKE ?');
             params.push(`%${author}%`);
         }
 
         if (publisher) {
-            joins.push('JOIN publishers p ON b.publisher_id = p.id');
+            joins.push('LEFT JOIN publishers p ON b.publisher_id = p.id');
             conditions.push('p.name LIKE ?');
             params.push(`%${publisher}%`);
         }
@@ -40,8 +82,8 @@ class Book {
         }
 
         if (category || category_id) {
-            joins.push('JOIN book_categories bc ON b.id = bc.book_id');
-            joins.push('JOIN categories c ON c.id = bc.category_id');
+            joins.push('LEFT JOIN book_categories bc ON b.id = bc.book_id');
+            joins.push('LEFT JOIN categories c ON c.id = bc.category_id');
             if (category_id) {
                 conditions.push('c.id = ?');
                 params.push(category_id);
@@ -59,11 +101,24 @@ class Book {
         else if (sort === 'price_desc') orderSql = ' ORDER BY b.price DESC';
 
         const sql = `
-            SELECT DISTINCT 
-                b.id, b.name, b.original_price, b.price, b.quantity, b.publish_year
+            SELECT 
+                b.id,
+                b.name,
+                b.description,
+                b.original_price,
+                b.price,
+                b.quantity,
+                b.publish_year,
+                COALESCE(a.name, '') AS author,
+                (SELECT image_url 
+                 FROM book_images 
+                 WHERE book_id = b.id 
+                 ORDER BY is_thumbnail DESC, id ASC 
+                 LIMIT 1) AS image
             FROM books b
             ${joinsSql}
             ${whereSql}
+            GROUP BY b.id
             ${orderSql}
         `;
 
