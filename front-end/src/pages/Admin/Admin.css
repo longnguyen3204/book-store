@@ -1,0 +1,226 @@
+/* src/pages/Admin/Admin.css */
+
+:root {
+  /* Bảng màu lấy cảm hứng từ Booksaw theme */
+  --admin-primary: #C5A992;       /* Màu nâu be chủ đạo */
+  --admin-dark: #232323;          /* Màu đen xám (Sidebar/Text) */
+  --admin-light: #F3F2EC;         /* Màu nền kem nhạt (Background) */
+  --admin-white: #FFFFFF;         /* Màu nền thẻ (Card) */
+  --admin-text: #74642F;          /* Màu chữ phụ */
+  --admin-danger: #d9534f;        /* Màu đỏ cho nút xóa */
+  --admin-success: #5cb85c;       /* Màu xanh cho trạng thái */
+  --sidebar-width: 260px;
+}
+
+body {
+  background-color: var(--admin-light); /* Đổi màu nền cả trang */
+}
+
+/* --- Layout Chung --- */
+.admin-container {
+  display: flex;
+  min-height: 100vh;
+  font-family: "Inter", sans-serif; /* Hoặc font chữ chính của web bạn */
+}
+
+/* Sidebar bên trái */
+.admin-sidebar {
+  width: var(--sidebar-width);
+  background-color: var(--admin-white);
+  border-right: 1px solid #e0e0e0;
+  padding: 2rem;
+  position: fixed;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.03);
+}
+
+.admin-sidebar h3 {
+  color: var(--admin-dark);
+  font-weight: 700;
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 1.2rem;
+  border-bottom: 2px solid var(--admin-primary);
+  padding-bottom: 10px;
+}
+
+.admin-nav-link {
+  display: block;
+  padding: 12px 0;
+  color: #777;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border-bottom: 1px dashed #eee;
+}
+
+.admin-nav-link:hover, .admin-nav-link.active {
+  color: var(--admin-dark);
+  padding-left: 10px; /* Hiệu ứng trượt nhẹ */
+  border-left: 3px solid var(--admin-primary);
+}
+
+/* Khu vực nội dung chính */
+.admin-content {
+  margin-left: var(--sidebar-width);
+  padding: 2rem 3rem;
+  flex-grow: 1;
+  background-color: var(--admin-light);
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.admin-title {
+  font-family: "Prata", serif; /* Font tiêu đề giống trang chủ */
+  font-size: 2rem;
+  color: var(--admin-dark);
+}
+
+/* --- Card & Form --- */
+.admin-card {
+  background: var(--admin-white);
+  padding: 2rem;
+  border-radius: 8px; /* Bo góc nhẹ */
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+  border: none;
+}
+
+.admin-input {
+  border: 1px solid #ddd;
+  padding: 10px 15px;
+  border-radius: 0; /* Vuông vức theo style minimalist */
+  width: 100%;
+  margin-bottom: 15px;
+  background: #f9f9f9;
+}
+
+.admin-input:focus {
+  outline: none;
+  border-color: var(--admin-primary);
+  background: #fff;
+}
+
+/* --- Buttons --- */
+.admin-btn {
+  padding: 10px 25px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  transition: 0.3s;
+  display: inline-block;
+}
+
+.admin-btn-primary {
+  background-color: var(--admin-primary);
+  color: #fff;
+}
+
+.admin-btn-primary:hover {
+  background-color: var(--admin-tẽxt);
+  color: #fff;
+}
+
+.admin-btn-danger {
+  background-color: #fff;
+  color: var(--admin-danger);
+  border: 1px solid var(--admin-danger);
+}
+
+.admin-btn-danger:hover {
+  background-color: var(--admin-danger);
+  color: #fff;
+}
+
+/* --- Tables --- */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.admin-table th {
+  text-align: left;
+  padding: 15px;
+  background-color: var(--admin-primary);
+  color: #fff;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+.admin-table td {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  color: #555;
+}
+
+.admin-table tr:hover {
+  background-color: #fcfcfc;
+}
+/* --- Bổ sung cho Category Manager --- */
+
+/* Nút hành động nhỏ trong bảng (Sửa/Xóa) */
+.action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-right: 8px;
+}
+
+.action-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.btn-edit {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.btn-edit:hover {
+  background-color: #1976d2;
+  color: white;
+}
+
+.btn-delete {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.btn-delete:hover {
+  background-color: #c62828;
+  color: white;
+}
+
+/* Badge số thứ tự */
+.index-badge {
+  background-color: var(--admin-primary);
+  color: white;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
