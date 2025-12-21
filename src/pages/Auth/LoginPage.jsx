@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import "./LoginPage.css";
 import { login as loginApi } from "../../api/authApi";
 
@@ -15,33 +14,21 @@ const BookIcon = () => (
 );
 
 export default function LoginPage({ onLogin }) {
-  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (submitting) return;
     setError("");
-    setSuccess("");
     setSubmitting(true);
     try {
       const result = await loginApi({ email, password });
-      let targetPath = "/";
       if (onLogin) {
-        targetPath = (await onLogin(result)) || "/";
-      } else {
-        // Fallback nếu không truyền onLogin: vẫn lưu localStorage và điều hướng theo role
-        if (result?.token) localStorage.setItem("token", result.token);
-        if (result?.user) localStorage.setItem("user", JSON.stringify(result.user));
-        targetPath = result?.user?.role_id === 1 ? "/admin" : "/";
+        await onLogin(result);
       }
-
-      setSuccess("Đăng nhập thành công! Đang chuyển trang...");
-      setTimeout(() => navigate(targetPath), 800);
     } catch (err) {
       setError(err?.message || "Đăng nhập thất bại");
     } finally {
@@ -57,10 +44,9 @@ export default function LoginPage({ onLogin }) {
             <BookIcon />
             <span className="brand-name">BOOKSAW</span>
           </div>
-          <h1 className="title">Đăng Nhập</h1>
+          <h1 className="title">Login</h1>
         </div>
 
-        {success && <div className="success-text">{success}</div>}
         {error && <div className="error-text">{error}</div>}
 
         <form className="login-form" onSubmit={handleSubmit}>
@@ -94,19 +80,19 @@ export default function LoginPage({ onLogin }) {
 
           <div className="helper-row">
             <a href="#" className="link">
-              Quên mật khẩu?
+              Forgot password?
             </a>
           </div>
 
           <button type="submit" className="submit-btn" disabled={submitting}>
-            {submitting ? "Đang đăng nhập..." : "Đăng Nhập"}
+            {submitting ? "Signing In..." : "Sign In"}
           </button>
         </form>
 
         <div className="footer-text">
           Don&apos;t have an account?{" "}
-          <a href="/register" className="link">
-            Đăng Ký
+          <a href="#" className="link">
+            Sign up
           </a>
         </div>
       </div>

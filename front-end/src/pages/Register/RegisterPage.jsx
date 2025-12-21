@@ -51,9 +51,11 @@ const RegisterPage = () => {
       navigate("/login");
     } catch (err) {
       console.error(err);
-      setError(
-        err.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại."
-      );
+      const message =
+        err?.message ||
+        err.response?.data?.message ||
+        "Đăng ký thất bại. Vui lòng thử lại.";
+      setError(message);
     } finally {
       setIsLoading(false);
     }
