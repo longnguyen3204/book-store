@@ -4,6 +4,17 @@ import classNames from "classnames";
 import AOS from "aos";
 import { Link } from "react-router-dom";
 
+import {
+  brandAssets,
+  heroSlides,
+  clientLogos,
+  featuredBooks,
+  popularBooks,
+  bestSelling,
+  specialOffers,
+  blogPosts,
+} from "./content";
+
 const Arrow = ({ direction, onClick }) => (
   <button
     type="button"
