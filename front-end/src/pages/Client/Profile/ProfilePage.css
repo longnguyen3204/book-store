@@ -42,6 +42,9 @@
   width: 280px;
   border-right: 1px solid #ddd;
   padding-right: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .sidebar-title {
@@ -67,16 +70,18 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  flex-grow: 1;
 }
 
 .account-menu li {
   font-size: 16px;
-  padding: 14px 0;
+  padding: 14px 0 14px 15px;
   cursor: pointer;
   color: #666;
   border-left: 4px solid transparent;
-  transition: all 0.3s ease;
+  transition: color 0.3s ease, border-color 0.3s ease;
   user-select: none;
+  border-radius: 4px;
 }
 
 .account-menu li.active,
@@ -84,11 +89,33 @@
   color: #bf7c4a;
   border-left-color: #bf7c4a;
   font-weight: 600;
+  background-color: #f7eee2;
+}
+
+/* Nút đăng xuất */
+.account-sidebar > button {
+  margin-top: 30px;
+  width: 100%;
+  padding: 12px 0;
+  background-color: #b36c4d;
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(179, 108, 77, 0.25);
+  transition: background-color 0.3s ease;
+  user-select: none;
+}
+
+.account-sidebar > button:hover {
+  background-color: #9a5940;
 }
 
 /* Content */
 .account-content {
   flex: 1;
+  min-width: 0; /* Giúp text wrap đúng trong flex */
 }
 
 .content-title {
@@ -107,11 +134,12 @@
   font-size: 16px;
   margin-bottom: 18px;
   gap: 8px;
+  align-items: center;
 }
 
 .info-line .label {
   font-weight: 700;
-  min-width: 100px;
+  min-width: 120px;
   color: #7e5a3c;
   user-select: none;
 }

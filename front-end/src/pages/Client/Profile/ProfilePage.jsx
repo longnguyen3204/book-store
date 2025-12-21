@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./ProfilePage.css";
 
-export default function UserAccount({ user }) {
+export default function UserAccount({ user, onLogout }) {
   const profile = user || {};
 
   // Quản lý tab sidebar đang active
@@ -82,6 +82,32 @@ export default function UserAccount({ user }) {
               Sổ địa chỉ
             </li>
           </ul>
+
+          {/* Nút đăng xuất */}
+          <button
+            onClick={onLogout}
+            style={{
+              marginTop: "30px",
+              width: "100%",
+              padding: "12px",
+              backgroundColor: "#b36c4d",
+              border: "none",
+              borderRadius: "10px",
+              color: "#fff",
+              fontWeight: "700",
+              cursor: "pointer",
+              boxShadow: "0 10px 20px rgba(179, 108, 77, 0.25)",
+              transition: "background-color 0.3s ease",
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = "#9a5940")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = "#b36c4d")
+            }
+          >
+            Đăng xuất
+          </button>
         </aside>
 
         {/* Content */}

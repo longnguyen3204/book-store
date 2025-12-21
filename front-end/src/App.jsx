@@ -9,13 +9,10 @@ import ProfilePage from "./pages/Client/Profile/ProfilePage";
 import DetailProduct from "./pages/Client/BookDetailPage";
 import SearchPage from "./pages/Client/SearchPage";
 
-import AdminDoashBoard from "./pages/Admin/Dashboard";
 function AdminPlaceholder() {
   return (
     <div style={{ padding: "4rem", textAlign: "center" }}>
-      <h1>
-        <AdminDoashBoard />
-      </h1>
+      <h1>AdminDoashBoard</h1>
     </div>
   );
 }

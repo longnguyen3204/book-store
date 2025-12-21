@@ -3,15 +3,30 @@ import AdminSidebar from "../components/AdminSidebar";
 
 const AdminLayout = ({ children }) => {
   return (
-    <div className="app">
+    <div
+      className="admin-wrapper"
+      style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+    >
+      {/* Header cố định phía trên */}
       <AdminHeader />
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-md-2 p-0">
-            <AdminSidebar />
-          </div>
-          <div className="col-md-10 py-4">{children}</div>
+
+      <div style={{ display: "flex", flex: 1 }}>
+        {/* Sidebar cố định bên trái */}
+        <div style={{ width: "260px", flexShrink: 0 }}>
+          <AdminSidebar />
         </div>
+
+        {/* Nội dung chính bên phải */}
+        <main
+          style={{
+            flex: 1,
+            padding: "30px",
+            backgroundColor: "#f8f9fa",
+            overflowY: "auto",
+          }}
+        >
+          {children}
+        </main>
       </div>
     </div>
   );
