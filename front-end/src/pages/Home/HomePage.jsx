@@ -158,9 +158,21 @@ const HomePage = ({ user }) => {
                 </div>
               </div>
               <div className="col-md-6">
-                <div className="right-element" style={{ display: "flex", gap: 20, justifyContent: "flex-end", alignItems: "center" }}>
+                <div
+                  className="right-element"
+                  style={{
+                    display: "flex",
+                    gap: 20,
+                    justifyContent: "flex-end",
+                    alignItems: "center",
+                  }}
+                >
                   {user ? (
-                    <Link to="/profile" className="user-account for-buy" style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                    <Link
+                      to="/profile"
+                      className="user-account for-buy"
+                      style={{ display: "flex", gap: 8, alignItems: "center" }}
+                    >
                       <i className="icon icon-user"></i>
                       <span>{user.fullname || user.email}</span>
                     </Link>
@@ -171,7 +183,11 @@ const HomePage = ({ user }) => {
                     </Link>
                   )}
 
-                  <Link to="/cart" className="cart for-buy" style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                  <Link
+                    to="/cart"
+                    className="cart for-buy"
+                    style={{ display: "flex", gap: 6, alignItems: "center" }}
+                  >
                     <i className="icon icon-clipboard"></i>
                     <span>Cart:(0 $)</span>
                   </Link>

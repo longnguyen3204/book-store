@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
-import Slider from 'react-slick'
-import classNames from 'classnames'
-import AOS from 'aos'
+import { useEffect, useMemo, useState } from "react";
+import Slider from "react-slick";
+import classNames from "classnames";
+import AOS from "aos";
 import {
   heroSlides,
   clientLogos,
@@ -11,28 +11,37 @@ import {
   specialOffers,
   blogPosts,
   brandAssets,
-} from './data/content'
-import './App.css'
-import { Link } from 'react-router-dom'
-import React from 'react'
-import { listProduct } from './config/ProductRequest'
+} from "./data/content";
+import "./App.css";
+import { Link } from "react-router-dom";
+import React from "react";
+import { listProduct } from "./config/ProductRequest";
 
 const Arrow = ({ direction, onClick }) => (
   <button
     type="button"
-    className={classNames('slick-arrow', direction === 'prev' ? 'prev' : 'next')}
+    className={classNames(
+      "slick-arrow",
+      direction === "prev" ? "prev" : "next"
+    )}
     onClick={onClick}
-    aria-label={direction === 'prev' ? 'Previous slide' : 'Next slide'}
+    aria-label={direction === "prev" ? "Previous slide" : "Next slide"}
   >
-    <i className={`icon icon-arrow-${direction === 'prev' ? 'left' : 'right'}`}></i>
+    <i
+      className={`icon icon-arrow-${direction === "prev" ? "left" : "right"}`}
+    ></i>
   </button>
-)
+);
 
 export const ProductCard = ({ id, title, author, price, image, prevPrice }) => (
   <div className="product-item">
     <figure className="product-style">
       <img src={image} alt={title} className="product-item" />
-      <button type="button" className="add-to-cart" data-product-tile="add-to-cart">
+      <button
+        type="button"
+        className="add-to-cart"
+        data-product-tile="add-to-cart"
+      >
         Add to Cart
       </button>
     </figure>
@@ -41,7 +50,6 @@ export const ProductCard = ({ id, title, author, price, image, prevPrice }) => (
         <h3>{title}</h3>
       </Link>
 
-      
       <span>{author}</span>
       <div className="item-price">
         {prevPrice && <span className="prev-price">{prevPrice}</span>}
@@ -49,64 +57,60 @@ export const ProductCard = ({ id, title, author, price, image, prevPrice }) => (
       </div>
     </figcaption>
   </div>
-)
+);
 
-<<<<<<< HEAD
-function App({ onAccountClick }) {
-=======
 function App() {
   const [products, setProducts] = useState([]);
->>>>>>> 9a6bc88 (Add frontend)
-  const [activeTab, setActiveTab] = useState('all-genre')
-  const [isMenuOpen, setMenuOpen] = useState(false)
-  const [isSearchOpen, setSearchOpen] = useState(false)
-  const [isSticky, setSticky] = useState(false)
+  const [activeTab, setActiveTab] = useState("all-genre");
+  const [isMenuOpen, setMenuOpen] = useState(false);
+  const [isSearchOpen, setSearchOpen] = useState(false);
+  const [isSticky, setSticky] = useState(false);
   const tabLabels = {
-    'all-genre': 'All Genre',
-    business: 'Business',
-    technology: 'Technology',
-    romantic: 'Romantic',
-    adventure: 'Adventure',
-    fictional: 'Fictional',
-  }
+    "all-genre": "All Genre",
+    business: "Business",
+    technology: "Technology",
+    romantic: "Romantic",
+    adventure: "Adventure",
+    fictional: "Fictional",
+  };
 
-  const [searchQuery, setSearchQuery] = useState('');
-const filteredProducts = useMemo(() => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const filteredProducts = useMemo(() => {
     if (!searchQuery.trim()) return products;
-    return products.filter((book) =>
-      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      book.author.toLowerCase().includes(searchQuery.toLowerCase())
+    return products.filter(
+      (book) =>
+        book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        book.author.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [searchQuery, products]);
-  
 
-useEffect(() => {
-    AOS.init({ duration: 1200, once: true })
-  }, [])
+  useEffect(() => {
+    AOS.init({ duration: 1200, once: true });
+  }, []);
 
   useEffect(() => {
     const onScroll = () => {
-      setSticky(window.scrollY >= 200)
-    }
-    onScroll()
-    window.addEventListener('scroll', onScroll)
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+      setSticky(window.scrollY >= 200);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     const handleClick = (event) => {
-      if (isSearchOpen && !event.target.closest('.search-bar')) {
-        setSearchOpen(false)
+      if (isSearchOpen && !event.target.closest(".search-bar")) {
+        setSearchOpen(false);
       }
-    }
-    document.addEventListener('click', handleClick)
-    return () => document.removeEventListener('click', handleClick)
-  }, [isSearchOpen])
+    };
+    document.addEventListener("click", handleClick);
+    return () => document.removeEventListener("click", handleClick);
+  }, [isSearchOpen]);
 
   const handleAccount = (event) => {
-    if (event) event.preventDefault()
-    if (onAccountClick) onAccountClick()
-  }
+    if (event) event.preventDefault();
+    if (onAccountClick) onAccountClick();
+  };
 
   const heroSettings = useMemo(
     () => ({
@@ -117,8 +121,8 @@ useEffect(() => {
       prevArrow: <Arrow direction="prev" />,
       nextArrow: <Arrow direction="next" />,
     }),
-    [],
-  )
+    []
+  );
 
   const offerSliderSettings = useMemo(
     () => ({
@@ -142,21 +146,21 @@ useEffect(() => {
         },
       ],
     }),
-    [],
-  )
+    []
+  );
 
-  const toggleMenu = () => setMenuOpen((open) => !open)
-  const closeMenu = () => setMenuOpen(false)
+  const toggleMenu = () => setMenuOpen((open) => !open);
+  const closeMenu = () => setMenuOpen(false);
   const toggleSearch = (event) => {
-    event.preventDefault()
-    setSearchOpen((open) => !open)
-  }
-   useEffect(() => {
+    event.preventDefault();
+    setSearchOpen((open) => !open);
+  };
+  useEffect(() => {
     listProduct().then(setProducts);
   }, []);
   return (
     <div className="app">
-      <div id="header-wrap" className={isSearchOpen ? 'show' : ''}>
+      <div id="header-wrap" className={isSearchOpen ? "show" : ""}>
         <div className="top-content">
           <div className="container-fluid">
             <div className="row">
@@ -178,7 +182,11 @@ useEffect(() => {
               </div>
               <div className="col-md-6">
                 <div className="right-element">
-                  <a href="#" className="user-account for-buy" onClick={handleAccount}>
+                  <a
+                    href="#"
+                    className="user-account for-buy"
+                    onClick={handleAccount}
+                  >
                     <i className="icon icon-user"></i>
                     <span>Account</span>
                   </a>
@@ -190,21 +198,29 @@ useEffect(() => {
                     <div className="search-bar">
                       <a
                         href="#"
-                        className={classNames('search-button', 'search-toggle', { active: isSearchOpen })}
+                        className={classNames(
+                          "search-button",
+                          "search-toggle",
+                          { active: isSearchOpen }
+                        )}
                         onClick={toggleSearch}
                         data-selector="#header-wrap"
                       >
                         <i className="icon icon-search"></i>
                       </a>
-                      <form role="search" className="search-box" onSubmit={(e) => e.preventDefault()}>
-                      <input 
-                        className="search-field text search-input" 
-                        placeholder="Search" 
-                        type="search" 
-                        value={searchQuery} // Kết nối với state
-                        onChange={(e) => setSearchQuery(e.target.value)} // Cập nhật state khi gõ
-                      />
-                    </form>
+                      <form
+                        role="search"
+                        className="search-box"
+                        onSubmit={(e) => e.preventDefault()}
+                      >
+                        <input
+                          className="search-field text search-input"
+                          placeholder="Search"
+                          type="search"
+                          value={searchQuery} // Kết nối với state
+                          onChange={(e) => setSearchQuery(e.target.value)} // Cập nhật state khi gõ
+                        />
+                      </form>
                     </div>
                   </div>
                 </div>
@@ -213,7 +229,7 @@ useEffect(() => {
           </div>
         </div>
 
-        <header id="header" className={classNames({ 'fixed-top': isSticky })}>
+        <header id="header" className={classNames({ "fixed-top": isSticky })}>
           <div className="container-fluid">
             <div className="row">
               <div className="col-md-2">
@@ -226,40 +242,73 @@ useEffect(() => {
               <div className="col-md-10">
                 <nav id="navbar">
                   <div className="main-menu stellarnav">
-                    <ul className={classNames('menu-list', { responsive: isMenuOpen })}>
+                    <ul
+                      className={classNames("menu-list", {
+                        responsive: isMenuOpen,
+                      })}
+                    >
                       <li className="menu-item active">
-                        <a href="#home" className="nav-link" onClick={closeMenu}>
+                        <a
+                          href="#home"
+                          className="nav-link"
+                          onClick={closeMenu}
+                        >
                           Home
                         </a>
                       </li>
                       <li className="menu-item">
-                        <a href="#pages" className="nav-link" onClick={closeMenu}>
+                        <a
+                          href="#pages"
+                          className="nav-link"
+                          onClick={closeMenu}
+                        >
                           Pages
                         </a>
                       </li>
                       <li className="menu-item">
-                        <a href="#featured-books" className="nav-link" onClick={closeMenu}>
+                        <a
+                          href="#featured-books"
+                          className="nav-link"
+                          onClick={closeMenu}
+                        >
                           Featured
                         </a>
                       </li>
                       <li className="menu-item">
-                        <a href="#popular-books" className="nav-link" onClick={closeMenu}>
+                        <a
+                          href="#popular-books"
+                          className="nav-link"
+                          onClick={closeMenu}
+                        >
                           Popular
                         </a>
                       </li>
                       <li className="menu-item">
-                        <a href="#special-offer" className="nav-link" onClick={closeMenu}>
+                        <a
+                          href="#special-offer"
+                          className="nav-link"
+                          onClick={closeMenu}
+                        >
                           Offer
                         </a>
                       </li>
                       <li className="menu-item">
-                        <a href="#latest-blog" className="nav-link" onClick={closeMenu}>
+                        <a
+                          href="#latest-blog"
+                          className="nav-link"
+                          onClick={closeMenu}
+                        >
                           Articles
                         </a>
                       </li>
                       {/* Download App menu item removed */}
                     </ul>
-                    <div className={classNames('hamburger', { active: isMenuOpen })} onClick={toggleMenu}>
+                    <div
+                      className={classNames("hamburger", {
+                        active: isMenuOpen,
+                      })}
+                      onClick={toggleMenu}
+                    >
                       <span className="bar"></span>
                       <span className="bar"></span>
                       <span className="bar"></span>
@@ -285,12 +334,19 @@ useEffect(() => {
                       <h2 className="banner-title">{slide.title}</h2>
                       <p>{slide.description}</p>
                       <div className="btn-wrap">
-                        <a href="#" className="btn btn-outline-accent btn-accent-arrow">
+                        <a
+                          href="#"
+                          className="btn btn-outline-accent btn-accent-arrow"
+                        >
                           Read More<i className="icon icon-ns-arrow-right"></i>
                         </a>
                       </div>
                     </div>
-                    <img src={slide.image} alt={slide.title} className="banner-image" />
+                    <img
+                      src={slide.image}
+                      alt={slide.title}
+                      className="banner-image"
+                    />
                   </div>
                 ))}
               </Slider>
@@ -327,22 +383,22 @@ useEffect(() => {
                 </div>
                 <h2 className="section-title">Featured Books</h2>
               </div>
-                   
+
               <div className="product-list" data-aos="fade-up">
-              <div className="row">
-                {filteredProducts.length > 0 ? (
-                  filteredProducts.map((book) => (
-                    <div className="col-md-3" key={book.id}>
-                      <ProductCard {...book} />
+                <div className="row">
+                  {filteredProducts.length > 0 ? (
+                    filteredProducts.map((book) => (
+                      <div className="col-md-3" key={book.id}>
+                        <ProductCard {...book} />
+                      </div>
+                    ))
+                  ) : (
+                    <div className="col-12 text-center py-5">
+                      <p>Không tìm thấy sách phù hợp với "{searchQuery}"</p>
                     </div>
-                  ))
-                ) : (
-                  <div className="col-12 text-center py-5">
-                    <p>Không tìm thấy sách phù hợp với "{searchQuery}"</p>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
             </div>
           </div>
           <div className="row">
@@ -365,12 +421,18 @@ useEffect(() => {
               <div className="row align-items-center g-4 g-lg-5">
                 <div className="col-12 col-lg-6">
                   <figure className="products-thumb">
-                    <img src={bestSelling.image} alt="book" className="single-image w-100" />
+                    <img
+                      src={bestSelling.image}
+                      alt="book"
+                      className="single-image w-100"
+                    />
                   </figure>
                 </div>
                 <div className="col-12 col-lg-6">
                   <div className="product-entry">
-                    <h2 className="section-title divider">{bestSelling.title}</h2>
+                    <h2 className="section-title divider">
+                      {bestSelling.title}
+                    </h2>
                     <div className="products-content">
                       <div className="author-name">{bestSelling.author}</div>
                       <h3 className="item-title">{bestSelling.bookTitle}</h3>
@@ -378,7 +440,8 @@ useEffect(() => {
                       <div className="item-price">{bestSelling.price}</div>
                       <div className="btn-wrap">
                         <a href="#" className="btn-accent-arrow">
-                          shop it now <i className="icon icon-ns-arrow-right"></i>
+                          shop it now{" "}
+                          <i className="icon icon-ns-arrow-right"></i>
                         </a>
                       </div>
                     </div>
@@ -406,7 +469,7 @@ useEffect(() => {
                   <li
                     key={key}
                     data-tab-target={`#${key}`}
-                    className={classNames('tab', { active: activeTab === key })}
+                    className={classNames("tab", { active: activeTab === key })}
                     onClick={() => setActiveTab(key)}
                   >
                     {tabLabels[key] ?? key}
@@ -426,7 +489,10 @@ useEffect(() => {
                       <>
                         <div className="row">
                           {items.slice(0, 4).map((book) => (
-                            <div className="col-md-3" key={`${key}-${book.title}`}>
+                            <div
+                              className="col-md-3"
+                              key={`${key}-${book.title}`}
+                            >
                               <ProductCard {...book} />
                             </div>
                           ))}
@@ -434,7 +500,10 @@ useEffect(() => {
                         {items.length > 4 && (
                           <div className="row">
                             {items.slice(4).map((book) => (
-                              <div className="col-md-3" key={`${key}-${book.title}-extra`}>
+                              <div
+                                className="col-md-3"
+                                key={`${key}-${book.title}-extra`}
+                              >
                                 <ProductCard {...book} />
                               </div>
                             ))}
@@ -455,8 +524,8 @@ useEffect(() => {
           <h2 className="section-title divider">Quote of the day</h2>
           <blockquote data-aos="fade-up">
             <q>
-              “The more that you read, the more things you will know. The more that you learn, the more places you’ll
-              go.”
+              “The more that you read, the more things you will know. The more
+              that you learn, the more places you’ll go.”
             </q>
             <div className="author-name">Dr. Seuss</div>
           </blockquote>
@@ -492,17 +561,23 @@ useEffect(() => {
               <div className="row">
                 <div className="col-md-6">
                   <div className="title-element">
-                    <h2 className="section-title divider">Subscribe to our newsletter</h2>
+                    <h2 className="section-title divider">
+                      Subscribe to our newsletter
+                    </h2>
                   </div>
                 </div>
                 <div className="col-md-6">
                   <div className="subscribe-content" data-aos="fade-up">
                     <p>
-                      Sed eu feugiat amet, libero ipsum enim pharetra hac dolor sit amet, consectetur. Elit adipiscing
-                      enim pharetra hac.
+                      Sed eu feugiat amet, libero ipsum enim pharetra hac dolor
+                      sit amet, consectetur. Elit adipiscing enim pharetra hac.
                     </p>
                     <form id="form">
-                      <input type="text" name="email" placeholder="Enter your email addresss here" />
+                      <input
+                        type="text"
+                        name="email"
+                        placeholder="Enter your email addresss here"
+                      />
                       <button className="btn-subscribe">
                         <span>send</span>
                         <i className="icon icon-send"></i>
@@ -529,10 +604,18 @@ useEffect(() => {
               <div className="row">
                 {blogPosts.map((post, index) => (
                   <div className="col-md-4" key={post.title + index}>
-                    <article className="column" data-aos="fade-up" data-aos-delay={index * 200}>
+                    <article
+                      className="column"
+                      data-aos="fade-up"
+                      data-aos-delay={index * 200}
+                    >
                       <figure>
                         <a href="#" className="image-hvr-effect">
-                          <img src={post.image} alt="post" className="post-image" />
+                          <img
+                            src={post.image}
+                            alt="post"
+                            className="post-image"
+                          />
                         </a>
                       </figure>
                       <div className="post-item">
@@ -569,8 +652,13 @@ useEffect(() => {
               </div>
               <div className="row">
                 <div className="btn-wrap align-center">
-                  <a href="#" className="btn btn-outline-accent btn-accent-arrow" tabIndex={0}>
-                    Read All Articles<i className="icon icon-ns-arrow-right"></i>
+                  <a
+                    href="#"
+                    className="btn btn-outline-accent btn-accent-arrow"
+                    tabIndex={0}
+                  >
+                    Read All Articles
+                    <i className="icon icon-ns-arrow-right"></i>
                   </a>
                 </div>
               </div>
@@ -587,11 +675,16 @@ useEffect(() => {
             <div className="col-md-4">
               <div className="footer-item">
                 <div className="company-brand">
-                  <img src={brandAssets.logo} alt="logo" className="footer-logo" />
+                  <img
+                    src={brandAssets.logo}
+                    alt="logo"
+                    className="footer-logo"
+                  />
                   <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sagittis sed ptibus liberolectus nonet
-                    psryroin. Amet sed lorem posuere sit iaculis amet, ac urna. Adipiscing fames semper erat ac in
-                    suspendisse iaculis.
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    Sagittis sed ptibus liberolectus nonet psryroin. Amet sed
+                    lorem posuere sit iaculis amet, ac urna. Adipiscing fames
+                    semper erat ac in suspendisse iaculis.
                   </p>
                 </div>
               </div>
@@ -692,8 +785,12 @@ useEffect(() => {
                 <div className="row">
                   <div className="col-md-6">
                     <p>
-                      © 2022 All rights reserved. Free HTML Template by{' '}
-                      <a href="https://www.templatesjungle.com/" target="_blank" rel="noreferrer">
+                      © 2022 All rights reserved. Free HTML Template by{" "}
+                      <a
+                        href="https://www.templatesjungle.com/"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
                         TemplatesJungle
                       </a>
                     </p>
@@ -721,7 +818,7 @@ useEffect(() => {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

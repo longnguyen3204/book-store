@@ -9,11 +9,13 @@ import ProfilePage from "./pages/Client/Profile/ProfilePage";
 import DetailProduct from "./pages/Client/BookDetailPage";
 import SearchPage from "./pages/Client/SearchPage";
 
+import AdminDoashBoard from "./pages/Admin/Dashboard";
 function AdminPlaceholder() {
   return (
     <div style={{ padding: "4rem", textAlign: "center" }}>
-      <h1>Admin dashboard</h1>
-      <p>Chưa có trang admin. Bạn đã đăng nhập với vai trò admin.</p>
+      <h1>
+        <AdminDoashBoard />
+      </h1>
     </div>
   );
 }

@@ -12,7 +12,10 @@ function ProductCard({ book }) {
           <p className="text-muted mb-1">{book.author}</p>
           <p className="text-danger fw-bold">{book.price} đ</p>
         </div>
-        <Link to={`/books/${book.id}`} className="btn btn-primary btn-sm w-100">
+        <Link
+          to={`/product/${book.id}`}
+          className="btn btn-primary btn-sm w-100"
+        >
           Xem chi tiết
         </Link>
       </div>
