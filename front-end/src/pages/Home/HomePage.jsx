@@ -4,18 +4,6 @@ import classNames from "classnames";
 import AOS from "aos";
 import { Link } from "react-router-dom";
 
-// Lưu ý: Đường dẫn import data cần thêm "../" để thoát ra khỏi thư mục components
-import {
-  heroSlides,
-  clientLogos,
-  featuredBooks,
-  bestSelling,
-  popularBooks,
-  specialOffers,
-  blogPosts,
-  brandAssets,
-} from "../../data/content";
-
 const Arrow = ({ direction, onClick }) => (
   <button
     type="button"

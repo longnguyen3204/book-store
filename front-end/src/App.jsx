@@ -1,8 +1,7 @@
 import { Routes, Route } from "react-router-dom";
-import "./App.css";
-import HomePage from "./components/Home/HomePage";
-import LoginPage from "./components/Login/LoginPage";
-import RegisterPage from "./components/Register/RegisterPage";
+import HomePage from "./pages/Home/HomePage";
+import LoginPage from "./pages/Login/LoginPage";
+import RegisterPage from "./pages/Register/RegisterPage";
 
 function App() {
   return (
@@ -15,4 +14,3 @@ function App() {
 }
 
 export default App;
-1;
