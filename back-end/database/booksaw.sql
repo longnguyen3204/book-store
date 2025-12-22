@@ -52,6 +52,7 @@ CREATE TABLE categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description TEXT
+    is_activity BOOLEAN DEFAULT TRUE
 );
 
 -- Bảng Sách (Thông tin chính)
@@ -170,7 +171,7 @@ CREATE TABLE orders (
     voucher_id INT NULL,                 -- Có thể null nếu không dùng voucher
     order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     total_amount DECIMAL(10, 2) NOT NULL, -- Tổng tiền cuối cùng
-    status ENUM('pending', 'processing', 'shipped', 'delivered', 'cancelled') DEFAULT 'pending',
+    status ENUM('pending', 'processing', 'shipping', 'completed', 'cancelled') DEFAULT 'pending',
     shipping_address TEXT NOT NULL,       -- Địa chỉ giao hàng
     note TEXT,                            -- Ghi chú của khách
     FOREIGN KEY (user_id) REFERENCES users(id),

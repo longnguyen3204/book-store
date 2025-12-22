@@ -1,4 +1,5 @@
 const Book = require("../models/Book");
+const multer = require("multer");
 
 //Hiển thị danh sách các sách hiện có
 exports.getBooks = async (req, res) => {
@@ -55,94 +56,95 @@ exports.getBooks = async (req, res) => {
   }
 };
 
-// Thêm sách mới
-exports.addBook = async (req, res) => {
-  try {
-    const {
-      publisher_id,
-      name,
-      isbn,
-      description,
-      original_price,
-      price,
-      publish_year,
-      language,
-      weight,
-      size,
-      page_count,
-    } = req.body;
-
-    if (!name || !original_price || !price) {
-      return res
-        .status(400)
-        .json({ message: "Vui lòng nhập tên sách, giá gốc và giá bán!" });
-    }
-
-    // Kiểm tra trường giá và năm xuất bản
-    if (isNaN(original_price) || isNaN(price)) {
-      return res.status(400).json({ message: "Giá phải là số hợp lệ." });
-    }
-
-    if (publish_year && isNaN(publish_year)) {
-      return res.status(400).json({ message: "Năm phát hành phải là số." });
-    }
-
-    const result = await Book.create({
-      publisher_id,
-      name,
-      isbn,
-      description,
-      original_price,
-      price,
-      publish_year,
-      language,
-      weight,
-      size,
-      page_count,
-    });
-
-    res.status(201).json({
-      message: "Thêm sách thành công!",
-      bookId: result.insertId, // Trả về ID của cuốn sách vừa tạo
-    });
-  } catch (error) {
-    console.error("Lỗi thêm sách:", error);
-    res.status(500).json({ message: "Lỗi Server khi thêm sách" });
-  }
-};
-
-// Cập nhật thông tin sách
 exports.updateBook = async (req, res) => {
   try {
-    const bookId = req.params.id; // Lấy ID từ đường dẫn (số 1, 2...)
-    const updateData = req.body; // Lấy dữ liệu mới từ Postman gửi lên
-
-    // Kiểm tra id có phải số không
-    if (isNaN(bookId)) {
-      return res.status(400).json({ message: "ID sách không hợp lệ." });
-    }
-
-    // Kiểm tra xem sách có tồn tại không
+    const bookId = req.params.id;
     const existingBook = await Book.findById(bookId);
-    if (!existingBook) {
-      return res.status(404).json({ message: "Không tìm thấy cuốn sách này!" });
-    }
+    if (!existingBook)
+      return res.status(404).json({ message: "Không tìm thấy!" });
 
-    // Cập nhật thông tin sách
+    // Lấy dữ liệu từ req.body (do multer xử lý)
+    const b = req.body;
+
     const dataToUpdate = {
-      ...existingBook, // Copy toàn bộ dữ liệu cũ
-      ...updateData, // Đè dữ liệu mới lên
+      name: b.name || existingBook.name,
+      publisher_id: b.publisher_id
+        ? parseInt(b.publisher_id, 10)
+        : existingBook.publisher_id,
+      category_id: b.category_id
+        ? parseInt(b.category_id, 10)
+        : existingBook.category_id,
+      author: b.author || existingBook.author,
+
+      // ÉP KIỂU SỐ CHO QUANTITY - KHÔNG ĐỂ VỀ 0 NẾU CÓ DỮ LIỆU
+      quantity:
+        b.quantity !== undefined && b.quantity !== ""
+          ? parseInt(b.quantity, 10)
+          : existingBook.quantity,
+
+      sold_count:
+        b.sold_count !== undefined && b.sold_count !== ""
+          ? parseInt(b.sold_count, 10)
+          : existingBook.sold_count,
+
+      original_price: b.original_price
+        ? parseFloat(b.original_price)
+        : existingBook.original_price,
+      price: b.price ? parseFloat(b.price) : existingBook.price,
+      publish_year: b.publish_year
+        ? parseInt(b.publish_year, 10)
+        : existingBook.publish_year,
+      page_count: b.page_count
+        ? parseInt(b.page_count, 10)
+        : existingBook.page_count,
+      description: b.description || existingBook.description,
     };
 
-    await Book.updateBookInfo(bookId, dataToUpdate);
+    if (req.file) dataToUpdate.image = req.file.path;
 
-    res.json({ message: "Cập nhật thông tin sách thành công!" });
+    await Book.updateBookInfo(bookId, dataToUpdate);
+    res.json({ message: "Cập nhật thành công!" });
   } catch (error) {
-    console.error("Lỗi cập nhật thông tin sách", error);
+    console.error("Lỗi cập nhật sách:", error);
     res.status(500).json({ message: "Lỗi server" });
   }
 };
 
+// Thêm sách mới
+exports.addBook = async (req, res) => {
+  try {
+    const b = req.body;
+
+    const bookData = {
+      name: b.name,
+      author: b.author,
+      publisher_id: parseInt(b.publisher_id, 10) || null,
+      category_id: parseInt(b.category_id, 10) || null,
+      quantity: parseInt(b.quantity, 10) || 0, // Đảm bảo là số
+      isbn: b.isbn,
+      description: b.description,
+      original_price: parseFloat(b.original_price) || 0,
+      price: parseFloat(b.price) || 0,
+      publish_year: parseInt(b.publish_year, 10) || null,
+      language: b.language,
+      weight: b.weight,
+      size: b.size,
+      page_count: parseInt(b.page_count, 10) || null,
+    };
+
+    if (req.file) {
+      bookData.image = req.file.path;
+    }
+
+    const result = await Book.create(bookData);
+    res
+      .status(201)
+      .json({ message: "Thêm sách thành công!", bookId: result.insertId });
+  } catch (error) {
+    console.error("Lỗi thêm sách:", error);
+    res.status(500).json({ message: "Lỗi Server" });
+  }
+};
 // Xem thông tin chi tiết của 1 quyển sách
 exports.getBookDetail = async (req, res) => {
   try {

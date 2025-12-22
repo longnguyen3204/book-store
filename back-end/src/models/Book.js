@@ -35,24 +35,30 @@ class Book {
 
   static async getAll() {
     const sql = `
-            SELECT 
-                b.id,
-                b.name,
-                b.description,
-                b.original_price,
-                b.price,
-                b.sold_count,
-                b.quantity,
-                b.page_count,
-                b.publish_year,
-                b.is_active,
-                (SELECT a.name 
-                 FROM book_authors ba 
-                 JOIN authors a ON a.id = ba.author_id 
-                 WHERE ba.book_id = b.id 
-                 LIMIT 1) AS author,
-                (${Book.thumbnailSql}) AS image
-            FROM books b `;
+      SELECT 
+          b.id,
+          b.name,
+          b.description,
+          b.original_price,
+          b.price,
+          b.sold_count,
+          b.quantity,
+          b.page_count,
+          b.publish_year,
+          b.is_active,
+          (SELECT a.name 
+           FROM book_authors ba 
+           JOIN authors a ON a.id = ba.author_id 
+           WHERE ba.book_id = b.id 
+           LIMIT 1) AS author,
+          -- THÊM DÒNG NÀY ĐỂ LẤY THỂ LOẠI
+          (SELECT c.name 
+           FROM book_categories bc 
+           JOIN categories c ON c.id = bc.category_id 
+           WHERE bc.book_id = b.id 
+           LIMIT 1) AS category_name,
+          (${Book.thumbnailSql}) AS image
+      FROM books b `;
     const [rows] = await db.query(sql);
     return rows;
   }
@@ -141,11 +147,13 @@ class Book {
   static async create(bookInfo) {
     const {
       publisher_id,
+      category_id, // Nhận thêm từ controller
       name,
       isbn,
       description,
       original_price,
       price,
+      quantity, // Nhận thêm từ controller
       language,
       weight,
       size,
@@ -153,12 +161,12 @@ class Book {
       page_count,
     } = bookInfo;
 
+    // 1. Lưu vào bảng books (Thêm quantity vào đây)
     const sql = `INSERT INTO books (
-            publisher_id, name, isbn, description, original_price, price, 
-            language, weight, size, publish_year, page_count
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+          publisher_id, name, isbn, description, original_price, price, 
+          quantity, language, weight, size, publish_year, page_count
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-    // Thực thi lệnh insert
     const [result] = await db.query(sql, [
       publisher_id,
       name,
@@ -166,12 +174,23 @@ class Book {
       description,
       original_price,
       price,
+      quantity || 0,
       language,
       weight,
       size,
       publish_year,
       page_count,
     ]);
+
+    const newBookId = result.insertId;
+
+    // 2. Lưu vào bảng trung gian book_categories
+    if (category_id) {
+      await db.query(
+        "INSERT INTO book_categories (book_id, category_id) VALUES (?, ?)",
+        [newBookId, category_id]
+      );
+    }
 
     return result;
   }
