@@ -1,0 +1,42 @@
+.shop-page .section-title {
+  font-family: "Prata", serif;
+  font-size: 3rem;
+  color: #222;
+}
+
+.shop-page .product-style {
+  position: relative;
+  overflow: hidden;
+  background: #f3f3f3;
+}
+
+.shop-page .product-style img {
+  transition: transform 0.5s ease;
+  height: 350px;
+  object-fit: cover;
+}
+
+.shop-page .product-item:hover img {
+  transform: scale(1.1);
+}
+
+.shop-page .add-to-cart {
+  position: absolute;
+  bottom: -50px;
+  left: 0;
+  width: 100%;
+  background: #c5a992;
+  color: white;
+  border: none;
+  padding: 10px;
+  transition: bottom 0.3s ease;
+}
+
+.shop-page .product-item:hover .add-to-cart {
+  bottom: 0;
+}
+
+.shop-page .search-input {
+  border-radius: 0;
+  border: 1px solid #ddd;
+}

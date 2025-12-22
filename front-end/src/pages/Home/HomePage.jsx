@@ -3,6 +3,10 @@ import Slider from "react-slick";
 import classNames from "classnames";
 import AOS from "aos";
 import { Link } from "react-router-dom";
+import { useCart } from "../../context/CartContext";
+import {specialOffers,blogPosts, popularBooks, bestSelling,featuredBooks, heroSlides, clientLogos, brandAssets } from "../../data/content.js";
+// Thêm đoạn này vào đầu file HomePage.jsx, sau các dòng import
+// Thêm đoạn này để chặn tất cả các lỗi "is not defined"
 
 const Arrow = ({ direction, onClick }) => (
   <button
@@ -20,14 +24,14 @@ const Arrow = ({ direction, onClick }) => (
   </button>
 );
 
-const ProductCard = ({ title, author, price, image, prevPrice }) => (
+const ProductCard = ({ id, title, author, price, image, prevPrice, onAdd }) => (
   <div className="product-item">
     <figure className="product-style">
       <img src={image} alt={title} className="product-item" />
       <button
         type="button"
         className="add-to-cart"
-        data-product-tile="add-to-cart"
+        onClick={() => onAdd({ id, title, author, price, image })} // Gọi hàm onAdd khi click
       >
         Add to Cart
       </button>
@@ -43,7 +47,7 @@ const ProductCard = ({ title, author, price, image, prevPrice }) => (
   </div>
 );
 
-const HomePage = ({ onAccountClick }) => {
+const HomePage = ({ user }) => {
   const [activeTab, setActiveTab] = useState("all-genre");
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [isSearchOpen, setSearchOpen] = useState(false);
@@ -55,6 +59,10 @@ const HomePage = ({ onAccountClick }) => {
     romantic: "Romantic",
     adventure: "Adventure",
     fictional: "Fictional",
+  };
+  const handleAddToCart = (book) => {
+    addToCart(book); // Gọi hàm từ context
+    alert(`Đã thêm "${book.title}" vào giỏ hàng!`);
   };
 
   useEffect(() => {
@@ -148,15 +156,28 @@ const HomePage = ({ onAccountClick }) => {
               </div>
               <div className="col-md-6">
                 <div className="right-element">
-                  <Link to="/login" className="user-account for-buy">
-                    <i className="icon icon-user"></i>
-                    <span>Account</span>
-                  </Link>
+                  {user ? (
+  /* Nếu đã đăng nhập: Hiển thị tên và dẫn đến trang Profile */
+                <Link to="/profile" className="user-account for-buy">
+                  <i className="icon icon-user"></i>
+                  <span>{user.fullname || "Profile"}</span>
+                </Link>
+              ) : (
+                /* Nếu chưa đăng nhập: Hiển thị "Account" và dẫn đến trang Login */
+                <Link to="/login" className="user-account for-buy">
+                  <i className="icon icon-user"></i>
+                  <span>Account</span>
+                </Link>
+              )}
 
-                  <a href="#" className="cart for-buy">
+                  <a href="/cart" className="cart for-buy">
                     <i className="icon icon-clipboard"></i>
                     <span>Cart:(0 $)</span>
                   </a>
+                  <Link to="/order-history" className="history for-buy">
+                    <i className="icon icon-history"></i> {/* Hoặc icon-time, icon-search tùy bộ font của bạn */}
+                    <span>History</span>
+                  </Link>
                   <div className="action-menu">
                     <div className="search-bar">
                       <a
@@ -250,6 +271,10 @@ const HomePage = ({ onAccountClick }) => {
                           Articles
                         </a>
                       </li>
+                       
+                    <li className="menu-item">
+                      <Link to="/shop" className="nav-link">Library</Link>
+                    </li>
                     </ul>
                     <div
                       className={classNames("hamburger", {
@@ -671,6 +696,7 @@ const HomePage = ({ onAccountClick }) => {
                   <li className="menu-item">
                     <a href="#">Advanced Search</a>
                   </li>
+                  
                 </ul>
               </div>
             </div>

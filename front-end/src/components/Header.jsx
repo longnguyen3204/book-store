@@ -11,14 +11,14 @@ import {
 } from "@ant-design/icons";
 import logo from "../assets/images/main-logo.png"; //
 import "./header.css";
-
+import { useCart } from "../context/CartContext";
 function Header() {
   const navigate = useNavigate();
   const [keyword, setKeyword] = useState("");
-
+const { cart } = useCart();
   // Giả lập dữ liệu người dùng
   const dataUser = null;
-  const cartProducts = [];
+  //const cartProducts = [];
 
   // Trong Header.jsx
   const handleSearch = (e) => {
@@ -77,10 +77,10 @@ function Header() {
             )}
 
             <Link to="/cart" className="cart">
-              <Badge count={cartProducts.length} size="small" offset={[5, 0]}>
+              <Badge count={cart.length} size="small" offset={[5, 0]}>
                 <ShoppingCartOutlined />
               </Badge>
-              <span>Cart: ($0)</span>
+              <span>Cart: ({cart.length})</span>
             </Link>
           </div>
         </div>

@@ -1,0 +1,14 @@
+# Chặn thư mục node_modules ở mọi cấp độ
+node_modules/
+**/node_modules/
+
+# Chặn tệp cấu hình môi trường và bảo mật
+.env
+**/.env
+
+# Chặn tệp build của React (Vite)
+front-end/dist/
+
+# Chặn các tệp rác của hệ điều hành
+.DS_Store
+Thumbs.db

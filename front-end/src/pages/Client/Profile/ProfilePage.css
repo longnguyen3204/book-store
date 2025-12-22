@@ -85,13 +85,18 @@
 .btn {
   border: none;
   border-radius: 10px;
-  padding: 12px 18px;
+  padding: 12px 24px; /* Tăng padding để nút trông đầy đặn hơn */
   font-weight: 700;
   cursor: pointer;
-  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
-  background: #b36c4d;
+  transition: all 0.2s ease;
+  
+  /* Màu nâu đặc trưng của nút Chỉnh sửa / Lưu thay đổi */
+  background: #b36c4d; 
   color: #fff;
-  box-shadow: 0 10px 20px rgba(179, 108, 77, 0.25);
+  box-shadow: 0 8px 16px rgba(179, 108, 77, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn.secondary {
@@ -99,13 +104,54 @@
   color: #5c4437;
   box-shadow: none;
 }
+.btn.secondary:hover {
+  background: #e6d0bc;
+  transform: translateY(-2px);
+  color: #3e2d25;
+}
 
 .btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 12px 22px rgba(179, 108, 77, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 22px rgba(179, 108, 77, 0.35);
+  filter: brightness(1.1);
 }
 
 .btn:active {
   transform: translateY(0);
   opacity: 0.9;
+}
+.edit-input {
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 60%;
+  color: #333;
+}
+
+.edit-input:focus {
+  outline: none;
+  border-color: #b36c4d; /* Màu nâu đặc trưng của BOOKSAW */
+}
+
+.btn.outline {
+  border: none;
+  border-radius: 10px;
+  padding: 12px 24px; /* Tăng padding để nút trông đầy đặn hơn */
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  /* Màu nâu đặc trưng của nút Chỉnh sửa / Lưu thay đổi */
+  background: #b36c4d; 
+  color: #fff;
+  box-shadow: 0 8px 16px rgba(179, 108, 77, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn.outline:hover {
+  background: #ff4d4f;
+  color: #fff;
+  transform: translateY(-2px);
 }

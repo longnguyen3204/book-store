@@ -98,4 +98,22 @@ exports.login = async (req, res) => {
         console.error("Lỗi đăng nhập:", error);
         res.status(500).json({ message: "Lỗi Server khi đăng nhập" });
     }
+    
+};
+// Thêm vào controllers/authController.js hoặc userController.js
+exports.updateProfile = async (req, res) => {
+    try {
+        const { id, fullname, phone_number, address, email } = req.body;
+
+        // 1. Kiểm tra ID người dùng
+        if (!id) return res.status(400).json({ message: "Thiếu ID người dùng" });
+
+        // 2. Gọi hàm updateProfile trong Model User.js
+        await User.updateProfile(id, { fullname, phone_number, address, email });
+
+        res.status(200).json({ message: "Cập nhật thông tin thành công!" });
+    } catch (error) {
+        console.error("Lỗi cập nhật:", error);
+        res.status(500).json({ message: "Lỗi Server khi cập nhật thông tin" });
+    }
 };

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./LoginPage.css";
 import { login as loginApi } from "../../api/authApi";
 
@@ -14,21 +15,33 @@ const BookIcon = () => (
 );
 
 export default function LoginPage({ onLogin }) {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (submitting) return;
     setError("");
+    setSuccess("");
     setSubmitting(true);
     try {
       const result = await loginApi({ email, password });
+      let targetPath = "/";
       if (onLogin) {
-        await onLogin(result);
+        targetPath = (await onLogin(result)) || "/";
+      } else {
+        // Fallback nếu không truyền onLogin: vẫn lưu localStorage và điều hướng theo role
+        if (result?.token) localStorage.setItem("token", result.token);
+        if (result?.user) localStorage.setItem("user", JSON.stringify(result.user));
+        targetPath = result?.user?.role_id === 1 ? "/admin" : "/";
       }
+
+      setSuccess("Đăng nhập thành công! Đang chuyển trang...");
+      setTimeout(() => navigate(targetPath), 800);
     } catch (err) {
       setError(err?.message || "Đăng nhập thất bại");
     } finally {
@@ -47,11 +60,12 @@ export default function LoginPage({ onLogin }) {
           <h1 className="title">Đăng Nhập</h1>
         </div>
 
+        {success && <div className="success-text">{success}</div>}
         {error && <div className="error-text">{error}</div>}
 
         <form className="login-form" onSubmit={handleSubmit}>
           <label className="form-label" htmlFor="email">
-            Email Address
+            Email
           </label>
           <input
             id="email"
@@ -65,7 +79,7 @@ export default function LoginPage({ onLogin }) {
           />
 
           <label className="form-label" htmlFor="password">
-            Password
+            Mật khẩu
           </label>
           <input
             id="password"

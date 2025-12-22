@@ -21,6 +21,33 @@ export async function login(credentials) {
   }
 }
 
+export async function register(payload) {
+  try {
+    // Backend expect: fullname, email, password, phone_number (optional)
+    const body = {
+      fullname: payload.fullname,
+      email: payload.email,
+      password: payload.password,
+      phone_number: payload.phone_number || null,
+    };
+    const response = await api.post("/auth/register", body);
+    return response.data;
+  } catch (error) {
+    const message = error.response?.data?.message || "Đăng ký thất bại";
+    throw new Error(message);
+  }
+}
+
 export default {
   login,
+  register,
 };
+// Thêm vào src/api/authApi.js
+export async function updateProfile(data) {
+  try {
+    const response = await api.put("/users/update-profile", data);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Cập nhật thất bại");
+  }
+}

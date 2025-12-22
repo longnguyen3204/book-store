@@ -1,0 +1,122 @@
+.history-page-wrapper {
+  /* Chuyển sang màu nền kem nhạt giống Profile */
+  background-color: #f7ede2; 
+  min-height: 100vh;
+}
+
+.history-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 15px;
+}
+
+.history-title {
+  font-size: 19px;
+  font-weight: 700; /* Đậm hơn để khớp style BOOKSAW */
+  margin-bottom: 15px;
+  color: #1b1b1b;
+}
+
+/* Tabs Styling - Tone Nâu */
+.history-tabs {
+  display: flex;
+  background: #fff;
+  border-radius: 12px; /* Bo góc tròn hơn giống card Profile */
+  margin-bottom: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.tab-item {
+  flex: 1;
+  padding: 15px 0;
+  border: none;
+  background: none;
+  font-size: 14px;
+  color: #6b6b6b;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
+  font-weight: 600;
+}
+
+.tab-item.active {
+  /* Chuyển từ xanh dương sang nâu BOOKSAW */
+  color: #b36c4d; 
+  border-bottom: 3px solid #b36c4d;
+  background-color: #fff9f4; /* Nền kem rất nhẹ khi active */
+}
+
+/* Search Bar - Tone Nâu */
+.history-search-bar {
+  display: flex;
+  background: #fff;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.search-input-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  border-right: 1px solid #f0e6dc;
+  padding: 5px 10px;
+}
+
+.search-input-wrapper i {
+  color: #b36c4d; /* Icon màu nâu */
+}
+
+.search-input-wrapper input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 14px;
+  margin-left: 10px;
+  background: transparent;
+}
+
+.btn-search-order {
+  border: none;
+  background: none;
+  color: #b36c4d; /* Chữ màu nâu */
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0 15px;
+  transition: opacity 0.2s;
+}
+
+.btn-search-order:hover {
+  opacity: 0.7;
+}
+
+/* Empty State */
+.history-content-card {
+  background: #fff;
+  border-radius: 16px; /* Bo góc giống card Profile */
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.empty-order-state {
+  text-align: center;
+}
+
+.empty-order-state img {
+  width: 180px;
+  margin-bottom: 20px;
+  filter: sepia(0.3) saturate(0.8); /* Làm ảnh hơi ngả nâu để hợp tone */
+}
+
+.empty-order-state p {
+  color: #6b6b6b;
+  font-size: 16px;
+  font-weight: 500;
+}
