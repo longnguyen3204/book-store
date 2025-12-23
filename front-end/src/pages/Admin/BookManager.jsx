@@ -49,9 +49,9 @@ const BookManager = () => {
         categoryApi.fetchCategories(),
         authorApi.fetchAuthors(),
       ]);
-      setBooks(booksData);
+      setBooks([...booksData]);
       setCategories(categoriesData);
-      setAuthors(authorsData); // Fix lỗi gán sai biến gây 404 hoặc trống data
+      setAuthors(authorsData);
     } catch (err) {
       console.error("Lỗi tải dữ liệu:", err);
     }
@@ -151,6 +151,9 @@ const BookManager = () => {
 
       resetForm();
       setShowForm(false);
+      setTimeout(() => {
+        loadData();
+      }, 300);
       await loadData();
     } catch (err) {
       alert(err.message || "Thao tác thất bại");
@@ -346,20 +349,47 @@ const BookManager = () => {
           <tbody>
             {books.map((book) => (
               <tr key={book.id}>
-                <td className="fw-bold text-start ps-4">{book.name}</td>
+                <td className="fw-bold text-start ps-4">
+                  <div className="d-flex align-items-center">
+                    {book.image && (
+                      <img
+                        src={
+                          book.image.startsWith("http")
+                            ? book.image
+                            : `http://localhost:3000/${book.image}`
+                        }
+                        alt={book.name}
+                        className="rounded me-3 shadow-sm"
+                        style={{
+                          width: "40px",
+                          height: "55px",
+                          objectFit: "cover",
+                          border: "1px solid #eee",
+                        }}
+                        onError={(e) => {
+                          e.target.style.display = "none";
+                        }} // Ẩn nếu ảnh lỗi đường dẫn
+                      />
+                    )}
+                    <span>{book.name}</span>
+                  </div>
+                </td>
                 <td className="text-start">{book.author}</td>
-                <td>
-                  <span className="badge bg-info text-dark">
+                {/* ... (Giữ nguyên tất cả các thẻ <td> phía sau) */}
+                <td className=" text-center">
+                  <span className="badge bg-info text-dark ">
                     {book.category_name || getCategoryName(book)}
                   </span>
                 </td>
-                <td className="text-danger fw-bold">
+                <td className="text-danger fw-bold text-center">
                   {Number(book.price).toLocaleString()}đ
                 </td>
-                <td className="fw-bold text-primary">{book.quantity ?? 0}</td>
-                <td>
+                <td className="fw-bold text-primary  text-center">
+                  {book.quantity ?? 0}
+                </td>
+                <td className=" text-center">
                   <button
-                    className="btn btn-warning btn-sm me-2 fw-bold"
+                    className="btn btn-warning btn-sm me-2 fw-bold "
                     onClick={() => handleEdit(book)}
                   >
                     SỬA

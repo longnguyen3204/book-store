@@ -2,10 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bookController = require("../controllers/bookController");
 const roleMiddleware = require("../middlewares/roleMiddleware");
-const multer = require("multer");
-
-// Cấu hình multer lưu tạm
-const upload = multer({ dest: "uploads/" });
+const upload = require("../middlewares/imageMiddleware");
 
 // Routes
 router.get("/", bookController.getBooks);

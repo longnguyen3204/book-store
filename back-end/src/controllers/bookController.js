@@ -56,69 +56,11 @@ exports.getBooks = async (req, res) => {
   }
 };
 
-exports.updateBook = async (req, res) => {
-  try {
-    const bookId = req.params.id;
-    const existingBook = await Book.findById(bookId);
-    if (!existingBook)
-      return res.status(404).json({ message: "Không tìm thấy!" });
-
-    const b = req.body;
-
-    const dataToUpdate = {
-      name: b.name || existingBook.name,
-      publisher_id: b.publisher_id
-        ? parseInt(b.publisher_id, 10)
-        : existingBook.publisher_id,
-      category_id: b.category_id
-        ? parseInt(b.category_id, 10)
-        : existingBook.category_id,
-
-      // QUAN TRỌNG: Nhận author_id từ Frontend gửi lên
-      author_id: b.author_id
-        ? parseInt(b.author_id, 10)
-        : existingBook.author_id,
-
-      quantity:
-        b.quantity !== undefined && b.quantity !== ""
-          ? parseInt(b.quantity, 10)
-          : existingBook.quantity,
-      sold_count:
-        b.sold_count !== undefined && b.sold_count !== ""
-          ? parseInt(b.sold_count, 10)
-          : existingBook.sold_count,
-      original_price: b.original_price
-        ? parseFloat(b.original_price)
-        : existingBook.original_price,
-      price: b.price ? parseFloat(b.price) : existingBook.price,
-      publish_year: b.publish_year
-        ? parseInt(b.publish_year, 10)
-        : existingBook.publish_year,
-      page_count: b.page_count
-        ? parseInt(b.page_count, 10)
-        : existingBook.page_count,
-      description: b.description || existingBook.description,
-    };
-
-    if (req.file) dataToUpdate.image = req.file.path;
-
-    // Model updateBookInfo bây giờ sẽ nhận author_id để xử lý bảng trung gian
-    await Book.updateBookInfo(bookId, dataToUpdate);
-    res.json({ message: "Cập nhật thành công!" });
-  } catch (error) {
-    console.error("Lỗi cập nhật sách:", error);
-    res.status(500).json({ message: "Lỗi server" });
-  }
-};
-
-// Thêm sách mới
 exports.addBook = async (req, res) => {
   try {
     const b = req.body;
-
     const bookData = {
       name: b.name,
-      // Nhận ID thay vì tên text
       author_id: parseInt(b.author_id, 10) || null,
       publisher_id: parseInt(b.publisher_id, 10) || null,
       category_id: parseInt(b.category_id, 10) || null,
@@ -134,18 +76,70 @@ exports.addBook = async (req, res) => {
       page_count: parseInt(b.page_count, 10) || null,
     };
 
+    // TÍCH HỢP ẢNH: Lấy đường dẫn file từ Multer
     if (req.file) {
       bookData.image = req.file.path;
     }
 
     const result = await Book.create(bookData);
-    res.status(201).json({
-      message: "Thêm sách thành công!",
-      bookId: result.insertId || result.id,
-    });
+    res
+      .status(201)
+      .json({ message: "Thêm sách thành công!", bookId: result.insertId });
   } catch (error) {
-    console.error("Lỗi thêm sách:", error);
     res.status(500).json({ message: "Lỗi Server" });
+  }
+};
+
+// Cập nhật sách
+exports.updateBook = async (req, res) => {
+  try {
+    const bookId = req.params.id;
+    const existingBook = await Book.findById(bookId);
+    if (!existingBook)
+      return res.status(404).json({ message: "Không tìm thấy!" });
+
+    const b = req.body;
+    const dataToUpdate = {
+      name: b.name || existingBook.name,
+      publisher_id: b.publisher_id
+        ? parseInt(b.publisher_id, 10)
+        : existingBook.publisher_id,
+      category_id: b.category_id
+        ? parseInt(b.category_id, 10)
+        : existingBook.category_id,
+      author_id: b.author_id
+        ? parseInt(b.author_id, 10)
+        : existingBook.author_id,
+      quantity:
+        b.quantity !== undefined
+          ? parseInt(b.quantity, 10)
+          : existingBook.quantity,
+      sold_count:
+        b.sold_count !== undefined
+          ? parseInt(b.sold_count, 10)
+          : existingBook.sold_count,
+      original_price: b.original_price
+        ? parseFloat(b.original_price)
+        : existingBook.original_price,
+      price: b.price ? parseFloat(b.price) : existingBook.price,
+      publish_year: b.publish_year
+        ? parseInt(b.publish_year, 10)
+        : existingBook.publish_year,
+      page_count: b.page_count
+        ? parseInt(b.page_count, 10)
+        : existingBook.page_count,
+      description: b.description || existingBook.description,
+    };
+
+    // TÍCH HỢP ẢNH: Lấy đường dẫn file mới nếu có
+    if (req.file) {
+      dataToUpdate.image = req.file.path;
+    }
+
+    await Book.updateBookInfo(bookId, dataToUpdate);
+    res.json({ message: "Cập nhật thành công!" });
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi server" });
   }
 };
 // Xem thông tin chi tiết của 1 quyển sách

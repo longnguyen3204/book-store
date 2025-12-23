@@ -144,25 +144,26 @@ class Book {
   static async create(bookInfo) {
     const {
       publisher_id,
-      category_id, // Nhận thêm từ controller
+      category_id,
+      author_id,
       name,
       isbn,
       description,
       original_price,
       price,
-      quantity, // Nhận thêm từ controller
+      quantity,
       language,
       weight,
       size,
       publish_year,
       page_count,
+      image,
     } = bookInfo;
 
-    // 1. Lưu vào bảng books (Thêm quantity vào đây)
     const sql = `INSERT INTO books (
-          publisher_id, name, isbn, description, original_price, price, 
-          quantity, language, weight, size, publish_year, page_count
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+      publisher_id, name, isbn, description, original_price, price, 
+      quantity, language, weight, size, publish_year, page_count
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     const [result] = await db.query(sql, [
       publisher_id,
@@ -181,11 +182,31 @@ class Book {
 
     const newBookId = result.insertId;
 
-    // 2. Lưu vào bảng trung gian book_categories
     if (category_id) {
       await db.query(
         "INSERT INTO book_categories (book_id, category_id) VALUES (?, ?)",
         [newBookId, category_id]
+      );
+    }
+
+    if (author_id) {
+      await db.query(
+        "INSERT INTO book_authors (book_id, author_id) VALUES (?, ?)",
+        [newBookId, author_id]
+      );
+    }
+
+    // --- SỬA TẠI ĐÂY: CHUẨN HÓA ĐƯỜNG DẪN TRƯỚC KHI LƯU ---
+    if (image) {
+      const normalizedPath = image.replace(/\\/g, "/"); // Chuyển \ thành /
+
+      // 3. Nối thêm địa chỉ localhost
+      const finalPath = `http://localhost:3000/${normalizedPath.substring(
+        normalizedPath.indexOf("uploads/")
+      )}`;
+      await db.query(
+        "INSERT INTO book_images (book_id, image_url, is_thumbnail) VALUES (?, ?, 1)",
+        [newBookId, finalPath]
       );
     }
 
@@ -196,7 +217,7 @@ class Book {
     const {
       publisher_id,
       category_id,
-      author_id, // Nhận thêm author_id
+      author_id,
       name,
       isbn,
       description,
@@ -206,11 +227,17 @@ class Book {
       sold_count,
       publish_year,
       page_count,
+      image,
     } = data;
-
-    // 1. Cập nhật bảng books
+    const [existingBook] = await db.query(
+      "SELECT id FROM books WHERE LOWER(name) = LOWER(?) LIMIT 1",
+      [name.trim()]
+    );
+    if (existingBook.length > 0) {
+      throw new Error("Tên sách này đã tồn tại trong hệ thống!");
+    }
     const sql = `UPDATE books SET publisher_id = ?, name = ?, isbn = ?, description = ?, original_price = ?, 
-                price = ?, quantity = ?, sold_count = ?, publish_year = ?, page_count = ? WHERE id = ?`;
+               price = ?, quantity = ?, sold_count = ?, publish_year = ?, page_count = ? WHERE id = ?`;
     await db.query(sql, [
       publisher_id,
       name,
@@ -225,7 +252,6 @@ class Book {
       id,
     ]);
 
-    // 2. Cập nhật Thể loại
     if (category_id) {
       await db.query("DELETE FROM book_categories WHERE book_id = ?", [id]);
       await db.query(
@@ -234,12 +260,30 @@ class Book {
       );
     }
 
-    // 3. Cập nhật Tác giả (Thêm phần này)
     if (author_id) {
       await db.query("DELETE FROM book_authors WHERE book_id = ?", [id]);
       await db.query(
         "INSERT INTO book_authors (book_id, author_id) VALUES (?, ?)",
         [id, author_id]
+      );
+    }
+
+    // --- SỬA TẠI ĐÂY: CHUẨN HÓA ĐƯỜNG DẪN TRƯỚC KHI LƯU ---
+    if (image) {
+      const normalizedPath = image.replace(/\\/g, "/"); // Chuyển \ thành /
+
+      // 3. Nối thêm địa chỉ localhost
+      const finalPath = `http://localhost:3000/${normalizedPath.substring(
+        normalizedPath.indexOf("uploads/")
+      )}`;
+      await db.query(
+        "UPDATE book_images SET is_thumbnail = 0 WHERE book_id = ?",
+        [id]
+      );
+
+      await db.query(
+        "INSERT INTO book_images (book_id, image_url, is_thumbnail) VALUES (?, ?, 1)",
+        [id, finalPath]
       );
     }
   }
