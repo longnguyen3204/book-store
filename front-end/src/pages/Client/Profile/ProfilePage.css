@@ -1,108 +1,128 @@
-.profile-page {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #f7ede2 0%, #f0d7c2 100%);
-  padding: 24px;
-  font-family: "Poppins", Arial, sans-serif;
+/* Reset căn bản */
+* {
+  box-sizing: border-box;
 }
 
-.profile-card {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
-  width: 100%;
-  max-width: 520px;
-  padding: 28px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.profile-header {
-  display: flex;
-  gap: 14px;
-  align-items: center;
-}
-
-.avatar {
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
-  background: #b36c4d;
-  color: #fff;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 20px;
-}
-
-.profile-name {
-  font-size: 20px;
-  font-weight: 700;
-  color: #1b1b1b;
-}
-
-.profile-email {
-  color: #6b6b6b;
-  font-size: 14px;
-}
-
-.profile-body {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 12px;
-  border: 1px solid #f0e6dc;
+.user-account-page {
+  max-width: 1200px;
+  margin: 40px auto 80px;
+  padding: 0 20px;
+  font-family: "Georgia", serif;
+  color: #222;
+  background: #faf7f0;
   border-radius: 12px;
-  background: #fff9f4;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.1);
 }
 
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 15px;
+/* Breadcrumb */
+.breadcrumb {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 30px;
+  user-select: none;
 }
 
-.info-row .label {
-  color: #6b6b6b;
-}
-
-.info-row .value {
-  color: #1b1b1b;
+.breadcrumb span {
+  margin: 0 8px;
   font-weight: 600;
 }
 
-.profile-actions {
+/* Layout: flex container */
+.account-wrapper {
   display: flex;
-  justify-content: flex-end;
-  gap: 12px;
+  gap: 30px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 40px 50px;
+  box-shadow: 0 5px 25px rgb(0 0 0 / 0.08);
 }
 
-.btn {
+/* Sidebar */
+.account-sidebar {
+  width: 280px;
+  border-right: 1px solid #ddd;
+  padding-right: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.sidebar-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  letter-spacing: 0.05em;
+  color: #8a5a2b;
+}
+
+.welcome {
+  font-size: 16px;
+  margin-bottom: 30px;
+  color: #555;
+}
+
+.welcome span {
+  color: #bf7c4a;
+  font-weight: 600;
+}
+
+.account-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
+}
+
+.account-menu li {
+  font-size: 16px;
+  padding: 14px 0 14px 15px;
+  cursor: pointer;
+  color: #666;
+  border-left: 4px solid transparent;
+  transition: color 0.3s ease, border-color 0.3s ease;
+  user-select: none;
+  border-radius: 4px;
+}
+
+.account-menu li.active,
+.account-menu li:hover {
+  color: #bf7c4a;
+  border-left-color: #bf7c4a;
+  font-weight: 600;
+  background-color: #f7eee2;
+}
+
+/* Nút đăng xuất */
+.account-sidebar > button {
+  margin-top: 30px;
+  width: 100%;
+  padding: 12px 0;
+  background-color: #b36c4d;
   border: none;
   border-radius: 10px;
   padding: 12px 24px; /* Tăng padding để nút trông đầy đặn hơn */
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   /* Màu nâu đặc trưng của nút Chỉnh sửa / Lưu thay đổi */
-  background: #b36c4d; 
+  background: #b36c4d;
   color: #fff;
   box-shadow: 0 8px 16px rgba(179, 108, 77, 0.2);
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(179, 108, 77, 0.25);
+  transition: background-color 0.3s ease;
+  user-select: none;
 }
 
-.btn.secondary {
-  background: #f1e3d6;
-  color: #5c4437;
-  box-shadow: none;
+.account-sidebar > button:hover {
+  background-color: #9a5940;
 }
 .btn.secondary:hover {
   background: #e6d0bc;
@@ -115,10 +135,57 @@
   box-shadow: 0 12px 22px rgba(179, 108, 77, 0.35);
   filter: brightness(1.1);
 }
+/* Content */
+.account-content {
+  flex: 1;
+  min-width: 0; /* Giúp text wrap đúng trong flex */
+}
 
-.btn:active {
-  transform: translateY(0);
-  opacity: 0.9;
+.content-title {
+  font-size: 24px;
+  margin-bottom: 30px;
+  font-weight: 700;
+  color: #8a5a2b;
+  letter-spacing: 0.03em;
+  border-bottom: 2px solid #bf7c4a;
+  padding-bottom: 8px;
+  user-select: none;
+}
+
+.info-line {
+  display: flex;
+  font-size: 16px;
+  margin-bottom: 18px;
+  gap: 8px;
+  align-items: center;
+}
+
+.info-line .label {
+  font-weight: 700;
+  min-width: 120px;
+  color: #7e5a3c;
+  user-select: none;
+}
+
+.info-line .value {
+  color: #444;
+  flex: 1;
+  word-break: break-word;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .account-wrapper {
+    flex-direction: column;
+    padding: 30px 20px;
+  }
+  .account-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+    padding-right: 0;
+    margin-bottom: 25px;
+  }
 }
 .edit-input {
   padding: 5px 10px;
@@ -141,9 +208,9 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   /* Màu nâu đặc trưng của nút Chỉnh sửa / Lưu thay đổi */
-  background: #b36c4d; 
+  background: #b36c4d;
   color: #fff;
   box-shadow: 0 8px 16px rgba(179, 108, 77, 0.2);
   display: inline-flex;

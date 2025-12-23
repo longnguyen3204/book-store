@@ -1,19 +1,31 @@
-import axios from "axios";
+import api from "./api";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
+// 2. Định nghĩa các hàm nghiệp vụ
+export async function fetchOrders() {
+  try {
+    const response = await api.get("/orders");
+    return response.data;
+  } catch (error) {
+    const message =
+      error.response?.data?.message || "Lấy danh sách đơn hàng thất bại";
+    throw new Error(message);
+  }
+}
 
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+export async function updateOrderStatus(orderId, status) {
+  try {
+    const response = await api.put(`/orders/${orderId}/status`, { status });
+    return response.data;
+  } catch (error) {
+    const message =
+      error.response?.data?.message || "Cập nhật trạng thái đơn hàng thất bại";
+    throw new Error(message);
+  }
+}
 
 export async function createOrder(payload) {
   const token = localStorage.getItem("token");
   const headers = {
-    "Content-Type": "application/json",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 
@@ -30,7 +42,6 @@ export async function createOrder(payload) {
 export async function getOrderHistory(status) {
   const token = localStorage.getItem("token");
   const headers = {
-    "Content-Type": "application/json",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 
@@ -50,7 +61,6 @@ export async function getOrderHistory(status) {
 export async function cancelOrder(orderId) {
   const token = localStorage.getItem("token");
   const headers = {
-    "Content-Type": "application/json",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 
@@ -58,11 +68,15 @@ export async function cancelOrder(orderId) {
     const res = await api.post(`/orders/${orderId}/cancel`, {}, { headers });
     return res.data;
   } catch (error) {
-    const message =
-      error.response?.data?.message || "Hủy đơn hàng thất bại";
+    const message = error.response?.data?.message || "Hủy đơn hàng thất bại";
     throw new Error(message);
   }
 }
 
-export default { createOrder };
-
+export default {
+  fetchOrders,
+  updateOrderStatus,
+  createOrder,
+  getOrderHistory,
+  cancelOrder,
+};

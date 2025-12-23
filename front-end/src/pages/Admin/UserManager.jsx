@@ -1,44 +1,214 @@
-// src/pages/Admin/UserManager.jsx
-import React, { useState, useEffect } from 'react';
-import adminApi from '../../api/adminApi';
+import React, { useState, useEffect } from "react";
+import userApi from "../../api/userApi"; // Đảm bảo đường dẫn đúng
 
 const UserManager = () => {
-    const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        adminApi.getAllUsers().then(res => setUsers(res.data));
-    }, []);
-
-    const toggleRole = async (user) => {
-        const newRole = user.role === 'admin' ? 'user' : 'admin';
-        if(window.confirm(`Đổi quyền của ${user.name} thành ${newRole}?`)) {
-            await adminApi.updateUserRole(user._id, newRole);
-            setUsers(users.map(u => u._id === user._id ? {...u, role: newRole} : u));
-        }
+  // Lấy danh sách user khi component mount
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await userApi.getAllUsers();
+        // Giả sử API trả về: { success: true, data: [...] } hoặc trực tiếp mảng
+        setUsers(res.data || res);
+      } catch (error) {
+        console.error("Lỗi tải danh sách:", error);
+      } finally {
+        setLoading(false);
+      }
     };
+    fetchUsers();
+  }, []);
 
-    return (
-        <div>
-            <h2>Quản lý Người dùng</h2>
-            <table className="table">
-                <thead><tr><th>Tên</th><th>Email</th><th>Vai trò</th><th>Hành động</th></tr></thead>
-                <tbody>
-                    {users.map(user => (
-                        <tr key={user._id}>
-                            <td>{user.name}</td>
-                            <td>{user.email}</td>
-                            <td>{user.role}</td>
-                            <td>
-                                <button className="btn btn-info btn-sm" onClick={() => toggleRole(user)}>
-                                    Đổi vai trò
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+  // Hàm xử lý Khóa / Mở khóa
+  const toggleStatus = async (user) => {
+    // Logic: Nếu is_locked == 1 thì đang khóa -> cần mở (gửi 0)
+    //        Nếu is_locked == 0 thì đang mở -> cần khóa (gửi 1)
+    const currentLocked = user.is_locked === 1;
+    const newStatus = currentLocked ? 0 : 1;
+    const actionText = currentLocked ? "MỞ KHÓA" : "KHÓA";
+
+    if (
+      window.confirm(
+        `Bạn có chắc muốn ${actionText} tài khoản "${user.fullname}"?`
+      )
+    ) {
+      try {
+        // Gọi API cập nhật trạng thái
+        await userApi.updateLockStatus(user.id, newStatus);
+
+        // Cập nhật lại state giao diện ngay lập tức
+        setUsers(
+          users.map((u) =>
+            u.id === user.id ? { ...u, is_locked: newStatus } : u
+          )
+        );
+      } catch (error) {
+        alert("Lỗi cập nhật trạng thái: " + error.message);
+      }
+    }
+  };
+
+  return (
+    <div
+      className="container-fluid py-4 bg-light"
+      style={{ minHeight: "100vh" }}
+    >
+      {/* --- HEADER --- */}
+      <div className="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded shadow-sm">
+        <h3 className="fw-bold text-uppercase text-primary m-0">
+          <i className="bi bi-people-fill me-2"></i>Quản lý Khách hàng
+        </h3>
+        <span className="badge bg-primary fs-6 rounded-pill px-4 py-2">
+          Tổng: {users.length} thành viên
+        </span>
+      </div>
+
+      {/* --- TABLE --- */}
+      <div className="card border-0 shadow-sm rounded-3 overflow-hidden">
+        <div className="table-responsive">
+          <table className="table table-hover table-bordered align-middle mb-0">
+            <thead className="bg-light text-dark text-uppercase small fw-bold text-center border-bottom">
+              <tr>
+                <th className="text-center" style={{ width: "5%" }}>
+                  ID
+                </th>
+                <th className="text-center ps-4" style={{ width: "25%" }}>
+                  Thành viên
+                </th>
+                <th className="text-center">Liên hệ</th>
+                <th className="text-center">Tổng đơn</th>
+                <th className="text-center">Vai trò</th>
+                <th className="text-center">Trạng thái</th>
+                <th className="text-center">Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan="7" className="text-center py-5 text-muted">
+                    <div
+                      className="spinner-border text-primary me-2"
+                      role="status"
+                    />
+                    Đang tải dữ liệu...
+                  </td>
+                </tr>
+              ) : users.length > 0 ? (
+                users.map((user, index) => (
+                  <tr key={user.id} className="border-bottom">
+                    {/* Cột ID */}
+                    <td className="text-center text-muted fw-bold">
+                      {user.id}
+                    </td>
+
+                    {/* Cột Thông tin cá nhân */}
+                    <td className="ps-4 py-3">
+                      <div className="d-flex align-items-center">
+                        <img
+                          src={user.avatar || ""}
+                          alt="avatar"
+                          className="rounded-circle me-3 border"
+                          style={{ width: 40, height: 40, objectFit: "cover" }}
+                          onError={(e) => {
+                            e.target.src = "";
+                          }}
+                        />
+                        <div>
+                          <div className="fw-bold text-dark">
+                            {user.fullname || "Không tên"}
+                          </div>
+                          <div className="small text-muted">{user.email}</div>
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* Cột Liên hệ & Địa chỉ */}
+                    <td className="text-start">
+                      <div className="small">
+                        <i className="bi bi-telephone me-1"></i>{" "}
+                        {user.phone_number || "---"}
+                      </div>
+                      <div
+                        className="small text-muted text-truncate"
+                        style={{ maxWidth: "200px" }}
+                        title={user.address}
+                      >
+                        <i className="bi bi-geo-alt me-1"></i>{" "}
+                        {user.address || "Chưa cập nhật"}
+                      </div>
+                    </td>
+
+                    {/* Cột Tổng đơn hàng (MỚI) */}
+                    <td className="text-center">
+                      <span className="badge bg-light text-dark border fs-6">
+                        {user.total_orders || 0}{" "}
+                        {/* Backend cần trả field này */}
+                      </span>
+                    </td>
+
+                    {/* Cột Vai trò (Mapping role_id) */}
+                    <td className="text-center">
+                      {user.role_id === 1 ? (
+                        <span className="badge bg-danger bg-opacity-10 text-danger border border-danger rounded-pill">
+                          Admin
+                        </span>
+                      ) : (
+                        <span className="badge bg-info bg-opacity-10 text-info border border-info rounded-pill">
+                          Khách hàng
+                        </span>
+                      )}
+                    </td>
+
+                    {/* Cột Trạng thái (Mapping is_locked) */}
+                    <td className="text-center">
+                      {user.is_locked === 1 ? (
+                        <span className="badge bg-secondary px-3 rounded-pill text-dark ">
+                          Đã khóa
+                        </span>
+                      ) : (
+                        <span className="badge bg-success bg-opacity-10 text-success border border-success px-3 rounded-pill">
+                          Hoạt động
+                        </span>
+                      )}
+                    </td>
+
+                    {/* Cột Hành động */}
+                    <td className="text-center">
+                      {user.is_locked === 1 ? (
+                        <button
+                          className="btn btn-sm btn-success shadow-sm"
+                          onClick={() => toggleStatus(user)}
+                          title="Mở khóa tài khoản"
+                        >
+                          <i className="bi bi-unlock-fill me-1"></i> Mở
+                        </button>
+                      ) : (
+                        <button
+                          className="btn btn-sm btn-danger shadow-sm"
+                          onClick={() => toggleStatus(user)}
+                          title="Khóa tài khoản"
+                        >
+                          <i className="bi bi-lock-fill me-1"></i> Khóa
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="7" className="text-center py-5 text-muted">
+                    Chưa có thành viên nào.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default UserManager;

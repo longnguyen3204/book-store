@@ -1,246 +1,227 @@
-// src/pages/Admin/BookManager.jsx
-import React, { useState, useEffect } from 'react';
-import adminApi from '../../api/adminApi';
+import React, { useState, useEffect } from "react";
+import categoryApi from "../../api/categoryApi";
 
-const BookManager = () => {
-    const [books, setBooks] = useState([]);
-    const [formData, setFormData] = useState({ title: '', price: '', category: '', image: null });
-    const [categories, setCategories] = useState([]);
-    const [editingBook, setEditingBook] = useState(null); // ID sách đang sửa
-    const [loading, setLoading] = useState(false);
+const CategoryManager = () => {
+  // --- GIỮ NGUYÊN LOGIC CỦA BẠN ---
+  const [categories, setCategories] = useState([]);
+  const [editingId, setEditingId] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        loadData();
-    }, []);
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+  });
 
-    const loadData = async () => {
-        try {
-            setLoading(true);
-            const [bookRes, catRes] = await Promise.all([adminApi.getAllBooks(), adminApi.getAllCategories()]);
-            setBooks(bookRes.data);
-            setCategories(catRes.data);
-        } catch (error) {
-            console.error("Lỗi tải dữ liệu:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+  useEffect(() => {
+    loadCategories();
+  }, []);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const data = new FormData();
-        data.append('title', formData.title);
-        data.append('price', formData.price);
-        data.append('category', formData.category);
-        if (formData.image) data.append('image', formData.image);
+  const loadCategories = async () => {
+    try {
+      setLoading(true);
+      const res = await categoryApi.fetchCategories();
+      // Đảm bảo lấy đúng mảng dữ liệu từ phản hồi
+      setCategories(Array.isArray(res) ? res : res.data || []);
+    } catch (error) {
+      console.error("Lỗi tải danh mục:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        try {
-            if (editingBook) {
-                await adminApi.updateBook(editingBook, data);
-                alert("Cập nhật sách thành công!");
-            } else {
-                await adminApi.createBook(data);
-                alert("Thêm sách mới thành công!");
-            }
-            
-            // Reset form
-            setFormData({ title: '', price: '', category: '', image: null });
-            setEditingBook(null);
-            
-            // Reload data
-            loadData();
-            
-            // Reset file input value (trick để xóa tên file cũ trên giao diện)
-            document.getElementById('fileInput').value = ""; 
-        } catch (err) {
-            alert("Có lỗi xảy ra: " + (err.response?.data?.message || err.message));
-        }
-    };
+  const resetForm = () => {
+    setFormData({ name: "", description: "" });
+    setEditingId(null);
+  };
 
-    const handleDelete = async (id) => {
-        if (window.confirm("Bạn chắc chắn muốn xóa sách này?")) {
-            try {
-                await adminApi.deleteBook(id);
-                loadData();
-            } catch (error) {
-                alert("Lỗi xóa sách");
-            }
-        }
-    };
+  const handleEdit = (cat) => {
+    const targetId = cat.id || cat._id;
+    setEditingId(targetId);
+    setFormData({
+      name: cat.name || "",
+      description: cat.description || "",
+    });
+    window.scrollTo(0, 0);
+  };
 
-    const handleEdit = (book) => {
-        setEditingBook(book._id);
-        setFormData({ 
-            title: book.title, 
-            price: book.price, 
-            category: book.category?._id || book.category, // Handle populated vs unpopulated category
-            image: null 
-        });
-    };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (editingId) {
+        await categoryApi.updateCategory(editingId, formData);
+        alert("Cập nhật thông tin thể loại thành công!");
+      } else {
+        await categoryApi.addCategory(formData);
+        alert("Thêm thể loại thành công!");
+      }
+      resetForm();
+      loadCategories();
+    } catch (err) {
+      alert(
+        "Thao tác thất bại: " + (err.response?.data?.message || err.message)
+      );
+    }
+  };
 
-    const handleCancelEdit = () => {
-        setEditingBook(null);
-        setFormData({ title: '', price: '', category: '', image: null });
-        document.getElementById('fileInput').value = "";
-    };
+  const handleDelete = async (id) => {
+    if (window.confirm("Bạn chắc chắn muốn xóa thể loại này?")) {
+      try {
+        // Gọi API xóa mềm (Backend thực hiện UPDATE is_active = 0)
+        await categoryApi.delCategory(id);
+        loadCategories();
+      } catch (error) {
+        alert("Lỗi: " + (error.response?.data?.message || "Không thể xóa"));
+      }
+    }
+  };
+  // --- KẾT THÚC LOGIC ---
 
-    return (
-        <div>
-            <div className="admin-header">
-                <h2 className="admin-title">Quản lý Sách</h2>
-                <span style={{color: '#777'}}>Tổng số: {books.length} cuốn sách</span>
+  // --- PHẦN GIAO DIỆN MỚI (LAYOUT ĐỒNG BỘ) ---
+  return (
+    <div
+      className="container-fluid py-4 bg-light"
+      style={{ minHeight: "100vh" }}
+    >
+      {/* HEADER BLOCK */}
+      <div className="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded shadow-sm">
+        <h3 className="fw-bold text-uppercase text-primary m-0">
+          <i className="bi bi-grid-fill me-2"></i>Quản lý Danh mục
+        </h3>
+        <span className="badge bg-primary fs-6 rounded-pill px-4 py-2">
+          Tổng số: {categories.length}
+        </span>
+      </div>
+
+      <div className="row g-4">
+        {/* --- CỘT TRÁI: FORM NHẬP LIỆU (CARD TRẮNG) --- */}
+        <div className="col-md-4">
+          <div className="card border-0 shadow-sm rounded-3 h-100">
+            <div className="card-header bg-white border-bottom py-3">
+              <h5 className="fw-bold text-primary m-0 text-uppercase small">
+                {editingId ? "Cập nhật Danh mục" : "Thêm Danh mục mới"}
+              </h5>
             </div>
-            
-            <div className="row">
-                {/* --- CỘT TRÁI: FORM THÊM / SỬA --- */}
-                <div className="col-md-4">
-                    <div className="admin-card">
-                        <h4 className="mb-4" style={{ color: 'var(--admin-dark)', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
-                            {editingBook ? 'Cập nhật Sách' : 'Thêm Sách mới'}
-                        </h4>
-                        
-                        <form onSubmit={handleSubmit}>
-                            {/* Tên sách */}
-                            <div className="mb-3">
-                                <label className="form-label fw-bold text-secondary" style={{fontSize: '0.9rem'}}>Tên sách</label>
-                                <input 
-                                    type="text" 
-                                    placeholder="Nhập tên sách..." 
-                                    className="admin-input" 
-                                    value={formData.title} 
-                                    onChange={e => setFormData({...formData, title: e.target.value})} 
-                                    required 
-                                />
-                            </div>
-
-                            {/* Giá & Danh mục (Chung hàng) */}
-                            <div className="row">
-                                <div className="col-6 mb-3">
-                                    <label className="form-label fw-bold text-secondary" style={{fontSize: '0.9rem'}}>Giá ($)</label>
-                                    <input 
-                                        type="number" 
-                                        placeholder="0" 
-                                        className="admin-input" 
-                                        value={formData.price} 
-                                        onChange={e => setFormData({...formData, price: e.target.value})} 
-                                        required 
-                                    />
-                                </div>
-                                <div className="col-6 mb-3">
-                                    <label className="form-label fw-bold text-secondary" style={{fontSize: '0.9rem'}}>Danh mục</label>
-                                    <select 
-                                        className="admin-input" 
-                                        value={formData.category} 
-                                        onChange={e => setFormData({...formData, category: e.target.value})} 
-                                        required
-                                        style={{backgroundImage: 'none'}} // Fix icon mặc định của select
-                                    >
-                                        <option value="">Chọn...</option>
-                                        {categories.map(cat => <option key={cat._id} value={cat._id}>{cat.name}</option>)}
-                                    </select>
-                                </div>
-                            </div>
-
-                            {/* Ảnh bìa */}
-                            <div className="mb-4">
-                                <label className="form-label fw-bold text-secondary" style={{fontSize: '0.9rem'}}>Ảnh bìa</label>
-                                <input 
-                                    id="fileInput"
-                                    type="file" 
-                                    className="admin-input" 
-                                    onChange={e => setFormData({...formData, image: e.target.files[0]})} 
-                                    style={{padding: '6px'}}
-                                />
-                            </div>
-
-                            {/* Nút hành động */}
-                            <button type="submit" className="admin-btn admin-btn-primary w-100 py-2 mb-2">
-                                {editingBook ? 'Lưu thay đổi' : '+ Thêm Sách'}
-                            </button>
-                            
-                            {editingBook && (
-                                <button 
-                                    type="button" 
-                                    className="admin-btn w-100 py-2" 
-                                    style={{background: '#eee', color: '#555'}}
-                                    onClick={handleCancelEdit}
-                                >
-                                    Hủy bỏ
-                                </button>
-                            )}
-                        </form>
-                    </div>
+            <div className="card-body p-4">
+              <form onSubmit={handleSubmit}>
+                <div className="mb-3">
+                  <label className="fw-bold small text-uppercase text-dark mb-1">
+                    Tên danh mục <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={formData.name}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
+                    required
+                    placeholder="Nhập tên danh mục..."
+                  />
                 </div>
-
-                {/* --- CỘT PHẢI: DANH SÁCH --- */}
-                <div className="col-md-8">
-                    <div className="admin-card p-0 overflow-hidden">
-                        <div className="p-3 border-bottom bg-light">
-                            <h5 className="m-0 text-secondary">Danh sách hiện có</h5>
-                        </div>
-                        <table className="admin-table">
-                            <thead>
-                                <tr>
-                                    <th>Tên sách</th>
-                                    <th style={{width: '15%'}}>Giá</th>
-                                    <th style={{width: '20%'}}>Danh mục</th>
-                                    <th style={{width: '15%', textAlign: 'center'}}>Hành động</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {loading ? (
-                                    <tr><td colSpan="4" className="text-center py-4">Đang tải dữ liệu...</td></tr>
-                                ) : books.length > 0 ? (
-                                    books.map(book => (
-                                        <tr key={book._id}>
-                                            <td style={{fontWeight: '500', color: '#333'}}>
-                                                {book.title}
-                                            </td>
-                                            <td className="text-muted">${book.price}</td>
-                                            <td>
-                                                <span className="badge bg-light text-dark border">
-                                                    {book.category?.name || 'Chưa phân loại'}
-                                                </span>
-                                            </td>
-                                            <td className="text-center">
-                                                {/* Nút Sửa */}
-                                                <button 
-                                                    className="action-btn btn-edit" 
-                                                    onClick={() => handleEdit(book)}
-                                                    title="Sửa"
-                                                >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 00 2 2h11a2 2 0 00 2-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                    </svg>
-                                                </button>
-
-                                                {/* Nút Xóa */}
-                                                <button 
-                                                    className="action-btn btn-delete" 
-                                                    onClick={() => handleDelete(book._id)}
-                                                    title="Xóa"
-                                                >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                    </svg>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan="4" className="text-center py-5 text-muted">
-                                            Chưa có cuốn sách nào.
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
+                <div className="mb-4">
+                  <label className="fw-bold small text-uppercase text-dark mb-1">
+                    Mô tả chi tiết
+                  </label>
+                  <textarea
+                    className="form-control"
+                    rows="5"
+                    value={formData.description}
+                    onChange={(e) =>
+                      setFormData({ ...formData, description: e.target.value })
+                    }
+                    placeholder="Nhập mô tả..."
+                  />
                 </div>
+                <div className="d-grid gap-2">
+                  <button
+                    type="submit"
+                    className="btn btn-primary fw-bold shadow-sm"
+                  >
+                    {editingId ? "LƯU DỮ LIỆU" : "THÊM MỚI"}
+                  </button>
+                  {editingId && (
+                    <button
+                      type="button"
+                      className="btn btn-outline-secondary"
+                      onClick={resetForm}
+                    >
+                      HỦY BỎ
+                    </button>
+                  )}
+                </div>
+              </form>
             </div>
+          </div>
         </div>
-    );
+
+        {/* --- CỘT PHẢI: BẢNG DANH SÁCH (CARD TRẮNG) --- */}
+        <div className="col-md-8">
+          <div className="card border-0 shadow-sm rounded-3 h-100 overflow-hidden">
+            <div className="table-responsive">
+              <table className="table table-hover table-bordered align-middle mb-0">
+                <thead className="bg-light text-dark text-uppercase small fw-bold text-center border-bottom">
+                  <tr>
+                    <th
+                      className="py-3 text-center ps-4"
+                      style={{ width: "30%" }}
+                    >
+                      Tên danh mục
+                    </th>
+                    <th className="py-3 text-center" style={{ width: "50%" }}>
+                      Mô tả
+                    </th>
+                    <th className="py-3 text-center" style={{ width: "20%" }}>
+                      Hành động
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {loading ? (
+                    <tr>
+                      <td colSpan="3" className="py-5 text-center text-dark">
+                        Đang tải dữ liệu...
+                      </td>
+                    </tr>
+                  ) : categories.length > 0 ? (
+                    categories.map((cat) => (
+                      <tr key={cat.id || cat._id} className="border-bottom">
+                        <td className="text-start ps-4 fw-bold text-dark">
+                          {cat.name}
+                        </td>
+                        <td className="text-start text-muted small">
+                          {cat.description || "Chưa có mô tả"}
+                        </td>
+                        <td className="text-center">
+                          <button
+                            className="btn btn-sm btn-warning me-2 shadow-sm"
+                            onClick={() => handleEdit(cat)}
+                          >
+                            <b className="bi bi-pencil">Sửa</b>
+                          </button>
+                          <button
+                            className="btn btn-sm btn-danger shadow-sm"
+                            onClick={() => handleDelete(cat.id || cat._id)}
+                          >
+                            <b className="bi bi-trash">Xóa</b>
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="3" className="py-5 text-center text-muted">
+                        Chưa có danh mục nào.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
-export default BookManager;
+export default CategoryManager;

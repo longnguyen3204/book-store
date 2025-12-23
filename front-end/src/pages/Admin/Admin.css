@@ -2,39 +2,44 @@
 
 :root {
   /* Bảng màu lấy cảm hứng từ Booksaw theme */
-  --admin-primary: #C5A992;       /* Màu nâu be chủ đạo */
-  --admin-dark: #232323;          /* Màu đen xám (Sidebar/Text) */
-  --admin-light: #F3F2EC;         /* Màu nền kem nhạt (Background) */
-  --admin-white: #FFFFFF;         /* Màu nền thẻ (Card) */
-  --admin-text: #74642F;          /* Màu chữ phụ */
-  --admin-danger: #d9534f;        /* Màu đỏ cho nút xóa */
-  --admin-success: #5cb85c;       /* Màu xanh cho trạng thái */
+  --admin-primary: #c5a992;
+  --admin-dark: #232323;
+  --admin-light: #f3f2ec;
+  --admin-white: #ffffff;
+  --admin-text: #74642f;
+  --admin-danger: #d9534f;
+  --admin-success: #5cb85c;
   --sidebar-width: 260px;
 }
 
+/* --- Base Styles --- */
 body {
-  background-color: var(--admin-light); /* Đổi màu nền cả trang */
+  background-color: var(--admin-light);
+  font-family: "Inter", sans-serif;
 }
 
-/* --- Layout Chung --- */
-.admin-container {
+/* --- Layout Wrapper --- */
+.admin-wrapper {
   display: flex;
   min-height: 100vh;
-  font-family: "Inter", sans-serif; /* Hoặc font chữ chính của web bạn */
+  transition: all 0.3s ease;
 }
 
-/* Sidebar bên trái */
+/* --- Sidebar --- */
 .admin-sidebar {
   width: var(--sidebar-width);
   background-color: var(--admin-white);
-  border-right: 1px solid #e0e0e0;
-  padding: 2rem;
+  border-right: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
   position: fixed;
-  height: 100vh;
   top: 0;
   left: 0;
-  z-index: 100;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.03);
+  bottom: 0;
+  padding: 2rem;
+  z-index: 1000;
+  transition: transform 0.3s ease;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.03);
 }
 
 .admin-sidebar h3 {
@@ -48,6 +53,11 @@ body {
   padding-bottom: 10px;
 }
 
+/* Ẩn sidebar cho Desktop (Toggle logic) */
+.sidebar-closed .admin-sidebar {
+  transform: translateX(-100%);
+}
+
 .admin-nav-link {
   display: block;
   padding: 12px 0;
@@ -58,47 +68,81 @@ body {
   border-bottom: 1px dashed #eee;
 }
 
-.admin-nav-link:hover, .admin-nav-link.active {
+.admin-nav-link:hover,
+.admin-nav-link.active {
   color: var(--admin-dark);
-  padding-left: 10px; /* Hiệu ứng trượt nhẹ */
+  padding-left: 10px;
   border-left: 3px solid var(--admin-primary);
 }
 
-/* Khu vực nội dung chính */
-.admin-content {
+/* --- Main Content Area --- */
+.admin-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   margin-left: var(--sidebar-width);
-  padding: 2rem 3rem;
-  flex-grow: 1;
-  background-color: var(--admin-light);
+  transition: margin-left 0.3s ease;
+  min-width: 0; /* Tránh tràn layout */
 }
 
-.admin-header {
+.sidebar-closed .admin-main {
+  margin-left: 0;
+}
+
+.admin-content {
+  padding: 2rem 3rem;
+}
+
+/* --- Header & Top Bar --- */
+.admin-top-header {
+  height: 60px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  padding: 0 20px;
+  background: var(--admin-white);
+  border-bottom: 1px solid #eee;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.menu-toggle-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.menu-toggle-btn:hover {
+  background: #f5f5f5;
 }
 
 .admin-title {
-  font-family: "Prata", serif; /* Font tiêu đề giống trang chủ */
+  font-family: "Prata", serif;
   font-size: 2rem;
   color: var(--admin-dark);
+  margin: 0;
 }
 
 /* --- Card & Form --- */
 .admin-card {
   background: var(--admin-white);
   padding: 2rem;
-  border-radius: 8px; /* Bo góc nhẹ */
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
   margin-bottom: 20px;
-  border: none;
 }
 
 .admin-input {
   border: 1px solid #ddd;
   padding: 10px 15px;
-  border-radius: 0; /* Vuông vức theo style minimalist */
+  border-radius: 0;
   width: 100%;
   margin-bottom: 15px;
   background: #f9f9f9;
@@ -107,7 +151,7 @@ body {
 .admin-input:focus {
   outline: none;
   border-color: var(--admin-primary);
-  background: #fff;
+  background: var(--admin-white);
 }
 
 /* --- Buttons --- */
@@ -125,23 +169,36 @@ body {
 
 .admin-btn-primary {
   background-color: var(--admin-primary);
-  color: #fff;
-}
-
-.admin-btn-primary:hover {
-  background-color: var(--admin-tẽxt);
-  color: #fff;
+  color: var(--admin-white);
 }
 
 .admin-btn-danger {
-  background-color: #fff;
+  background-color: var(--admin-white);
   color: var(--admin-danger);
   border: 1px solid var(--admin-danger);
 }
 
 .admin-btn-danger:hover {
   background-color: var(--admin-danger);
-  color: #fff;
+  color: var(--admin-white);
+}
+
+.admin-logout-btn {
+  margin-top: auto;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ff4d4f;
+  background: transparent;
+  color: #ff4d4f;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+  text-transform: uppercase;
+}
+
+.admin-logout-btn:hover {
+  background: #ff4d4f;
+  color: var(--admin-white);
 }
 
 /* --- Tables --- */
@@ -155,7 +212,7 @@ body {
   text-align: left;
   padding: 15px;
   background-color: var(--admin-primary);
-  color: #fff;
+  color: var(--admin-white);
   font-weight: 500;
   text-transform: uppercase;
   font-size: 0.85rem;
@@ -170,9 +227,21 @@ body {
 .admin-table tr:hover {
   background-color: #fcfcfc;
 }
-/* --- Bổ sung cho Category Manager --- */
 
-/* Nút hành động nhỏ trong bảng (Sửa/Xóa) */
+/* --- Badges & Icons --- */
+.index-badge {
+  background-color: var(--admin-primary);
+  color: var(--admin-white);
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
 .action-btn {
   width: 32px;
   height: 32px;
@@ -186,16 +255,10 @@ body {
   margin-right: 8px;
 }
 
-.action-btn svg {
-  width: 16px;
-  height: 16px;
-}
-
 .btn-edit {
   background-color: #e3f2fd;
   color: #1976d2;
 }
-
 .btn-edit:hover {
   background-color: #1976d2;
   color: white;
@@ -205,22 +268,54 @@ body {
   background-color: #ffebee;
   color: #c62828;
 }
-
 .btn-delete:hover {
   background-color: #c62828;
   color: white;
 }
 
-/* Badge số thứ tự */
-.index-badge {
-  background-color: var(--admin-primary);
-  color: white;
-  width: 25px;
-  height: 25px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8rem;
-  font-weight: bold;
+/* --- Responsive & Mobile Logic --- */
+.admin-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 998;
+}
+
+.mobile-close-btn {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .admin-main {
+    margin-left: 0 !important;
+  }
+
+  .admin-sidebar {
+    transform: translateX(-100%);
+    width: 280px;
+  }
+
+  .sidebar-mobile-open .admin-sidebar {
+    transform: translateX(0);
+  }
+
+  .sidebar-mobile-open .admin-backdrop {
+    display: block;
+  }
+
+  .mobile-close-btn {
+    display: block;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+  }
+
+  .admin-content {
+    padding: 1.5rem;
+  }
 }

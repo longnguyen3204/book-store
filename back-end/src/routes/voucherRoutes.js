@@ -1,0 +1,12 @@
+const express = require("express");
+const router = express.Router();
+const voucherController = require("../controllers/voucherController");
+const authMiddleware = require("../middlewares/authMiddleware");
+const roleMiddleware = require("../middlewares/roleMiddleware");
+
+router.get("/", authMiddleware, voucherController.getAllVouchers);
+router.post("/", roleMiddleware, voucherController.addVoucher);
+router.put("/:id", roleMiddleware, voucherController.updateVoucher); // Cập nhật thông tin
+router.delete("/:id", roleMiddleware, voucherController.deleteVoucher);
+router.patch("/:id/restore", roleMiddleware, voucherController.restoreVoucher); // Hiện lại mã
+module.exports = router;

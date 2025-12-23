@@ -10,15 +10,15 @@ import DetailProduct from "./pages/Client/BookDetailPage";
 import SearchPage from "./pages/Client/SearchPage";
 
 // Import các trang phía Admin
-// Lưu ý: Đảm bảo bạn đã tạo các file này trong thư mục tương ứng
-import AdminLayout from './components/AdminLayout'; // Layout nằm trong components như bạn yêu cầu
-import BookManager from './pages/Admin/BookManager';
-import OrderManager from './pages/Admin/OrderManager';
-import UserManager from './pages/Admin/UserManager';
-import CategoryManager from './pages/Admin/CategoryManager';
+import AdminLayout from "./layouts/AdminLayout";
+import BookManager from "./pages/Admin/BookManager";
+import OrderManager from "./pages/Admin/OrderManager";
+import UserManager from "./pages/Admin/UserManager";
+import CategoryManager from "./pages/Admin/CategoryManager";
+import VoucherManager from "./pages/Admin/VoucherManager.jsx";
 
 // Sửa lại đường dẫn ProfilePage (thêm /Client/)
-import ProfilePage from "./pages/Client/Profile/ProfilePage.jsx"; 
+import ProfilePage from "./pages/Client/Profile/ProfilePage.jsx";
 
 // Giữ nguyên hoặc kiểm tra lại ShopPage (đảm bảo file nằm trong src/pages/Shop/)
 import ShopPage from "./pages/Shop/ShopPage.jsx";
@@ -63,7 +63,6 @@ function App() {
   const handleBackHome = () => navigate("/");
 
   return (
-    
     <Routes>
       {/* --- ROUTES CHO KHÁCH HÀNG (CLIENT) --- */}
       <Route path="/" element={<HomePage user={user} />} />
@@ -94,17 +93,16 @@ function App() {
       {/* AdminLayout sẽ bao bọc các route con bên trong */}
       <Route path="/admin" element={<AdminLayout />}>
         {/* Route index: Khi vào /admin sẽ mặc định hiện trang Quản lý Sách */}
-        <Route index element={<BookManager />} /> 
-        
+        <Route index element={<BookManager />} />
+
         {/* Các trang chức năng cụ thể */}
         <Route path="books" element={<BookManager />} />
         <Route path="categories" element={<CategoryManager />} />
         <Route path="orders" element={<OrderManager />} />
+        <Route path="vouchers" element={<VoucherManager />} />
         <Route path="users" element={<UserManager />} />
       </Route>
-      
     </Routes>
-    
   );
 }
 

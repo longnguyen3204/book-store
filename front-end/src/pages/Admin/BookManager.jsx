@@ -1,107 +1,389 @@
-// src/pages/Admin/BookManager.jsx
-import React, { useState, useEffect } from 'react';
-import adminApi from '../../api/adminApi';
+import React, { useState, useEffect, useMemo } from "react";
+import bookApi from "../../api/bookApi";
+import categoryApi from "../../api/categoryApi";
+import authorApi from "../../api/authorApi";
 
 const BookManager = () => {
-    const [books, setBooks] = useState([]);
-    const [formData, setFormData] = useState({ title: '', price: '', category: '', image: null });
-    const [categories, setCategories] = useState([]);
-    const [editingBook, setEditingBook] = useState(null); // ID sách đang sửa
+  const [books, setBooks] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [authors, setAuthors] = useState([]);
+  const [editingBookId, setEditingBookId] = useState(null);
+  const [showForm, setShowForm] = useState(false);
 
-    useEffect(() => {
-        loadData();
-    }, []);
+  const [formData, setFormData] = useState({
+    name: "",
+    author: "",
+    description: "",
+    price: "",
+    categoryName: "",
+    image: null,
+    sold_count: 0,
+    quantity: 0,
+    page_count: "",
+    publish_year: "",
+  });
 
-    const loadData = async () => {
-        const [bookRes, catRes] = await Promise.all([adminApi.getAllBooks(), adminApi.getAllCategories()]);
-        setBooks(bookRes.data);
-        setCategories(catRes.data);
-    };
+  const categoryMap = useMemo(() => {
+    const map = {};
+    categories.forEach((c) => {
+      const id = c.id || c._id;
+      if (id) map[id.toString()] = c.name;
+    });
+    return map;
+  }, [categories]);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const data = new FormData();
-        data.append('title', formData.title);
-        data.append('price', formData.price);
-        data.append('category', formData.category);
-        if (formData.image) data.append('image', formData.image);
+  const getCategoryName = (book) => {
+    if (book.category_name) return book.category_name;
+    const targetId = book.category_id || book.categoryId || book.category;
+    return categoryMap[targetId?.toString()] || "N/A";
+  };
 
-        try {
-            if (editingBook) {
-                await adminApi.updateBook(editingBook, data);
-            } else {
-                await adminApi.createBook(data);
-            }
-            alert("Thành công!");
-            setFormData({ title: '', price: '', category: '', image: null });
-            setEditingBook(null);
-            loadData();
-        } catch (err) {
-            alert("Có lỗi xảy ra");
-        }
-    };
+  useEffect(() => {
+    loadData();
+  }, []);
 
-    const handleDelete = async (id) => {
-        if (window.confirm("Bạn chắc chắn muốn xóa?")) {
-            await adminApi.deleteBook(id);
-            loadData();
-        }
-    };
+  const loadData = async () => {
+    try {
+      const [booksData, categoriesData, authorsData] = await Promise.all([
+        bookApi.fetchBooks(),
+        categoryApi.fetchCategories(),
+        authorApi.fetchAuthors(),
+      ]);
+      setBooks(booksData);
+      setCategories(categoriesData);
+      setAuthors(authorsData); // Fix lỗi gán sai biến gây 404 hoặc trống data
+    } catch (err) {
+      console.error("Lỗi tải dữ liệu:", err);
+    }
+  };
 
-    const handleEdit = (book) => {
-        setEditingBook(book._id);
-        setFormData({ title: book.title, price: book.price, category: book.category, image: null });
-    };
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      author: "",
+      description: "",
+      price: "",
+      categoryName: "",
+      image: null,
+      sold_count: 0,
+      quantity: 0,
+      page_count: "",
+      publish_year: "",
+    });
+    setEditingBookId(null);
+  };
 
-    return (
-        <div>
-            <h2>Quản lý Sách</h2>
-            
-            {/* Form Thêm/Sửa */}
-            <form onSubmit={handleSubmit} className="mb-4 p-3 border bg-white">
-                <div className="mb-2">
-                    <input type="text" placeholder="Tên sách" className="form-control" 
-                        value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} required />
-                </div>
-                <div className="row mb-2">
-                    <div className="col">
-                        <input type="number" placeholder="Giá" className="form-control" 
-                            value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} required />
-                    </div>
-                    <div className="col">
-                        <select className="form-control" value={formData.category} 
-                            onChange={e => setFormData({...formData, category: e.target.value})} required>
-                            <option value="">Chọn danh mục</option>
-                            {categories.map(cat => <option key={cat._id} value={cat._id}>{cat.name}</option>)}
-                        </select>
-                    </div>
-                </div>
-                <div className="mb-2">
-                    <input type="file" className="form-control" onChange={e => setFormData({...formData, image: e.target.files[0]})} />
-                </div>
-                <button type="submit" className="btn btn-primary">{editingBook ? 'Cập nhật' : 'Thêm mới'}</button>
-                {editingBook && <button type="button" className="btn btn-secondary ms-2" onClick={() => {setEditingBook(null); setFormData({ title: '', price: '', category: '', image: null })}}>Hủy</button>}
-            </form>
+  const handleEdit = (book) => {
+    setEditingBookId(book.id || book._id);
+    setShowForm(true);
 
-            {/* Danh sách */}
-            <table className="table table-bordered bg-white">
-                <thead><tr><th>Tên</th><th>Giá</th><th>Danh mục</th><th>Hành động</th></tr></thead>
-                <tbody>
-                    {books.map(book => (
-                        <tr key={book._id}>
-                            <td>{book.title}</td>
-                            <td>{book.price}</td>
-                            <td>{book.category?.name || book.category}</td>
-                            <td>
-                                <button className="btn btn-warning btn-sm me-2" onClick={() => handleEdit(book)}>Sửa</button>
-                                <button className="btn btn-danger btn-sm" onClick={() => handleDelete(book._id)}>Xóa</button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+    const currentCatName = getCategoryName(book);
+
+    setFormData({
+      name: book.name || "",
+      author: book.author || "",
+      description: book.description || "",
+      price: book.price?.toString() || "",
+      categoryName: currentCatName === "N/A" ? "" : currentCatName,
+      image: null,
+      sold_count: Number(book.sold_count) || 0,
+      quantity: Number(book.quantity) || 0,
+      page_count: book.page_count?.toString() || "",
+      publish_year: book.publish_year?.toString() || "",
+    });
+    window.scrollTo(0, 0);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      // 1. Xử lý Thể loại
+      let targetCategoryId = null;
+      const inputCatName = (formData.categoryName || "").trim();
+      const existingCategory = categories.find(
+        (c) => c.name?.toLowerCase().trim() === inputCatName.toLowerCase()
+      );
+      if (existingCategory) {
+        targetCategoryId = existingCategory.id || existingCategory._id;
+      } else {
+        const res = await categoryApi.addCategory({ name: inputCatName });
+        const resData = res.data || res;
+        targetCategoryId = resData.id || resData.categoryId;
+        const updatedCats = await categoryApi.fetchCategories();
+        setCategories(updatedCats);
+      }
+
+      // 2. Xử lý Tác giả (Sửa y hệt Category)
+      let targetAuthorId = null;
+      const inputAuthorName = (formData.author || "").trim();
+      const existingAuthor = authors.find(
+        (a) => a.name?.toLowerCase().trim() === inputAuthorName.toLowerCase()
+      );
+      if (existingAuthor) {
+        targetAuthorId = existingAuthor.id || existingAuthor._id;
+      } else {
+        const res = await authorApi.addAuthor({ name: inputAuthorName });
+        const resData = res.data || res;
+        targetAuthorId = resData.id || resData.authorId;
+        const updatedAuthors = await authorApi.fetchAuthors();
+        setAuthors(updatedAuthors);
+      }
+
+      const data = new FormData();
+      data.append("name", formData.name.trim());
+      data.append("author_id", targetAuthorId);
+      data.append("description", formData.description.trim());
+      data.append("price", Number(formData.price) || 0);
+      data.append("category_id", targetCategoryId);
+      data.append("quantity", Number(formData.quantity) || 0);
+      data.append("page_count", Number(formData.page_count) || 0);
+      data.append("publish_year", Number(formData.publish_year) || 0);
+
+      if (formData.image) data.append("image", formData.image);
+
+      if (editingBookId) {
+        await bookApi.updateBook(editingBookId, data);
+        alert("Cập nhật thành công!");
+      } else {
+        await bookApi.createBook(data);
+        alert("Thêm mới thành công!");
+      }
+
+      resetForm();
+      setShowForm(false);
+      await loadData();
+    } catch (err) {
+      alert(err.message || "Thao tác thất bại");
+    }
+  };
+
+  return (
+    <div
+      className="container-fluid py-4 bg-light"
+      style={{ minHeight: "100vh" }}
+    >
+      <div className="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm">
+        <h3 className="fw-bold text-uppercase text-primary m-0">
+          QUẢN LÝ KHO SÁCH
+        </h3>
+        <span className="badge bg-primary fs-6 rounded-pill px-4 py-2">
+          Tổng số sách: {books.length}
+        </span>
+      </div>
+
+      <div className="mb-3">
+        <button
+          className="btn btn-success shadow-sm fw-bold px-4"
+          onClick={() => {
+            if (showForm) resetForm();
+            setShowForm(!showForm);
+          }}
+        >
+          {showForm ? "ĐÓNG FORM" : "THÊM SÁCH MỚI"}
+        </button>
+      </div>
+
+      {showForm && (
+        <div className="admin-card mb-4 p-4 border rounded bg-white shadow-sm border-2">
+          <h4 className="fw-bold mb-4 text-dark">
+            {editingBookId
+              ? "CẬP NHẬT THÔNG TIN SÁCH"
+              : "NHẬP THÔNG TIN SÁCH MỚI"}
+          </h4>
+          <form onSubmit={handleSubmit}>
+            <div className="row g-3">
+              <div className="col-md-6">
+                <label className="small fw-bold">Tên sách</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className="col-md-6">
+                <label className="small fw-bold">Tác giả</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={formData.author}
+                  onChange={(e) =>
+                    setFormData({ ...formData, author: e.target.value })
+                  }
+                  list="authorList"
+                  required
+                />
+                <datalist id="authorList">
+                  {authors.map((auth) => (
+                    <option key={auth.id} value={auth.name} />
+                  ))}
+                </datalist>
+              </div>
+              <div className="col-md-6">
+                <label className="small fw-bold">Thể loại</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={formData.categoryName}
+                  onChange={(e) =>
+                    setFormData({ ...formData, categoryName: e.target.value })
+                  }
+                  list="categoryList"
+                  required
+                />
+                <datalist id="categoryList">
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.name} />
+                  ))}
+                </datalist>
+              </div>
+              <div className="col-md-3">
+                <label className="small fw-bold">Giá bán</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  value={formData.price}
+                  onChange={(e) =>
+                    setFormData({ ...formData, price: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className="col-md-3">
+                <label className="small fw-bold">Số lượng tồn</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  value={formData.quantity}
+                  onChange={(e) =>
+                    setFormData({ ...formData, quantity: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className="col-md-3">
+                <label className="small fw-bold">Số trang</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  value={formData.page_count}
+                  onChange={(e) =>
+                    setFormData({ ...formData, page_count: e.target.value })
+                  }
+                />
+              </div>
+              <div className="col-md-3">
+                <label className="small fw-bold">Năm xuất bản</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  value={formData.publish_year}
+                  onChange={(e) =>
+                    setFormData({ ...formData, publish_year: e.target.value })
+                  }
+                />
+              </div>
+              <div className="col-md-6">
+                <label className="small fw-bold">Hình ảnh</label>
+                <input
+                  type="file"
+                  className="form-control"
+                  onChange={(e) =>
+                    setFormData({ ...formData, image: e.target.files[0] })
+                  }
+                  accept="image/*"
+                />
+              </div>
+              <div className="col-12">
+                <label className="small fw-bold">Mô tả nội dung</label>
+                <textarea
+                  className="form-control"
+                  rows="3"
+                  value={formData.description}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+            <div className="mt-4 text-end">
+              <button
+                type="submit"
+                className="btn btn-primary px-5 me-2 shadow fw-bold"
+              >
+                LƯU DỮ LIỆU
+              </button>
+              <button
+                type="button"
+                className="btn btn-outline-secondary px-4 fw-bold"
+                onClick={() => {
+                  resetForm();
+                  setShowForm(false);
+                }}
+              >
+                HỦY
+              </button>
+            </div>
+          </form>
         </div>
-    );
+      )}
+
+      <div className="table-responsive bg-white rounded shadow-sm">
+        <table className="table table-hover align-middle text-center table-bordered mb-0">
+          <thead className="bg-light text-dark fw-bold">
+            <tr>
+              <th className="py-3 text-center">Tên Sách</th>
+              <th className="py-3 text-center">Tác Giả</th>
+              <th className="py-3 text-center">Thể Loại</th>
+              <th className="py-3 text-center">Giá</th>
+              <th className="py-3 text-center">Còn Lại</th>
+              <th className="py-3 text-center">Hành Động</th>
+            </tr>
+          </thead>
+          <tbody>
+            {books.map((book) => (
+              <tr key={book.id}>
+                <td className="fw-bold text-start ps-4">{book.name}</td>
+                <td className="text-start">{book.author}</td>
+                <td>
+                  <span className="badge bg-info text-dark">
+                    {book.category_name || getCategoryName(book)}
+                  </span>
+                </td>
+                <td className="text-danger fw-bold">
+                  {Number(book.price).toLocaleString()}đ
+                </td>
+                <td className="fw-bold text-primary">{book.quantity ?? 0}</td>
+                <td>
+                  <button
+                    className="btn btn-warning btn-sm me-2 fw-bold"
+                    onClick={() => handleEdit(book)}
+                  >
+                    SỬA
+                  </button>
+                  <button
+                    className={`btn btn-sm fw-bold ${
+                      book.is_active ? "btn-danger" : "btn-success"
+                    }`}
+                    onClick={() =>
+                      book.is_active
+                        ? bookApi.deleteBook(book.id).then(loadData)
+                        : bookApi.restoreBook(book.id).then(loadData)
+                    }
+                  >
+                    {book.is_active ? "ẨN" : "HIỆN"}
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 };
 
 export default BookManager;
