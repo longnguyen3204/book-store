@@ -1,0 +1,138 @@
+.checkout-bg {
+    background-color: #f3f2ec; /* Đồng bộ với tông màu Header của bạn */
+    min-height: 100vh;
+    padding-bottom: 60px;
+}
+
+.checkout-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header style */
+.checkout-header-step {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    padding: 15px 40px;
+    margin-bottom: 30px;
+    border-radius: 4px;
+}
+
+
+.divider { margin: 0 15px; color: black; font-size: 24px; }
+.step-title { font-size: 25px; color: black; flex: 1; font-weight: 600; }
+
+.hotline-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 15px;
+    border: 1px solid #e5e5e5;
+    border-radius: 20px;
+}
+.hotline-num { color: black; font-weight: bold; margin: 0; }
+.hotline-sub { font-size: 11px; color: #999; margin: 0; }
+
+/* Form Card */
+.form-instruction { font-size: 16px; font-weight: 500; margin-bottom: 15px; }
+
+.address-form-card {
+    padding: 30px 100px;
+    background: #fff;
+    border-radius: 4px;
+}
+
+.add-new-link { font-size: 14px; margin-bottom: 25px; }
+.add-new-link span { color: black; cursor: pointer; }
+
+.form-group-row {
+    display: flex;
+    margin-bottom: 20px;
+    align-items: flex-start;
+}
+
+.form-group-row label {
+    width: 200px;
+    font-size: 17px;
+    color: #333;
+    padding-top: 12px;
+    font-weight: 600;
+}
+
+.form-group-row input, 
+.form-group-row select, 
+.form-group-row textarea {
+    flex: 1;
+    max-width: 450px;
+    padding: 14px 18px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    outline: none;
+    font-size: 17px;
+}
+.address-input-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    max-width: 450px; /* Khớp với độ rộng của các ô select phía trên */
+}
+.form-group-row textarea {
+    width: 100%;
+    padding: 14px 18px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 17px;
+    outline: none;
+    resize: vertical; /* Cho phép kéo dãn chiều cao */
+    transition: border-color 0.2s;
+}
+.form-group-row textarea:focus {
+    border-color: black; /* Màu xanh Tiki khi nhấn vào */
+}
+
+
+.radio-group { display: flex; gap: 30px; padding-top: 10px; }
+.radio-label, .checkbox-label { 
+    font-size: 16px; 
+    cursor: pointer; 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    white-space: nowrap;
+}
+
+.offset-label label { margin-left: 200px; }
+.form-group-row.offset-label { align-items: center; }
+
+/* Buttons */
+.form-actions {
+    margin-left: 200px;
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.btn-cancel {
+    padding: 10px 40px;
+    background:  rgb(250,235,215);
+    color: black;
+    border: none;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-submit {
+    padding: 10px 40px;
+    background:  rgb(250,235,215);
+    color: black;
+    border: none;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-submit:hover { background:  rgb(250,235,215); }
+.btn-cancel:hover { background:  rgb(250,235,215); }

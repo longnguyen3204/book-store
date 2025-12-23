@@ -18,7 +18,7 @@ const RegisterPage = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    name: "",
+    fullname: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -37,9 +37,9 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { name, email, password, confirmPassword } = formData;
+    const { fullname, email, password, confirmPassword } = formData;
 
-    if (!name || !email || !password || !confirmPassword) {
+    if (!fullname || !email || !password || !confirmPassword) {
       setError("Vui lòng điền đầy đủ thông tin.");
       return;
     }
@@ -56,7 +56,11 @@ const RegisterPage = () => {
 
     try {
       setIsLoading(true);
-      await authApi.register({ name, email, password });
+      await authApi.register({ 
+        fullname: formData.fullname, // Khớp với Backend
+        email: formData.email, 
+        password: formData.password 
+          });
 
       alert("Đăng ký thành công! Vui lòng đăng nhập.");
       navigate("/login");

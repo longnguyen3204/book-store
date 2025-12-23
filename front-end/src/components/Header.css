@@ -1,0 +1,21 @@
+header.fixed {
+  z-index: 9999 !important; /* Đảm bảo Header luôn nằm trên cùng */
+  pointer-events: auto !important; /* Cho phép nhận sự kiện click */
+}
+
+.history-link-prefix {
+  color: #b36c4d;
+  font-weight: 600;
+  cursor: pointer;
+  padding-right: 8px;
+  display: inline-block;
+}
+
+.order-history-link {
+  color: #b36c4d;
+  font-weight: 600;
+  text-decoration: none;
+}
+.order-history-link:hover {
+  opacity: 0.8;
+}

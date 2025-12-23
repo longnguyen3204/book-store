@@ -34,6 +34,16 @@ class Order {
         const [rows] = await db.query(sql, params);
         return rows;
     }
+
+    static async updateStatus(userId, orderId, status) {
+        const sql = `
+            UPDATE orders 
+            SET status = ?
+            WHERE id = ? AND user_id = ?
+        `;
+        const [result] = await db.query(sql, [status, orderId, userId]);
+        return result;
+    }
 }
 
 module.exports = Order;

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import Header from "../../components/Header";
+import HomeHeader from "../../components/HomeHeader";
 import { listProduct } from "../../config/ProductRequest";
 
 function SearchPage() {
@@ -23,7 +23,7 @@ function SearchPage() {
 
   return (
     <div className="app">
-      <Header searchQuery={query} />
+      <HomeHeader searchQuery={query} />
 
       <section className="py-5 mt-40">
         <div className="container">
@@ -47,7 +47,7 @@ function SearchPage() {
                           className="product-item"
                         />
                         <Link
-                          to={`/product/${book.id}`}
+                          to={`/books/${book.id}`}
                           className="add-to-cart"
                         >
                           Xem chi tiết

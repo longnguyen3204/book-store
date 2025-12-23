@@ -3,7 +3,7 @@ import Slider from "react-slick";
 import classNames from "classnames";
 import AOS from "aos";
 import { Link } from "react-router-dom";
-
+import { useCart } from "../../context/CartContext";
 import {
   brandAssets,
   heroSlides,
@@ -31,14 +31,14 @@ const Arrow = ({ direction, onClick }) => (
   </button>
 );
 
-const ProductCard = ({ title, author, price, image, prevPrice }) => (
+const ProductCard = ({ id, title, author, price, image, prevPrice, onAdd }) => (
   <div className="product-item">
     <figure className="product-style">
       <img src={image} alt={title} className="product-item" />
       <button
         type="button"
         className="add-to-cart"
-        data-product-tile="add-to-cart"
+        onClick={() => onAdd({ id, title, author, price, image })} // Gọi hàm onAdd khi click
       >
         Add to Cart
       </button>
@@ -59,6 +59,15 @@ const HomePage = ({ user }) => {
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [isSearchOpen, setSearchOpen] = useState(false);
   const [isSticky, setSticky] = useState(false);
+  const { cart, addToCart } = useCart();
+  const cartCount = useMemo(
+    () =>
+      cart.reduce(
+        (sum, item) => sum + (item.quantity ? Number(item.quantity) : 1),
+        0
+      ),
+    [cart]
+  );
   const tabLabels = {
     "all-genre": "All Genre",
     business: "Business",
@@ -66,6 +75,10 @@ const HomePage = ({ user }) => {
     romantic: "Romantic",
     adventure: "Adventure",
     fictional: "Fictional",
+  };
+  const handleAddToCart = (book) => {
+    addToCart(book); // Gọi hàm từ context
+    alert(`Đã thêm "${book.title}" vào giỏ hàng!`);
   };
 
   useEffect(() => {
@@ -173,7 +186,7 @@ const HomePage = ({ user }) => {
 
                   <Link to="/cart" className="cart for-buy" style={{ display: "flex", gap: 6, alignItems: "center" }}>
                     <i className="icon icon-clipboard"></i>
-                    <span>Cart:(0 $)</span>
+                    <span>Cart:({cartCount})</span>
                   </Link>
                   <div className="action-menu">
                     <div className="search-bar">
@@ -268,6 +281,10 @@ const HomePage = ({ user }) => {
                           Articles
                         </a>
                       </li>
+                       
+                    <li className="menu-item">
+                      <Link to="/books" className="nav-link">Library</Link>
+                    </li>
                     </ul>
                     <div
                       className={classNames("hamburger", {
@@ -355,7 +372,7 @@ const HomePage = ({ user }) => {
                 <div className="row">
                   {featuredBooks.map((book) => (
                     <div className="col-md-3" key={book.title}>
-                      <ProductCard {...book} />
+                      <ProductCard {...book} onAdd={handleAddToCart} />
                     </div>
                   ))}
                 </div>
@@ -454,7 +471,7 @@ const HomePage = ({ user }) => {
                               className="col-md-3"
                               key={`${key}-${book.title}`}
                             >
-                              <ProductCard {...book} />
+                              <ProductCard {...book} onAdd={handleAddToCart} />
                             </div>
                           ))}
                         </div>
@@ -465,7 +482,7 @@ const HomePage = ({ user }) => {
                                 className="col-md-3"
                                 key={`${key}-${book.title}-extra`}
                               >
-                                <ProductCard {...book} />
+                                <ProductCard {...book} onAdd={handleAddToCart} />
                               </div>
                             ))}
                           </div>
@@ -506,7 +523,11 @@ const HomePage = ({ user }) => {
               <div className="product-list" data-aos="fade-up">
                 <Slider {...offerSliderSettings} className="grid product-grid">
                   {specialOffers.map((book) => (
-                    <ProductCard key={book.title + book.price} {...book} />
+                    <ProductCard
+                      key={book.title + book.price}
+                      {...book}
+                      onAdd={handleAddToCart}
+                    />
                   ))}
                 </Slider>
               </div>
@@ -689,6 +710,7 @@ const HomePage = ({ user }) => {
                   <li className="menu-item">
                     <a href="#">Advanced Search</a>
                   </li>
+                  
                 </ul>
               </div>
             </div>

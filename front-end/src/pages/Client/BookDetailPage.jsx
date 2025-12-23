@@ -6,13 +6,15 @@ import {
     Button, Tag, Breadcrumb, Image, Spin, Descriptions, 
     Divider, message, Rate, Form, Input, List, Avatar 
 } from 'antd';
-import { HomeOutlined, ShoppingCartOutlined, HeartOutlined, ShareAltOutlined } from '@ant-design/icons';
+import { HomeOutlined, HeartOutlined } from '@ant-design/icons';
 import "./review.css"
 import defaultImg from "../../assets/images/default.png";
+import { useCart } from "../../context/CartContext";
 
 function DetailProduct() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { addToCart } = useCart();
     const [product, setProduct] = useState(null);
     const [relatedProducts, setRelatedProducts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -22,8 +24,6 @@ function DetailProduct() {
         () => new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }),
         []
     );
-
-
 
     useEffect(() => {
         const fetchData = async () => {
@@ -66,7 +66,11 @@ function DetailProduct() {
                         ),
                     },
                     {
-                        title: <span className="breadcrumb-item">Sách</span>,
+                        title: (
+                            <Link to="/books" className="breadcrumb-item">
+                                Sách
+                            </Link>
+                        ),
                     },
                     {
                         title: <span className="breadcrumb-item">{product.title}</span>,
@@ -106,7 +110,7 @@ function DetailProduct() {
                             </h1>
 
                             {/* 2. Tác giả */}
-                            <p className="text-gray-400 uppercase text-[10px] tracking-[0.2em] mb-0">
+                            <p className="text-gray-400 uppercase text-[10px] tracking-[0.2em] mb-0 text-left">
                                 Tác giả: <span className="text-blue-500 font-medium">{product.author}</span>
                             </p>
                             
@@ -135,35 +139,58 @@ function DetailProduct() {
                             </div>
 
                             {/* 5. Khối Nhận xét (NX) / Mô tả ngắn */}
-                            <div className="bg-gray-50/80 p-6 lg:p-8 rounded-3xl relative mt-2">
+                            <div className="bg-gray-50/80 p-6 lg:p-8 rounded-3xl relative mt-2 text-left">
                                 <span className="absolute -top-3 left-6 bg-white px-3 text-gray-300 font-serif text-lg italic uppercase tracking-tighter">Mô tả sách</span>
-                                <p className="text-gray-500 leading-relaxed text-sm lg:text-base italic mb-0">
+                                <p className="text-gray-500 leading-relaxed text-sm lg:text-base italic mb-0 text-left">
                                     "{product.description || product.descriptionProduct || "Chưa có mô tả."}"
                                 </p>
                             </div>
 
                             {/* 6. Cụm nút Mua ngay & Yêu thích (Tim) */}
                             <div className="flex w-full max-w-sm h-14 lg:h-16 mt-4" style={{ display: "flex", gap: 12, marginTop: 12 }}>
-                                {/*nút mua ngay */}
-                            <button
-                                onClick={() => message.success('Mua ngay thành công')}>
+                              {/*nút mua ngay */}
+                              <button
+                                onClick={() => {
+                                  const item = {
+                                    id: product.id,
+                                    title: product.title,
+                                    author: product.author,
+                                    price: product.price,
+                                    image: product.imagesProduct?.[0] || product.image || defaultImg,
+                                  };
+                                  addToCart(item);
+                                  message.success("Đã thêm vào giỏ hàng");
+                                  navigate("/cart");
+                                }}
+                                className="flex-1 bg-[#b19173] hover:bg-[#9d7b5b] text-white font-bold text-sm lg:text-base uppercase tracking-widest transition-all disabled:bg-gray-300 rounded-2xl shadow-lg shadow-amber-100"
+                              >
                                 Mua ngay
-                            </button>
-                             {/* Nút Thêm vào giỏ */}
-                            <button 
-                                onClick={() => message.success('Đã thêm vào giỏ hàng')}
+                              </button>
+                              {/* Nút Thêm vào giỏ */}
+                              <button 
+                                onClick={() => {
+                                  const item = {
+                                    id: product.id,
+                                    title: product.title,
+                                    author: product.author,
+                                    price: product.price,
+                                    image: product.imagesProduct?.[0] || product.image || defaultImg,
+                                  };
+                                  addToCart(item);
+                                  message.success('Đã thêm vào giỏ hàng');
+                                }}
                                 disabled={product.stockProduct === 0}
                                 className="flex-[3] bg-[#0066ff] hover:bg-blue-700 text-white font-bold text-sm lg:text-base uppercase tracking-widest transition-all disabled:bg-gray-300 rounded-2xl shadow-lg shadow-blue-100"
-                            >
+                              >
                                 Thêm vào giỏ hàng
-                            </button>
+                              </button>
 
-                            {/* Nút Trái tim - Sửa lại để hiển thị rõ ràng */}
-                            <button className="flex-1  hover:bg-red-50 text-red-400 flex items-center justify-center transition-all text-xl lg:text-2xl rounded-2xl border border-gray-100 shadow-sm"
+                              {/* Nút Trái tim - Sửa lại để hiển thị rõ ràng */}
+                              <button className="flex-1  hover:bg-red-50 text-red-400 flex items-center justify-center transition-all text-xl lg:text-2xl rounded-2xl border border-gray-100 shadow-sm"
                                 onClick={() => message.success('Đã thêm vào danh sách yêu thích')}>
                                 <HeartOutlined />
-                            </button>
-                        </div>
+                              </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -250,24 +277,6 @@ function DetailProduct() {
     </div>
 </div>
 
-                {/* Sản phẩm liên quan */}
-                <div className="mt-24">
-                    <h2 className="text-2xl font-serif mb-10 text-gray-800">Sách bạn có thể thích</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                        {relatedProducts.map((item) => (
-                            <div key={item.id} onClick={() => navigate(`/product/${item.id}`)} className="group cursor-pointer">
-                                <div className="bg-[#f4f2ee] rounded-[30px] p-8 mb-5 shadow-sm group-hover:shadow-xl transition-all duration-500 flex justify-center border border-white">
-                                    <img src={item.image} alt={item.title} className="h-44 object-contain transform group-hover:scale-110 transition-transform duration-500" />
-                                    <div className="text-center">
-                                        <h4 className="text-sm font-bold text-gray-800 mb-1">{item.title}</h4>
-                                        <p className="text-[10px] text-gray-400 uppercase tracking-widest">{item.author}</p>
-                                    </div>
-                                </div>
-                                
-                            </div>
-                        ))}
-                    </div>
-                </div>
             </div>
         </div>
         

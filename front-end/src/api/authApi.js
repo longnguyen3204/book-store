@@ -41,4 +41,41 @@ export async function register(payload) {
 export default {
   login,
   register,
+  updateProfile,
+  getProfile,
 };
+export async function updateProfile(data) {
+  try {
+    const token = localStorage.getItem("token");
+    const headers = {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+
+    const body = {
+      fullname: data.fullname,
+      phone_number: data.phone_number,
+      address: data.address ?? null,
+      avatar: data.avatar ?? null,
+    };
+
+    const response = await api.put("/users/profile", body, { headers });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Cập nhật thất bại");
+  }
+}
+
+export async function getProfile() {
+  try {
+    const token = localStorage.getItem("token");
+    const headers = {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+    const response = await api.get("/users/profile", { headers });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Không lấy được thông tin người dùng");
+  }
+}

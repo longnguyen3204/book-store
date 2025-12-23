@@ -6,7 +6,6 @@ import "./App.css";
 import HomePage from "./pages/Home/HomePage";
 import LoginPage from "./pages/Login/LoginPage";
 import RegisterPage from "./pages/Register/RegisterPage";
-import ProfilePage from "./pages/Client/Profile/ProfilePage";
 import DetailProduct from "./pages/Client/BookDetailPage";
 import SearchPage from "./pages/Client/SearchPage";
 
@@ -18,6 +17,14 @@ import OrderManager from './pages/Admin/OrderManager';
 import UserManager from './pages/Admin/UserManager';
 import CategoryManager from './pages/Admin/CategoryManager';
 
+// Sửa lại đường dẫn ProfilePage (thêm /Client/)
+import ProfilePage from "./pages/Client/Profile/ProfilePage.jsx"; 
+
+// Giữ nguyên hoặc kiểm tra lại ShopPage (đảm bảo file nằm trong src/pages/Shop/)
+import ShopPage from "./pages/Shop/ShopPage.jsx";
+import CartPage from "./pages/Cart/CartPage.jsx";
+import CheckoutPage from "./pages/Cart/Checkout/CheckoutPage.jsx";
+import HistoryPage from "./pages/History/HistoryPage.jsx";
 function App() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -56,11 +63,16 @@ function App() {
   const handleBackHome = () => navigate("/");
 
   return (
+    
     <Routes>
       {/* --- ROUTES CHO KHÁCH HÀNG (CLIENT) --- */}
       <Route path="/" element={<HomePage user={user} />} />
-      <Route path="/product/:id" element={<DetailProduct />} />
+      <Route path="/books/:id" element={<DetailProduct />} />
       <Route path="/search" element={<SearchPage />} />
+      <Route path="/books" element={<ShopPage />} />
+      <Route path="/cart" element={<CartPage />} />
+      <Route path="/checkout" element={<CheckoutPage />} />
+      <Route path="/order-history" element={<HistoryPage user={user} />} />
       <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route
@@ -68,6 +80,7 @@ function App() {
         element={
           <ProfilePage
             user={user}
+            setUser={setUser}
             onBack={handleBackHome}
             onLogout={() => {
               handleLogout();
@@ -91,6 +104,7 @@ function App() {
       </Route>
       
     </Routes>
+    
   );
 }
 
