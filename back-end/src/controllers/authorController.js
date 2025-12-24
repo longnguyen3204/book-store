@@ -1,6 +1,6 @@
 const Author = require("../models/Author");
 
-// Lấy danh sách tác giả
+//1. Lấy danh sách tác giả
 exports.getAuthors = async (req, res) => {
   try {
     const authors = await Author.getAll();
@@ -10,7 +10,7 @@ exports.getAuthors = async (req, res) => {
   }
 };
 
-// Thêm tác giả mới
+//2. Thêm tác giả mới
 exports.addAuthor = async (req, res) => {
   try {
     const { name, bio } = req.body;
@@ -26,7 +26,7 @@ exports.addAuthor = async (req, res) => {
   }
 };
 
-// Xem chi tiết tác giả
+//3. Xem chi tiết tác giả
 exports.getAuthorDetail = async (req, res) => {
   try {
     const author = await Author.findById(req.params.id);

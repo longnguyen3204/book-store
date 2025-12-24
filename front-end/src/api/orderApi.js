@@ -1,6 +1,6 @@
 import api from "./api";
 
-// 2. Định nghĩa các hàm nghiệp vụ
+// 1. Lấy toàn bộ danh sách đơn hàng cho Admin
 export async function fetchOrders() {
   try {
     const response = await api.get("/orders");
@@ -12,6 +12,7 @@ export async function fetchOrders() {
   }
 }
 
+// 2. Cập nhật trạng thái đơn hàng (Admin)
 export async function updateOrderStatus(orderId, status) {
   try {
     const response = await api.put(`/orders/${orderId}/status`, { status });
@@ -23,6 +24,7 @@ export async function updateOrderStatus(orderId, status) {
   }
 }
 
+// 3. Đặt hàng mới (User)
 export async function createOrder(payload) {
   const token = localStorage.getItem("token");
   const headers = {
@@ -30,6 +32,7 @@ export async function createOrder(payload) {
   };
 
   try {
+    // Payload cần chứa: { items, shipping_address, total_amount, payment_method_id, voucher_id, note }
     const res = await api.post("/orders", payload, { headers });
     return res.data;
   } catch (error) {
@@ -39,6 +42,7 @@ export async function createOrder(payload) {
   }
 }
 
+// 4. Lấy lịch sử đơn hàng của cá nhân (User)
 export async function getOrderHistory(status) {
   const token = localStorage.getItem("token");
   const headers = {
@@ -58,6 +62,7 @@ export async function getOrderHistory(status) {
   }
 }
 
+// 5. Hủy đơn hàng (User)
 export async function cancelOrder(orderId) {
   const token = localStorage.getItem("token");
   const headers = {
@@ -65,6 +70,8 @@ export async function cancelOrder(orderId) {
   };
 
   try {
+    // API Route: PUT /orders/:id/status (với body status: 'cancelled')
+    // Hoặc giữ nguyên POST /orders/:id/cancel tùy theo Backend của bạn
     const res = await api.post(`/orders/${orderId}/cancel`, {}, { headers });
     return res.data;
   } catch (error) {

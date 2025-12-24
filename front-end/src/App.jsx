@@ -2,14 +2,20 @@ import { Routes, Route, useNavigate, Router } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "./App.css";
 import ScrollToTop from "./layouts/scrollToTop.js";
+import PrivateRoute from "./PrivateRoute.jsx";
 
 // Import các trang phía Client
 import HomePage from "./pages/Home/HomePage";
 import LoginPage from "./pages/Login/LoginPage";
+import ForgotPassword from "./pages/ForgotPass/ForgotPass.jsx";
 import RegisterPage from "./pages/Register/RegisterPage";
 import DetailProduct from "./pages/Shop/BookDetailPage";
 import SearchPage from "./pages/Shop/SearchPage";
-
+import ProfilePage from "./pages/Profile/ProfilePage.jsx";
+import ShopPage from "./pages/Shop/ShopPage.jsx";
+import CartPage from "./pages/Cart/CartPage.jsx";
+import CheckoutPage from "./pages/Cart/Checkout/CheckoutPage.jsx";
+import HistoryPage from "./pages/History/HistoryPage.jsx";
 // Import các trang phía Admin
 import AdminLayout from "./layouts/AdminLayout";
 import BookManager from "./pages/Admin/BookManager";
@@ -19,13 +25,7 @@ import CategoryManager from "./pages/Admin/CategoryManager";
 import VoucherManager from "./pages/Admin/VoucherManager.jsx";
 
 // Sửa lại đường dẫn ProfilePage (thêm /Client/)
-import ProfilePage from "./pages/Profile/ProfilePage.jsx";
 
-// Giữ nguyên hoặc kiểm tra lại ShopPage (đảm bảo file nằm trong src/pages/Shop/)
-import ShopPage from "./pages/Shop/ShopPage.jsx";
-import CartPage from "./pages/Cart/CartPage.jsx";
-import CheckoutPage from "./pages/Cart/Checkout/CheckoutPage.jsx";
-import HistoryPage from "./pages/History/HistoryPage.jsx";
 function App() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -73,37 +73,110 @@ function App() {
         <Route path="/books/:id" element={<DetailProduct />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/books" element={<ShopPage />} />
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/order-history" element={<HistoryPage user={user} />} />
+        <Route
+          path="/cart"
+          element={
+            <PrivateRoute>
+              <CartPage />{" "}
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/checkout"
+          element={
+            <PrivateRoute>
+              <CheckoutPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/order-history"
+          element={
+            <PrivateRoute>
+              <HistoryPage user={user} />
+            </PrivateRoute>
+          }
+        />
         <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot_password" element={<ForgotPassword />} />
         <Route
           path="/profile"
           element={
-            <ProfilePage
-              user={user}
-              setUser={setUser}
-              onBack={handleBackHome}
-              onLogout={() => {
-                handleLogout();
-                navigate("/");
-              }}
-            />
+            <PrivateRoute>
+              <ProfilePage
+                user={user}
+                setUser={setUser}
+                onBack={handleBackHome}
+                onLogout={() => {
+                  handleLogout();
+                  navigate("/");
+                }}
+              />
+            </PrivateRoute>
           }
         />
         {/* --- ROUTES CHO ADMIN --- */}
         {/* AdminLayout sẽ bao bọc các route con bên trong */}
-        <Route path="/admin" element={<AdminLayout />}>
+        <Route
+          path="/admin"
+          element={
+            <PrivateRoute>
+              <AdminLayout />
+            </PrivateRoute>
+          }
+        >
           {/* Route index: Khi vào /admin sẽ mặc định hiện trang Quản lý Sách */}
-          <Route index element={<BookManager />} />
+          <Route
+            index
+            element={
+              <PrivateRoute>
+                <BookManager />
+              </PrivateRoute>
+            }
+          />
 
           {/* Các trang chức năng cụ thể */}
-          <Route path="books" element={<BookManager />} />
-          <Route path="categories" element={<CategoryManager />} />
-          <Route path="orders" element={<OrderManager />} />
-          <Route path="vouchers" element={<VoucherManager />} />
-          <Route path="users" element={<UserManager />} />
+          <Route
+            path="books"
+            element={
+              <PrivateRoute>
+                <BookManager />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="categories"
+            element={
+              <PrivateRoute>
+                <CategoryManager />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="orders"
+            element={
+              <PrivateRoute>
+                <OrderManager />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="vouchers"
+            element={
+              <PrivateRoute>
+                <VoucherManager />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="users"
+            element={
+              <PrivateRoute>
+                <UserManager />
+              </PrivateRoute>
+            }
+          />
         </Route>
       </Routes>
     </>

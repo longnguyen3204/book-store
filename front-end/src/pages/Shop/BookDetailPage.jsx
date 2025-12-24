@@ -33,7 +33,7 @@ import "./review.css";
 function DetailProduct() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
+  // const location = useLocation(); // Không dùng thì bỏ đi cho gọn
   const { addToCart } = useCart();
 
   const [product, setProduct] = useState(null);
@@ -56,7 +56,8 @@ function DetailProduct() {
       acc[curr.rating] = (acc[curr.rating] || 0) + 1;
       return acc;
     }, {});
-    return { average: (sum / count).toFixed(1), count, stars };
+    // Fix lỗi chia cho 0 nếu count = 0 (dù đã check length ở trên nhưng thêm cho chắc)
+    return { average: count ? (sum / count).toFixed(1) : 0, count, stars };
   }, [reviews]);
 
   useEffect(() => {
@@ -67,9 +68,16 @@ function DetailProduct() {
           getBookDetail(id),
           getReviewsByBook(id),
         ]);
-        const productData = resProduct.metadata?.product || resProduct;
-        setProduct(productData);
-        setReviews(resReviews || []);
+
+        let rawData = resProduct.metadata?.product || resProduct;
+        const finalProduct = Array.isArray(rawData) ? rawData[0] : rawData;
+        setProduct(finalProduct);
+
+        const finalReviews = Array.isArray(resReviews) ? resReviews : [];
+        setReviews(finalReviews);
+
+        console.log("Product:", finalProduct);
+        console.log("Reviews:", finalReviews);
 
         const completedOrders = await getOrderHistory("completed");
         setCanReview(
@@ -78,6 +86,7 @@ function DetailProduct() {
           )
         );
       } catch (error) {
+        console.error(error);
         message.error("Lỗi tải dữ liệu");
       } finally {
         setLoading(false);
@@ -101,8 +110,11 @@ function DetailProduct() {
       await createReview(payload);
       message.success("Cảm ơn bạn đã gửi đánh giá!");
       setIsModalOpen(false);
-      setReviews(await getReviewsByBook(id));
+
+      const updatedReviews = await getReviewsByBook(id);
+      setReviews(Array.isArray(updatedReviews) ? updatedReviews : []);
     } catch (error) {
+      console.error(error);
       message.error("Gửi đánh giá thất bại");
     }
   };
@@ -113,7 +125,9 @@ function DetailProduct() {
         <Spin size="large" />
       </div>
     );
-  if (!product)
+
+  // Kiểm tra product tồn tại
+  if (!product || Object.keys(product).length === 0)
     return (
       <div className="error-center">
         <h2>Sản phẩm không tồn tại</h2>
@@ -153,7 +167,7 @@ function DetailProduct() {
 
           <div className="product-info-section">
             <h1 className="product-name">{product.name}</h1>
-            <p className="author-name">
+            <p className="author-name text-start">
               Tác giả: <span>{product.author || "Nhiều tác giả"}</span>
             </p>
 
@@ -164,13 +178,16 @@ function DetailProduct() {
               </span>
             </div>
 
+            {/* --- SỬA 4: Ép kiểu Number để tránh lỗi NaN --- */}
             <div className="price-row">
               <span className="price-current">
-                {formatCurrency.format(product.price)}
+                {product.price
+                  ? formatCurrency.format(Number(product.price))
+                  : "Liên hệ"}
               </span>
-              {product.original_price > product.price && (
+              {Number(product.original_price) > Number(product.price) && (
                 <span className="price-original">
-                  {formatCurrency.format(product.original_price)}
+                  {formatCurrency.format(Number(product.original_price))}
                 </span>
               )}
             </div>
@@ -178,7 +195,9 @@ function DetailProduct() {
             <Divider />
             <div className="description-section">
               <h3>TÓM LƯỢC NỘI DUNG</h3>
-              <p>"{product.description || "Đang cập nhật..."}"</p>
+              <p className="text-start">
+                "{product.description || "Đang cập nhật..."}"
+              </p>
             </div>
 
             <div className="action-group">
@@ -224,6 +243,7 @@ function DetailProduct() {
           </div>
 
           <div className="review-content-grid">
+            {/* Phần thống kê sao giữ nguyên */}
             <div className="score-overview">
               <div className="score-big">{ratingStats.average}</div>
               <Rate
@@ -260,26 +280,35 @@ function DetailProduct() {
             <div className="comments-section">
               <List
                 dataSource={reviews}
+                // Thêm check empty để hiện thông báo nếu chưa có review
+                locale={{ emptyText: "Chưa có đánh giá nào." }}
                 renderItem={(item) => (
                   <div className="comment-card-item">
                     <Avatar className="user-avatar">
-                      {item.user_name?.[0]?.toUpperCase()}
+                      {/* Thêm optional chaining ?. để tránh lỗi nếu user_name null */}
+                      {item.user_name ? item.user_name[0].toUpperCase() : "U"}
                     </Avatar>
                     <div className="comment-body">
                       <div className="comment-header">
-                        <span className="user-name">{item.user_name}</span>
+                        <span className="user-name">
+                          {item.user_name || "Người dùng ẩn danh"}
+                        </span>
                         <span className="comment-date">
-                          {new Date(item.created_at).toLocaleDateString(
-                            "vi-VN"
-                          )}
+                          {item.created_at
+                            ? new Date(item.created_at).toLocaleDateString(
+                                "vi-VN"
+                              )
+                            : ""}
                         </span>
                       </div>
                       <Rate
                         disabled
-                        value={item.rating}
+                        value={Number(item.rating)}
                         style={{ fontSize: "10px" }}
                       />
-                      <p className="comment-text">"{item.comment}"</p>
+                      <p className="comment-text text-start">
+                        "{item.comment}"
+                      </p>
                     </div>
                   </div>
                 )}

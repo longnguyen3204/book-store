@@ -1,12 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
-import { MenuOutlined, CloseOutlined } from "@ant-design/icons";
+import { MenuOutlined, CloseOutlined, HomeOutlined } from "@ant-design/icons"; // Thêm HomeOutlined
 import "../pages/Admin/Admin.css";
 
 const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    if (user.role_id !== 1 && user.role_name !== "admin") {
+      navigate("/");
+    }
+  }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -21,7 +28,6 @@ const AdminLayout = () => {
   };
 
   return (
-    /* Sử dụng class sidebar-closed để đẩy nội dung ra khi đóng */
     <div
       className={`admin-wrapper ${
         isSidebarOpen ? "sidebar-open" : "sidebar-closed"
@@ -31,13 +37,25 @@ const AdminLayout = () => {
       <aside className="admin-sidebar">
         <div className="admin-sidebar-header">
           <h3>ADMIN PANEL</h3>
-          {/* Nút đóng nhanh cho mobile nằm bên trong sidebar */}
           <button className="mobile-close-btn" onClick={toggleSidebar}>
             <CloseOutlined />
           </button>
         </div>
 
         <nav className="admin-nav">
+          {/* PHẦN TRANG CHỦ MỚI THÊM */}
+          <Link
+            to="/"
+            className="admin-nav-link home-link"
+            style={{
+              borderBottom: "1px solid rgba(255,255,255,0.1)",
+              marginBottom: "10px",
+              color: "#000000ff",
+            }}
+          >
+            <HomeOutlined /> Trang chủ
+          </Link>
+
           <Link
             to="/admin/books"
             className={`admin-nav-link ${isActive("/admin/books")}`}
@@ -82,7 +100,6 @@ const AdminLayout = () => {
 
       {/* 2. MAIN AREA */}
       <div className="admin-main">
-        {/* THANH TOP HEADER - NƠI CHỨA NÚT MENU BẠN CẦN */}
         <header className="admin-top-header">
           <button className="menu-toggle-btn" onClick={toggleSidebar}>
             <MenuOutlined />
@@ -90,13 +107,11 @@ const AdminLayout = () => {
           <h2 className="admin-title">Quản trị hệ thống</h2>
         </header>
 
-        {/* NỘI DUNG TRANG */}
         <main className="admin-content">
           <Outlet />
         </main>
       </div>
 
-      {/* BACKDROP CHO MOBILE */}
       <div className="admin-backdrop" onClick={toggleSidebar}></div>
     </div>
   );

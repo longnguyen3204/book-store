@@ -23,14 +23,19 @@ export default function UserAccount({ user: propUser, onLogout }) {
 
   // Dùng state nội bộ để quản lý thông tin User thực tế từ API
   const [currentUser, setCurrentUser] = useState(propUser || {});
-
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [addressInput, setAddressInput] = useState("");
   const [formData, setFormData] = useState({
     fullname: "",
     email: "",
     phone_number: "",
     address: "",
   });
-
+  const [passwordData, setPasswordData] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
   const [orders, setOrders] = useState([]);
   const [orderLoading, setOrderLoading] = useState(false);
 
@@ -120,6 +125,67 @@ export default function UserAccount({ user: propUser, onLogout }) {
       </div>
     );
 
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+
+    // 1. Kiểm tra khớp mật khẩu
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      return message.error("Mật khẩu xác nhận không khớp!");
+    }
+
+    // 2. Kiểm tra độ dài mật khẩu
+    if (passwordData.newPassword.length < 6) {
+      return message.error("Mật khẩu mới phải từ 6 ký tự trở lên!");
+    }
+
+    try {
+      setLoading(true);
+      // ĐỔI KEY: từ oldPassword sang currentPassword để khớp Backend
+      await userApi.changePassword({
+        currentPassword: passwordData.oldPassword,
+        newPassword: passwordData.newPassword,
+      });
+
+      message.success("Đổi mật khẩu thành công!");
+
+      // Reset form
+      setPasswordData({
+        oldPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+    } catch (error) {
+      // Hiển thị thông báo lỗi chi tiết từ Server nếu có
+      const serverMsg =
+        error.response?.data?.message || "Mật khẩu hiện tại không đúng!";
+      message.error(serverMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleUpdateAddress = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      // Tận dụng API updateProfile sẵn có
+      await userApi.updateProfile({
+        ...currentUser,
+        address: addressInput,
+      });
+
+      message.success("Cập nhật địa chỉ thành công!");
+      setIsEditingAddress(false);
+
+      // Cập nhật lại state local và localStorage
+      const updatedData = { ...currentUser, address: addressInput };
+      setCurrentUser(updatedData);
+      localStorage.setItem("user", JSON.stringify(updatedData));
+    } catch (error) {
+      message.error("Không thể cập nhật địa chỉ");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="user-account-page">
       <Header />
@@ -318,18 +384,71 @@ export default function UserAccount({ user: propUser, onLogout }) {
 
               {activeTab === "address" && (
                 <div className="tab-content">
-                  <h3 className="tab-title">Sổ địa chỉ</h3>
+                  <div className="pane-header-flex">
+                    <h3 className="tab-title">Sổ địa chỉ</h3>
+                    {!isEditingAddress && (
+                      <button
+                        className="btn-outline-edit"
+                        onClick={() => setIsEditingAddress(true)}
+                      >
+                        <EditOutlined /> Thay đổi địa chỉ
+                      </button>
+                    )}
+                  </div>
+
                   <div className="address-grid">
-                    <div className="address-item-card">
+                    <div
+                      className="address-item-card"
+                      style={{ width: "100%" }}
+                    >
                       <div className="addr-icon">
                         <EnvironmentOutlined />
                       </div>
-                      <div className="addr-text">
+                      <div className="addr-text" style={{ flex: 1 }}>
                         <strong>Địa chỉ mặc định</strong>
-                        <p>
-                          {currentUser.address ||
-                            "Bạn chưa cập nhật địa chỉ giao hàng."}
-                        </p>
+
+                        {isEditingAddress ? (
+                          <form
+                            onSubmit={handleUpdateAddress}
+                            style={{ marginTop: "10px" }}
+                          >
+                            <textarea
+                              className="form-control mb-2"
+                              rows="3"
+                              value={addressInput}
+                              onChange={(e) => setAddressInput(e.target.value)}
+                              placeholder="Nhập địa chỉ giao hàng chi tiết..."
+                              required
+                              style={{
+                                width: "100%",
+                                padding: "10px",
+                                borderRadius: "4px",
+                                border: "1px solid #ddd",
+                              }}
+                            />
+                            <div className="form-actions">
+                              <button
+                                type="submit"
+                                className="btn-action-primary"
+                                disabled={loading}
+                              >
+                                <SaveOutlined /> Lưu địa chỉ
+                              </button>
+                              <button
+                                type="button"
+                                className="btn-action-cancel"
+                                onClick={() => setIsEditingAddress(false)}
+                              >
+                                <CloseOutlined /> Hủy
+                              </button>
+                            </div>
+                          </form>
+                        ) : (
+                          <p style={{ marginTop: "5px", color: "#666" }}>
+                            {currentUser.address ||
+                              "Bạn chưa cập nhật địa chỉ giao hàng."}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -339,21 +458,58 @@ export default function UserAccount({ user: propUser, onLogout }) {
               {activeTab === "password" && (
                 <div className="tab-content">
                   <h3 className="tab-title">Đổi mật khẩu</h3>
-                  <form className="password-form">
+                  <form
+                    className="password-form"
+                    onSubmit={handlePasswordChange}
+                  >
                     <div className="form-input-group">
                       <label>Mật khẩu hiện tại</label>
-                      <input type="password" required />
+                      <input
+                        type="password"
+                        required
+                        value={passwordData.oldPassword}
+                        onChange={(e) =>
+                          setPasswordData({
+                            ...passwordData,
+                            oldPassword: e.target.value,
+                          })
+                        }
+                      />
                     </div>
                     <div className="form-input-group">
                       <label>Mật khẩu mới</label>
-                      <input type="password" required />
+                      <input
+                        type="password"
+                        required
+                        value={passwordData.newPassword}
+                        onChange={(e) =>
+                          setPasswordData({
+                            ...passwordData,
+                            newPassword: e.target.value,
+                          })
+                        }
+                      />
                     </div>
                     <div className="form-input-group">
-                      <label>Xác nhận mật khẩu</label>
-                      <input type="password" required />
+                      <label>Xác nhận mật khẩu mới</label>
+                      <input
+                        type="password"
+                        required
+                        value={passwordData.confirmPassword}
+                        onChange={(e) =>
+                          setPasswordData({
+                            ...passwordData,
+                            confirmPassword: e.target.value,
+                          })
+                        }
+                      />
                     </div>
-                    <button type="submit" className="btn-submit-pass">
-                      Cập nhật mật khẩu
+                    <button
+                      type="submit"
+                      className="btn-submit-pass"
+                      disabled={loading}
+                    >
+                      {loading ? <Spin size="small" /> : "Cập nhật mật khẩu"}
                     </button>
                   </form>
                 </div>

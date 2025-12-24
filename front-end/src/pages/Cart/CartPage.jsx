@@ -1,14 +1,15 @@
+import React, { useState, useMemo, useEffect } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useCart } from "./CartContext";
-import { useNavigate, Link, useLocation } from "react-router-dom";
-import { useState, useMemo, useEffect } from "react";
-import "./cart.css";
 import Header from "../../components/Header";
+import "./cart.css";
 
 // IMPORT API
 import bookApi from "../../api/bookApi";
 import orderApi from "../../api/orderApi";
 import voucherApi from "../../api/voucherApi";
 
+// IMPORT ICONS & UI LIBRARY
 import { DeleteOutlined, PlusOutlined, MinusOutlined } from "@ant-design/icons";
 import { message } from "antd";
 
@@ -17,20 +18,32 @@ export default function Cart() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // 1. Lấy thông tin User từ LocalStorage
   const user = useMemo(() => {
     try {
-      return JSON.parse(localStorage.getItem("user"));
+      const stored = localStorage.getItem("user");
+      return stored ? JSON.parse(stored) : null;
     } catch {
       return null;
     }
   }, []);
 
+  // Format tiền tệ VNĐ
   const currencyFormatter = useMemo(
     () =>
       new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }),
     []
   );
 
+  const formatNumberToText = (num) => {
+    if (!num) return "0";
+    if (num >= 1000000)
+      return (num / 1000000).toFixed(1).replace(/\.0$/, "") + " triệu";
+    if (num >= 1000) return (num / 1000).toFixed(0) + "k";
+    return num.toString();
+  };
+
+  // Helper parse giá (xử lý trường hợp giá là string "100.000" hoặc number)
   const parsePrice = (val) => {
     if (typeof val === "number") return val;
     if (typeof val === "string") {
@@ -40,41 +53,67 @@ export default function Cart() {
     return 0;
   };
 
+  // --- STATE QUẢN LÝ ---
   const [dbVouchers, setDbVouchers] = useState([]);
   const [selectedVoucher, setSelectedVoucher] = useState(null);
-  const [selectedIds, setSelectedIds] = useState([]);
-  const [selectedAddress, setSelectedAddress] = useState(
-    location.state?.savedAddress || null
-  );
+  const [selectedIds, setSelectedIds] = useState([]); // ID các sản phẩm được tích chọn
   const [recommendedProducts, setRecommendedProducts] = useState([]);
 
-  // Sync dữ liệu từ Database
+  // 2. Xử lý địa chỉ: Ưu tiên lấy từ Checkout truyền về -> Nếu không có thì lấy từ User Profile
+  const [selectedAddress, setSelectedAddress] = useState(() => {
+    // Trường hợp 1: Vừa điền form ở Checkout quay lại
+    if (location.state?.savedAddress) return location.state.savedAddress;
+
+    // Trường hợp 2: Lấy từ database user (nếu có)
+    if (user && user.address) {
+      return {
+        fullName: user.fullname || "Khách hàng",
+        phone: user.phone_number || "",
+        address: user.address, // Chuỗi địa chỉ từ DB
+        // Các trường phụ có thể để trống nếu DB lưu full string
+        ward: "",
+        district: "",
+        province: "",
+      };
+    }
+    return null;
+  });
+
+  // 3. Fetch dữ liệu từ Database (Sách đề xuất & Voucher)
   useEffect(() => {
     const fetchDbData = async () => {
       try {
-        const [booksData, vouchersData] = await Promise.all([
+        const [booksRes, vouchersRes] = await Promise.all([
           bookApi.getBooks(),
           voucherApi.fetchVouchers(),
         ]);
-        const normalized = (booksData || []).map((item) => ({
-          id: item.id,
-          title: item.name || item.title || "Đang cập nhật",
-          author: item.author || "Đang cập nhật",
-          price: item.price ?? 0,
-          image: item.image || item.thumbnail || "",
-        }));
-        setRecommendedProducts(
-          normalized.sort(() => Math.random() - 0.5).slice(0, 4)
+
+        // Xử lý danh sách sách để hiển thị "Có thể bạn sẽ thích"
+        const rawBooks = booksRes.data || booksRes;
+        const normalizedBooks = (Array.isArray(rawBooks) ? rawBooks : []).map(
+          (item) => ({
+            id: item.id,
+            title: item.name || item.title || "Đang cập nhật",
+            author: item.author || "Nhiều tác giả",
+            price: item.price ?? 0,
+            image:
+              item.image || item.thumbnail || "https://via.placeholder.com/150",
+          })
         );
-        setDbVouchers(vouchersData || []);
+
+        // Random lấy 4 sản phẩm
+        setRecommendedProducts(normalizedBooks.sort(() => Math.random() - 0.5));
+
+        // Set Voucher
+        setDbVouchers(Array.isArray(vouchersRes) ? vouchersRes : []);
       } catch (error) {
-        console.error("Lỗi API:", error);
+        console.error("Lỗi tải dữ liệu:", error);
       }
     };
     fetchDbData();
   }, []);
 
-  // 1. Tính Tạm tính (Tiền hàng chưa giảm)
+  // 4. Tính toán tiền nong
   const subTotal = useMemo(() => {
     return cart.reduce((sum, item) => {
       if (!selectedIds.includes(String(item.id))) return sum;
@@ -82,51 +121,31 @@ export default function Cart() {
     }, 0);
   }, [cart, selectedIds]);
 
-  // 2. Tính số tiền giảm giá (Xử lý cả % và số tiền mặt)
   const discountAmount = useMemo(() => {
     if (!selectedVoucher || subTotal < (selectedVoucher.min_order_value || 0))
       return 0;
-
-    // Nếu giá trị giảm <= 100 thì coi là %, nếu > 100 coi là số tiền mặt (hoặc dựa vào trường discount_type nếu có)
+    // Nếu giá trị <= 100 thì tính theo %, ngược lại là tiền mặt
     if (selectedVoucher.discount_value <= 100) {
       return (subTotal * Number(selectedVoucher.discount_value)) / 100;
-    } else {
-      return Number(selectedVoucher.discount_value);
     }
+    return Number(selectedVoucher.discount_value);
   }, [subTotal, selectedVoucher]);
 
-  // 3. Tổng tiền thanh toán cuối cùng
   const finalTotal = useMemo(
     () => Math.max(0, subTotal - discountAmount),
     [subTotal, discountAmount]
   );
-  const formatNumberToText = (num) => {
-    if (!num || isNaN(num)) return "0";
 
-    if (num >= 1000000) {
-      const million = num / 1000000;
-      // Trả về số nguyên nếu chia hết, hoặc lấy 1 số thập phân nếu cần (VD: 1.5 triệu)
-      return Number.isInteger(million)
-        ? `${million} triệu`
-        : `${million.toFixed(1)} triệu`;
-    }
-
-    if (num >= 1000) {
-      return `${num / 1000}k`;
-    }
-
-    return num.toString();
-  };
+  // 5. Xử lý chọn Voucher
   const handleSelectVoucher = (voucher) => {
     if (selectedVoucher?.id === voucher.id) {
-      setSelectedVoucher(null);
+      setSelectedVoucher(null); // Bỏ chọn
     } else {
-      // Kiểm tra điều kiện đơn hàng tối thiểu ngay khi bấm chọn
       if (subTotal < (voucher.min_order_value || 0)) {
         message.warning(
-          `Đơn hàng chưa đủ tối thiểu ${currencyFormatter.format(
+          `Đơn hàng cần tối thiểu ${currencyFormatter.format(
             voucher.min_order_value
-          )}`
+          )} để dùng mã này.`
         );
         return;
       }
@@ -134,36 +153,63 @@ export default function Cart() {
     }
   };
 
+  // 6. Xử lý đặt hàng
   const handlePlaceOrder = async () => {
+    if (!user) {
+      message.warning("Vui lòng đăng nhập để mua hàng");
+      navigate("/login");
+      return;
+    }
     if (selectedIds.length === 0) {
       message.error("Vui lòng chọn ít nhất 1 sản phẩm");
       return;
     }
     if (!selectedAddress) {
-      message.error("Vui lòng chọn địa chỉ giao hàng");
-      navigate("/checkout");
+      message.error("Vui lòng cập nhật địa chỉ giao hàng");
+      navigate("/checkout"); // Chuyển sang trang nhập địa chỉ
       return;
     }
 
+    // Chuẩn bị Items
     const items = cart
       .filter((i) => selectedIds.includes(String(i.id)))
       .map((i) => ({
         book_id: i.id,
         quantity: i.quantity || 1,
+        price: parsePrice(i.price),
       }));
+
+    // Chuẩn bị chuỗi địa chỉ
+    // Nếu selectedAddress là object từ Checkout thì gộp lại, nếu là string từ DB thì giữ nguyên
+    let shippingStr = "";
+    if (typeof selectedAddress === "string") {
+      shippingStr = selectedAddress;
+    } else {
+      shippingStr = `${selectedAddress.fullName} | ${selectedAddress.phone} | ${selectedAddress.address}`;
+      if (selectedAddress.ward) shippingStr += `, ${selectedAddress.ward}`;
+      if (selectedAddress.district)
+        shippingStr += `, ${selectedAddress.district}`;
+      if (selectedAddress.province)
+        shippingStr += `, ${selectedAddress.province}`;
+    }
 
     try {
       await orderApi.createOrder({
         items,
-        shipping_address: `${selectedAddress.address}, ${selectedAddress.ward}, ${selectedAddress.district}, ${selectedAddress.province}`,
-        note: "",
-        payment_method_id: 1,
-        voucher_id: selectedVoucher ? selectedVoucher.id : null, // Gửi ID voucher về server
+        shipping_address: shippingStr,
+        total_amount: finalTotal,
+        payment_method_id: 1, // Mặc định COD
+        voucher_id: selectedVoucher ? selectedVoucher.id : null,
       });
-      message.success("Đặt hàng thành công");
+
+      message.success("Đặt hàng thành công!");
+
+      // Xóa các sản phẩm đã mua khỏi giỏ
+      selectedIds.forEach((id) => removeFromCart(Number(id)));
+
       navigate("/order-history");
     } catch (err) {
-      message.error(err.message || "Đặt hàng thất bại");
+      message.error(err.message || "Đặt hàng thất bại, vui lòng thử lại");
     }
   };
 
@@ -179,11 +225,14 @@ export default function Cart() {
         <h2 className="main-title">
           GIỎ HÀNG <span>({cart.length} sản phẩm)</span>
         </h2>
+
         <div className="cart-flex-layout">
+          {/* CỘT TRÁI: DANH SÁCH SẢN PHẨM & ĐỀ XUẤT */}
           <div className="cart-left-section">
+            {/* Nếu giỏ hàng trống */}
             {cart.length === 0 ? (
               <div className="white-card empty-state-card text-center py-5">
-                <p>Giỏ hàng trống.</p>
+                <p>Giỏ hàng của bạn đang trống.</p>
                 <button
                   onClick={() => navigate("/")}
                   className="checkout-primary-btn w-auto px-4 mt-3"
@@ -193,6 +242,7 @@ export default function Cart() {
               </div>
             ) : (
               <>
+                {/* Header Bảng Giỏ hàng */}
                 <div className="white-card select-all-bar">
                   <label className="custom-checkbox">
                     <input
@@ -208,10 +258,15 @@ export default function Cart() {
                   <span className="col-price">Đơn giá</span>
                   <span className="col-qty">Số lượng</span>
                   <span className="col-total">Thành tiền</span>
+                  <span className="col-action">
+                    <DeleteOutlined />
+                  </span>
                 </div>
+
+                {/* Danh sách Items */}
                 <div className="white-card shop-group">
                   <div className="shop-header">
-                    <span className="shop-name">BOOKSAW</span>
+                    <span className="shop-name">BOOKSAW STORE</span>
                   </div>
                   {cart.map((item) => (
                     <div key={item.id} className="cart-item-row">
@@ -243,9 +298,11 @@ export default function Cart() {
                           </p>
                         </div>
                       </div>
+
                       <div className="item-unit-price">
                         {currencyFormatter.format(parsePrice(item.price))}
                       </div>
+
                       <div className="item-quantity-control">
                         <div className="qty-stepper">
                           <button
@@ -263,19 +320,8 @@ export default function Cart() {
                             value={item.quantity}
                             onChange={(e) => {
                               const val = parseInt(e.target.value);
-                              // Cho phép để trống tạm thời khi đang gõ, hoặc nhập số > 0
-                              if (!isNaN(val) && val > 0) {
+                              if (!isNaN(val) && val > 0)
                                 updateQuantity(item.id, val);
-                              } else if (e.target.value === "") {
-                                updateQuantity(item.id, ""); // Giữ trống để người dùng nhập tiếp
-                              }
-                            }}
-                            onBlur={(e) => {
-                              // Khi nhấn ra ngoài, nếu trống hoặc lỗi thì reset về 1
-                              const val = parseInt(e.target.value);
-                              if (isNaN(val) || val <= 0) {
-                                updateQuantity(item.id, 1);
-                              }
                             }}
                           />
                           <button
@@ -286,13 +332,14 @@ export default function Cart() {
                             <PlusOutlined />
                           </button>
                         </div>
-                        <p className="qty-note">Còn hàng</p>
                       </div>
-                      <div className="item-subtotal">
+
+                      <div className="item-subtotal text-danger fw-bold">
                         {currencyFormatter.format(
                           parsePrice(item.price) * item.quantity
                         )}
                       </div>
+
                       <div className="item-action">
                         <DeleteOutlined
                           className="btn-remove-item"
@@ -305,21 +352,28 @@ export default function Cart() {
               </>
             )}
 
-            <div className="white-card recommendation-section">
-              <h3 className="section-label">Sản phẩm bạn có thể thích</h3>
+            {/* SẢN PHẨM CÓ THỂ THÍCH*/}
+            <div className="white-card recommendation-section mt-4">
+              <h3 className="section-label">Sản phẩm có thể bạn thích</h3>
               <div className="recommendation-grid">
-                {recommendedProducts.map((book, index) => (
+                {recommendedProducts.map((book) => (
                   <div
-                    key={index}
+                    key={book.id}
                     className="rec-item"
                     onClick={() => navigate(`/books/${book.id}`)}
                   >
                     <div className="rec-img-wrapper">
-                      <img src={book.image} alt={book.title} />
+                      <img
+                        src={book.image}
+                        alt={book.title}
+                        onError={(e) =>
+                          (e.target.src = "https://via.placeholder.com/150")
+                        }
+                      />
                     </div>
                     <p className="rec-title">{book.title}</p>
                     <div className="rec-price">
-                      {currencyFormatter.format(parsePrice(book.price))}
+                      {currencyFormatter.format(book.price)}
                     </div>
                     <button
                       className="btn-add-rec"
@@ -336,34 +390,41 @@ export default function Cart() {
             </div>
           </div>
 
+          {/* CỘT PHẢI: THANH TOÁN & ĐỊA CHỈ */}
           <div className="cart-right-section">
+            {/* Box Địa chỉ */}
             <div className="white-card address-summary">
               <div className="address-summary-header">
-                <span className="address-title">📍 Địa Chỉ Giao Hàng</span>
+                <span className="address-title">📍 Địa Chỉ Nhận Hàng</span>
                 <button
                   className="address-edit"
                   onClick={() => navigate("/checkout")}
                 >
-                  {selectedAddress ? "Đổi" : "Thêm"}
+                  {selectedAddress ? "Thay đổi" : "Nhập Địa chỉ"}
                 </button>
               </div>
               {selectedAddress ? (
                 <div className="address-info mt-2">
-                  <span className="address-name">
-                    {selectedAddress.fullName} - {selectedAddress.phone} -
-                    {selectedAddress.address}
-                  </span>
+                  <div className="fw-bold">
+                    {selectedAddress.fullName} | {selectedAddress.phone} |
+                  </div>
+                  <div className="fw-bold text-muted text-truncate">
+                    {typeof selectedAddress === "string"
+                      ? selectedAddress
+                      : selectedAddress.address}
+                  </div>
                 </div>
               ) : (
                 <p className="small text-muted mt-2">
-                  Vui lòng chọn địa chỉ giao hàng
+                  Vui lòng cập nhật địa chỉ để mua hàng.
                 </p>
               )}
             </div>
 
-            <div className="white-card coupon-section mt-3 ">
+            {/* Box Voucher */}
+            <div className="white-card coupon-section mt-3">
               <span className="coupon-title">
-                Voucher Hệ Thống ({dbVouchers.length})
+                Mã Giảm Giá ({dbVouchers.length})
               </span>
               <div className="coupon-list mt-2">
                 {dbVouchers.length > 0 ? (
@@ -378,55 +439,52 @@ export default function Cart() {
                     >
                       <div className="coupon-left">🎫</div>
                       <div className="coupon-right">
-                        <p className="v-code">
-                          Mã: {v.code} <br />
-                          Tối thiểu: {formatNumberToText(v.min_order_value)}
-                        </p>
-                        <p className="v-value text-muted">
-                          Giảm:{" "}
+                        <p className="v-code fw-bold">{v.code}</p>
+                        <p className="v-desc small">
+                          Giảm{" "}
                           {v.discount_value <= 100
                             ? `${v.discount_value}%`
-                            : formatNumberToText(v.discount_value)}
+                            : formatNumberToText(v.discount_value)}{" "}
+                          cho đơn từ {formatNumberToText(v.min_order_value)}
                         </p>
                         <button
                           className="btn-apply-coupon"
                           onClick={() => handleSelectVoucher(v)}
                         >
-                          {selectedVoucher?.id === v.id ? "Bỏ" : "Dùng"}
+                          {selectedVoucher?.id === v.id ? "Bỏ chọn" : "Áp dụng"}
                         </button>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <p className="small text-muted p-2">Hiện chưa có voucher</p>
+                  <p className="small text-muted">Không có mã giảm giá nào.</p>
                 )}
               </div>
             </div>
 
+            {/* Box Tổng tiền */}
             <div className="white-card summary-box mt-3">
               <div className="summary-line d-flex justify-content-between">
                 <span>Tạm tính</span>
                 <span>{currencyFormatter.format(subTotal)}</span>
               </div>
               {selectedVoucher && discountAmount > 0 && (
-                <div className="summary-line d-flex justify-content-between text-success mt-2">
-                  <span>
-                    Giảm giá ({selectedVoucher.discount_value}
-                    {selectedVoucher.discount_value <= 100 ? "%" : "đ"})
-                  </span>
+                <div className="summary-line d-flex justify-content-between text-success mt-1">
+                  <span>Khuyến mãi</span>
                   <span>-{currencyFormatter.format(discountAmount)}</span>
                 </div>
               )}
-              <div className="summary-line highlight d-flex justify-content-between mt-2 pt-3 border-top">
-                <span className="label fw-bold">Tổng tiền thanh toán</span>
+              <div className="summary-line highlight d-flex justify-content-between mt-3 pt-3 border-top">
+                <span className="label fw-bold">Tổng thanh toán</span>
                 <span className="total-val text-danger fw-bold fs-5">
                   {currencyFormatter.format(finalTotal)}
                 </span>
               </div>
               <button
                 className="checkout-primary-btn w-100 mt-3"
-                disabled={selectedIds.length === 0}
                 onClick={handlePlaceOrder}
+                disabled={selectedIds.length === 0}
+                style={{ opacity: selectedIds.length === 0 ? 0.6 : 1 }}
               >
                 MUA HÀNG ({selectedIds.length})
               </button>

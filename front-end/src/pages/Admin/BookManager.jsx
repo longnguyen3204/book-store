@@ -49,6 +49,7 @@ const BookManager = () => {
         categoryApi.fetchCategories(),
         authorApi.fetchAuthors(),
       ]);
+      console.log(booksData, categoriesData);
       setBooks([...booksData]);
       setCategories(categoriesData);
       setAuthors(authorsData);
@@ -159,7 +160,31 @@ const BookManager = () => {
       alert(err.message || "Thao tác thất bại");
     }
   };
+  const handleToggleStatus = async (book) => {
+    // Hỏi xác nhận trước khi thực hiện (tùy chọn)
+    const action = book.is_active ? "ẩn" : "hiện";
+    if (
+      !window.confirm(
+        `Bạn có chắc muốn ${action} cuốn sách "${book.name}" không?`
+      )
+    ) {
+      return;
+    }
 
+    try {
+      if (book.is_active) {
+        await bookApi.deleteBook(book.id); // Gọi API ẩn
+      } else {
+        await bookApi.restoreBook(book.id); // Gọi API hiện
+      }
+
+      // Load lại dữ liệu ngay lập tức
+      await loadData();
+    } catch (error) {
+      console.error(`Lỗi khi ${action} sách:`, error);
+      alert(`Không thể ${action} sách. Vui lòng thử lại!`);
+    }
+  };
   return (
     <div
       className="container-fluid py-4 bg-light"
@@ -339,9 +364,11 @@ const BookManager = () => {
           <thead className="bg-light text-dark fw-bold">
             <tr>
               <th className="py-3 text-center">Tên Sách</th>
+              <th className="py-3 text-center">Mô Tả</th>
               <th className="py-3 text-center">Tác Giả</th>
               <th className="py-3 text-center">Thể Loại</th>
               <th className="py-3 text-center">Giá</th>
+              <th className="py-3 text-center">Đã Bán</th>
               <th className="py-3 text-center">Còn Lại</th>
               <th className="py-3 text-center">Hành Động</th>
             </tr>
@@ -374,6 +401,7 @@ const BookManager = () => {
                     <span>{book.name}</span>
                   </div>
                 </td>
+                <td className="text-start">{book.description}</td>
                 <td className="text-start">{book.author}</td>
                 {/* ... (Giữ nguyên tất cả các thẻ <td> phía sau) */}
                 <td className=" text-center">
@@ -383,6 +411,9 @@ const BookManager = () => {
                 </td>
                 <td className="text-danger fw-bold text-center">
                   {Number(book.price).toLocaleString()}đ
+                </td>
+                <td className="fw-bold text-primary  text-center">
+                  {book.sold_count ?? 0}
                 </td>
                 <td className="fw-bold text-primary  text-center">
                   {book.quantity ?? 0}

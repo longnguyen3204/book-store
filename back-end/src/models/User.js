@@ -79,5 +79,17 @@ class User {
     const [result] = await db.query(sql, [role_id, id]);
     return result;
   }
+
+  static async updatePassword(id, hashedPassword) {
+    const sql = `UPDATE users SET password = ? WHERE id = ?`;
+    const [result] = await db.query(sql, [hashedPassword, id]);
+    return result;
+  }
+  static async updatePasswordByEmail(email, hashedPassword) {
+    const sql = `UPDATE users SET password = ? WHERE email = ?`;
+    const [result] = await db.query(sql, [hashedPassword, email]);
+    return result;
+  }
 }
+
 module.exports = User;

@@ -1,5 +1,6 @@
 import api from "./api";
 
+//1 Lấy tất cả người dùng
 export async function getAllUsers() {
   try {
     const response = await api.get("/users");
@@ -10,19 +11,8 @@ export async function getAllUsers() {
     throw new Error(message);
   }
 }
-export async function updateUserRole(userId, newRole) {
-  try {
-    const response = await api.put(`/users/${userId}/role`, {
-      role_id: newRole,
-    });
-    return response.data;
-  } catch (error) {
-    const message =
-      error.response?.data?.message || "Cập nhật vai trò người dùng thất bại";
-    throw new Error(message);
-  }
-}
-// 3. Khóa hoặc Mở khóa user (Hàm mới bổ sung)
+
+// 3. Khóa hoặc Mở khóa user
 export async function updateLockStatus(userId, status) {
   try {
     const response = await api.put(`/users/${userId}/lock`, {
@@ -73,11 +63,77 @@ export async function getProfile() {
     );
   }
 }
+export async function changePassword(data) {
+  try {
+    const token = localStorage.getItem("token");
+    const headers = {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
 
+    // Gửi request tới endpoint đổi mật khẩu (khớp với route Backend bạn đã tạo)
+    const response = await api.put("/users/change-password", data, { headers });
+    return response.data;
+  } catch (error) {
+    const message = error.response?.data?.message || "Đổi mật khẩu thất bại";
+    throw new Error(message);
+  }
+}
+export async function sendResetPin(data) {
+  try {
+    // data bao gồm { email }
+    const response = await api.post("/users/send-reset-pin", data);
+    return response.data;
+  } catch (error) {
+    const message = error.response?.data?.message || "Gửi mã PIN thất bại";
+    throw new Error(message);
+  }
+}
+
+// 8. Xác thực mã PIN
+export async function verifyPin(data) {
+  try {
+    // data bao gồm { email, pin }
+    const response = await api.post("/users/verify-pin", data);
+    return response.data;
+  } catch (error) {
+    const message = error.response?.data?.message || "Mã PIN không chính xác";
+    throw new Error(message);
+  }
+}
+
+// 9. Đặt lại mật khẩu mới
+export async function resetPassword(data) {
+  try {
+    // data bao gồm { email, pin, newPassword }
+    const response = await api.post("/users/reset-password", data);
+    return response.data;
+  } catch (error) {
+    const message =
+      error.response?.data?.message || "Đặt lại mật khẩu thất bại";
+    throw new Error(message);
+  }
+}
+export async function updateUserRole(userId, newRole) {
+  try {
+    const response = await api.put(`/users/${userId}/role`, {
+      role_id: newRole,
+    });
+    return response.data;
+  } catch (error) {
+    const message =
+      error.response?.data?.message || "Cập nhật vai trò người dùng thất bại";
+    throw new Error(message);
+  }
+}
 export default {
   getAllUsers,
   updateUserRole,
   updateLockStatus,
   updateProfile,
   getProfile,
+  changePassword,
+  sendResetPin,
+  verifyPin,
+  resetPassword,
 };

@@ -3,9 +3,9 @@ import api from "./api";
 export async function getReviewsByBook(bookId) {
   try {
     const response = await api.get(`/reviews/book/${bookId}`);
-    return response.data; // Giả sử trả về mảng các review
+    return response.data;
   } catch (error) {
-    console.error("Lấy đánh giá thất bại", error);
+    console.error("Lỗi API chi tiết:", error.response || error);
     return [];
   }
 }

@@ -9,6 +9,33 @@ class Book {
         ORDER BY is_thumbnail DESC, id ASC 
         LIMIT 1
     `;
+  static async getAll() {
+    const sql = `SELECT 
+        b.id,
+        b.name,
+        b.description,
+        b.original_price,
+        b.price,
+        b.sold_count,
+        b.quantity,
+        b.page_count,
+        b.publish_year,
+        b.is_active,
+        a.name AS author,
+        c.id AS category_id,
+        c.name AS category_name,        
+        (${Book.thumbnailSql}) AS image
+    FROM books b
+    LEFT JOIN book_authors ba ON b.id = ba.book_id
+    LEFT JOIN authors a ON ba.author_id = a.id
+    LEFT JOIN book_categories bc ON b.id = bc.book_id
+    LEFT JOIN categories c ON bc.category_id = c.id
+    GROUP BY b.id 
+    ORDER BY b.id DESC`; // Sắp xếp sách mới nhất lên đầu
+
+    const [rows] = await db.query(sql);
+    return rows;
+  }
 
   static async findById(id) {
     const sql = `
@@ -28,12 +55,12 @@ class Book {
                  WHERE ba.book_id = b.id 
                  LIMIT 1) AS author,
                 (${Book.thumbnailSql}) AS image
-            FROM books b WHERE b.id = ?`;
+            FROM books b WHERE  b.id = ?AND b.is_active = 1`;
     const [rows] = await db.query(sql, [id]);
-    return rows[0];
+    return rows;
   }
 
-  static async getAll() {
+  static async getActivity() {
     const sql = `SELECT
     b.id,
     b.name,
@@ -49,12 +76,14 @@ class Book {
     a.name AS author,
     c.id AS category_id,
     c.name AS category_name,
+    c.name AS category_name,
     (${Book.thumbnailSql}) AS image
     FROM books b
     LEFT JOIN book_authors ba ON b.id = ba.book_id
     LEFT JOIN authors a ON ba.author_id = a.id
     LEFT JOIN book_categories bc ON b.id = bc.book_id
     LEFT JOIN categories c ON bc.category_id = c.id
+   WHERE b.is_active = 1
     GROUP BY b.id; `;
     const [rows] = await db.query(sql);
     return rows;
@@ -111,7 +140,6 @@ class Book {
     let orderSql = "";
     if (sort === "price_asc") orderSql = " ORDER BY b.price ASC";
     else if (sort === "price_desc") orderSql = " ORDER BY b.price DESC";
-
     const sql = `
             SELECT 
                 b.id,
@@ -215,11 +243,11 @@ class Book {
 
   static async updateBookInfo(id, data) {
     const {
-      publisher_id,
+      publisher_id, // Nếu frontend không gửi, cái này sẽ là undefined
       category_id,
       author_id,
       name,
-      isbn,
+      isbn, // Nếu frontend không gửi, cái này sẽ là undefined
       description,
       original_price,
       price,
@@ -229,29 +257,46 @@ class Book {
       page_count,
       image,
     } = data;
+
+    // 1. SỬA LỖI CHECK TRÙNG TÊN: Loại trừ ID hiện tại (AND id != ?)
     const [existingBook] = await db.query(
-      "SELECT id FROM books WHERE LOWER(name) = LOWER(?) LIMIT 1",
-      [name.trim()]
+      "SELECT id FROM books WHERE LOWER(name) = LOWER(?) AND id != ? LIMIT 1",
+      [name.trim(), id]
     );
+
     if (existingBook.length > 0) {
-      throw new Error("Tên sách này đã tồn tại trong hệ thống!");
+      throw new Error(
+        "Tên sách này đã trùng với một cuốn sách khác trong hệ thống!"
+      );
     }
-    const sql = `UPDATE books SET publisher_id = ?, name = ?, isbn = ?, description = ?, original_price = ?, 
-               price = ?, quantity = ?, sold_count = ?, publish_year = ?, page_count = ? WHERE id = ?`;
+
+    // 2. Cập nhật bảng books
+    const sql = `UPDATE books SET 
+                  publisher_id = ?, 
+                  name = ?, 
+                  isbn = ?, 
+                  description = ?, 
+                  original_price = ?, 
+                  price = ?, 
+                  quantity = ?, 
+                  publish_year = ?, 
+                  page_count = ? 
+                WHERE id = ?`;
+
     await db.query(sql, [
-      publisher_id,
-      name,
-      isbn,
+      publisher_id || null, // Nếu không có thì set null để tránh lỗi
+      name.trim(),
+      isbn || null, // Nếu không có thì set null
       description,
       original_price,
       price,
       quantity,
-      sold_count,
       publish_year,
       page_count,
       id,
     ]);
 
+    // 3. Cập nhật Thể loại
     if (category_id) {
       await db.query("DELETE FROM book_categories WHERE book_id = ?", [id]);
       await db.query(
@@ -260,6 +305,7 @@ class Book {
       );
     }
 
+    // 4. Cập nhật Tác giả
     if (author_id) {
       await db.query("DELETE FROM book_authors WHERE book_id = ?", [id]);
       await db.query(
@@ -268,24 +314,43 @@ class Book {
       );
     }
 
-    // --- SỬA TẠI ĐÂY: CHUẨN HÓA ĐƯỜNG DẪN TRƯỚC KHI LƯU ---
+    // 5. Cập nhật Ảnh (Chỉ chạy khi có upload ảnh mới)
     if (image) {
       const normalizedPath = image.replace(/\\/g, "/"); // Chuyển \ thành /
 
-      // 3. Nối thêm địa chỉ localhost
-      const finalPath = `http://localhost:3000/${normalizedPath.substring(
-        normalizedPath.indexOf("uploads/")
-      )}`;
+      // Xử lý cắt chuỗi để lấy từ 'uploads/...'
+      // Đề phòng trường hợp path không chứa 'uploads/' (ví dụ ảnh online)
+      let relativePath = normalizedPath;
+      if (normalizedPath.includes("uploads/")) {
+        relativePath = normalizedPath.substring(
+          normalizedPath.indexOf("uploads/")
+        );
+      }
+
+      const finalPath = `http://localhost:3000/${relativePath}`;
+
+      // Set ảnh cũ thành không phải thumbnail
       await db.query(
         "UPDATE book_images SET is_thumbnail = 0 WHERE book_id = ?",
         [id]
       );
 
+      // Thêm ảnh mới làm thumbnail
       await db.query(
         "INSERT INTO book_images (book_id, image_url, is_thumbnail) VALUES (?, ?, 1)",
         [id, finalPath]
       );
     }
+  }
+  static async delBook(id) {
+    const sql = `UPDATE books SET is_active = 0 WHERE id = ?`;
+    const [result] = await db.query(sql, [id]);
+    return result;
+  }
+  static async restoreBook(id) {
+    const sql = `UPDATE books SET is_active = 1 WHERE id = ?`;
+    const [result] = await db.query(sql, [id]);
+    return result;
   }
 }
 module.exports = Book;

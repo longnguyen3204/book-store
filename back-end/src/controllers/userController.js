@@ -34,7 +34,23 @@ exports.getProfile = async (req, res) => {
     res.status(500).json({ message: "Lỗi server" });
   }
 };
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.getAllUsers();
 
+    return res.status(200).json({
+      success: true,
+      message: "Lấy danh sách user thành công",
+      data: users, // Trả về mảng user
+    });
+  } catch (error) {
+    console.error("Error getting users:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi server, không thể lấy danh sách user",
+    });
+  }
+};
 // 2. Cập nhật thông tin cá nhân
 exports.updateProfile = async (req, res) => {
   try {
@@ -53,16 +69,19 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-// 3. Đổi mật khẩu
 exports.changePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
     const userId = req.user.id;
 
-    // Lấy thông tin user hiện tại để lấy mật khẩu cũ trong DB
+    // Lấy thông tin user (Đảm bảo model User có hàm findById)
     const user = await User.findById(userId);
 
-    // Kiểm tra mật khẩu cũ nhập vào có đúng không
+    if (!user) {
+      return res.status(404).json({ message: "Người dùng không tồn tại!" });
+    }
+
+    // So sánh mật khẩu
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Mật khẩu hiện tại không đúng!" });
@@ -72,34 +91,15 @@ exports.changePassword = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-    // Lưu vào DB
+    // Cập nhật DB
     await User.updatePassword(userId, hashedPassword);
 
     res.json({ message: "Đổi mật khẩu thành công!" });
   } catch (error) {
-    res.status(500).json({ message: "Lỗi server" });
+    console.error("Lỗi đổi mật khẩu:", error);
+    res.status(500).json({ message: "Lỗi hệ thống khi đổi mật khẩu" });
   }
 };
-
-//  Lấy danh sách tất cả user
-exports.getAllUsers = async (req, res) => {
-  try {
-    const users = await User.getAllUsers();
-
-    return res.status(200).json({
-      success: true,
-      message: "Lấy danh sách user thành công",
-      data: users, // Trả về mảng user
-    });
-  } catch (error) {
-    console.error("Error getting users:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Lỗi server, không thể lấy danh sách user",
-    });
-  }
-};
-
 //  Khóa hoặc Mở khóa tài khoản
 exports.updateLockStatus = async (req, res) => {
   try {
@@ -167,5 +167,76 @@ exports.updateUserRole = async (req, res) => {
       message: "Lỗi server khi cập nhật quyền",
       error: error.message,
     });
+  }
+};
+let tempPinStore = {};
+
+exports.sendResetPin = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // 1. Tạo chuỗi 6 số ngẫu nhiên
+    const pin = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // 2. Lưu tạm vào object để đối chiếu (key là email)
+    tempPinStore[email] = pin;
+
+    // 3. IN RA TERMINAL NHƯ YÊU CẦU
+    console.log("\n" + "=".repeat(40));
+    console.log(`🔑 MÃ PIN QUÊN MẬT KHẨU CHO: ${email}`);
+    console.log(`👉 MÃ PIN: [ ${pin} ]`);
+    console.log("=".repeat(40) + "\n");
+
+    res.json({ message: "Mã PIN đã được in ra Terminal của Server!" });
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi hệ thống" });
+  }
+};
+
+exports.verifyPin = async (req, res) => {
+  const { email, pin } = req.body;
+
+  // Đối chiếu với mã PIN lưu trong biến tạm
+  if (tempPinStore[email] === pin) {
+    res.json({ success: true, message: "Mã PIN chính xác" });
+  } else {
+    res
+      .status(400)
+      .json({ success: false, message: "Mã PIN sai hoặc không tồn tại" });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  try {
+    const { email, pin, newPassword } = req.body; // Lấy thêm pin từ req.body
+
+    // 1. Kiểm tra lại mã PIN trước khi cho phép đổi mật khẩu
+    if (!tempPinStore[email] || tempPinStore[email] !== pin) {
+      return res.status(400).json({
+        message: "Phiên làm việc hết hạn hoặc mã PIN không hợp lệ!",
+      });
+    }
+    // 2. Mã hóa mật khẩu mới trước khi lưu
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // 3. Gọi Model để cập nhật mật khẩu vào Database theo Email
+    const result = await User.updatePasswordByEmail(email, hashedPassword);
+
+    if (result.affectedRows > 0) {
+      // 4. Xóa mã PIN khỏi bộ nhớ tạm sau khi đổi thành công để bảo mật
+      delete tempPinStore[email];
+
+      return res.json({
+        success: true,
+        message:
+          "Đặt lại mật khẩu thành công! Bạn có thể đăng nhập ngay bây giờ.",
+      });
+    } else {
+      return res.status(404).json({ message: "Không tìm thấy người dùng!" });
+    }
+  } catch (error) {
+    console.error("Lỗi reset password:", error);
+    res.status(500).json({ message: "Lỗi hệ thống khi đặt lại mật khẩu" });
   }
 };

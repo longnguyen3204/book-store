@@ -225,11 +225,13 @@
   flex: 7;
 }
 .comment-card-item {
+  position: relative;
   display: flex;
   gap: 20px;
   padding: 24px 0;
   border-bottom: 1px solid #f5f5f5;
 }
+
 .comment-header {
   display: flex;
   justify-content: space-between;
@@ -240,9 +242,13 @@
   color: #333;
 }
 .comment-date {
+  position: absolute;
+  top: 24px;
+  right: 0;
   color: #ccc;
   font-size: 12px;
 }
+
 .comment-text {
   margin-top: 12px;
   color: #555;

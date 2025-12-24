@@ -6,18 +6,6 @@ const Order = require("../models/Order");
 exports.getHistory = async (req, res) => {
   try {
     const { status } = req.query || {};
-    const allowedStatuses = [
-      "pending",
-      "processing",
-      "shipping",
-      "completed",
-      "cancelled",
-    ];
-
-    if (status && !allowedStatuses.includes(status.toLowerCase())) {
-      return res.status(400).json({ message: "Trạng thái không hợp lệ" });
-    }
-
     const rows = await Order.getHistoryByUser(req.user.id, status);
 
     const ordersMap = new Map();
@@ -37,6 +25,8 @@ exports.getHistory = async (req, res) => {
         order.items.push({
           book_id: row.book_id,
           book_name: row.book_name,
+          // QUAN TRỌNG: Thêm dòng này để truyền ảnh từ DB ra Frontend
+          book_image: row.book_image,
           quantity: row.quantity,
           price: Number(row.price),
         });
@@ -45,6 +35,7 @@ exports.getHistory = async (req, res) => {
 
     res.json(Array.from(ordersMap.values()));
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Lỗi server" });
   }
 };
@@ -84,17 +75,68 @@ exports.cancelOrder = async (req, res) => {
 
 // 4. Đặt hàng
 exports.placeOrder = async (req, res) => {
-  const { items, shipping_address } = req.body;
+  const {
+    items,
+    shipping_address,
+    total_amount,
+    payment_method_id,
+    voucher_id,
+    note,
+  } = req.body;
+  const userId = req.user.id;
+
   let connection;
   try {
     connection = await db.getConnection();
     await connection.beginTransaction();
 
+    // Bước 1: Tạo đơn hàng chính
+    const orderId = await Order.create(connection, {
+      user_id: userId,
+      total_amount,
+      shipping_address,
+      payment_method_id: payment_method_id || 1,
+      voucher_id: voucher_id || null,
+      note: note || "",
+    });
+
+    // Bước 2: Tạo chi tiết đơn hàng & Cập nhật kho
+    for (const item of items) {
+      await Order.createDetail(connection, orderId, item);
+
+      // Bước 3: Cập nhật số lượng tồn kho (Sửa stock -> quantity theo DB)
+      const updateQtySql =
+        "UPDATE books SET quantity = quantity - ? WHERE id = ?";
+      await connection.query(updateQtySql, [item.quantity, item.book_id]);
+
+      // Cập nhật sold_count (Số lượng đã bán)
+      const updateSoldSql =
+        "UPDATE books SET sold_count = sold_count + ? WHERE id = ?";
+      await connection.query(updateSoldSql, [item.quantity, item.book_id]);
+    }
+
+    // Bước 4: Xóa các mục trong giỏ hàng (cart_items) sau khi đặt thành công
+    // Tìm giỏ hàng của user và xóa các book_id tương ứng
+    const deleteCartItemsSql = `
+        DELETE FROM cart_items 
+        WHERE cart_id = (SELECT id FROM carts WHERE user_id = ?) 
+        AND book_id IN (?)
+    `;
+    const bookIds = items.map((i) => i.book_id);
+    await connection.query(deleteCartItemsSql, [userId, bookIds]);
+
     await connection.commit();
-    res.status(201).json({ message: "Đặt hàng thành công" });
+    res.status(201).json({
+      success: true,
+      message: "Đặt hàng thành công",
+      order_id: orderId,
+    });
   } catch (error) {
     if (connection) await connection.rollback();
-    res.status(500).json({ message: "Lỗi đặt hàng" });
+    console.error("Lỗi đặt hàng:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Lỗi hệ thống: " + error.message });
   } finally {
     if (connection) connection.release();
   }

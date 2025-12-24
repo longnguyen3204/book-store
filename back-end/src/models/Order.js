@@ -1,7 +1,7 @@
 const db = require("../config/db");
 
 class Order {
-  // 1. Lấy toàn bộ danh sách đơn hàng cho Admin
+  // 1. Lấy toàn bộ danh sách cho Admin
   static async getAllOrders() {
     const sql = `
             SELECT 
@@ -28,43 +28,76 @@ class Order {
     return rows;
   }
 
-  // 2. Lấy lịch sử đơn hàng của user (có lọc status)
+  // Tạo Đơn hàng mới
+  static async create(connection, orderData) {
+    const {
+      user_id,
+      total_amount,
+      shipping_address,
+      payment_method_id,
+      voucher_id,
+      note,
+    } = orderData;
+    const sql = `
+      INSERT INTO orders (user_id, total_amount, shipping_address, payment_method_id, voucher_id, note, status)
+      VALUES (?, ?, ?, ?, ?, ?, 'pending')
+    `;
+    const [result] = await connection.query(sql, [
+      user_id,
+      total_amount,
+      shipping_address,
+      payment_method_id,
+      voucher_id,
+      note,
+    ]);
+    return result.insertId;
+  }
+
+  // Tạo Chi tiết đơn hàng
+  static async createDetail(connection, orderId, item) {
+    const sql = `
+      INSERT INTO order_details (order_id, book_id, quantity, price)
+      VALUES (?, ?, ?, ?)
+    `;
+    await connection.query(sql, [
+      orderId,
+      item.book_id,
+      item.quantity,
+      item.price,
+    ]);
+  }
+
+  // Lấy lịch sử (User)
   static async getHistoryByUser(userId, status) {
     const params = [userId];
     let statusFilter = "";
-
     if (status && status !== "all") {
       statusFilter = " AND o.status = ?";
       params.push(status);
     }
 
     const sql = `
-            SELECT 
-                o.id AS order_id,
-                o.order_date,
-                o.total_amount,
-                o.status,
-                o.payment_method_id,
-                o.voucher_id,
-                o.shipping_address,
-                o.note,
-                od.book_id,
-                od.quantity,
-                od.price,
-                b.name AS book_name,
-                b.id AS book_id_ref
-            FROM orders o
-            JOIN order_details od ON od.order_id = o.id
-            JOIN books b ON b.id = od.book_id
-            WHERE o.user_id = ? ${statusFilter}
-            ORDER BY o.order_date DESC, o.id DESC
-        `;
-
+        SELECT 
+            o.id AS order_id,
+            o.order_date,
+            o.total_amount,
+            o.status,
+            o.shipping_address,
+            od.book_id,
+            od.quantity,
+            od.price,
+            b.name AS book_name,
+            -- Phải có câu lệnh con này để lấy image_url từ bảng book_images
+            (SELECT image_url FROM book_images WHERE book_id = b.id AND is_thumbnail = 1 LIMIT 1) AS book_image
+        FROM orders o
+        JOIN order_details od ON od.order_id = o.id
+        JOIN books b ON b.id = od.book_id
+        WHERE o.user_id = ? ${statusFilter}
+        ORDER BY o.order_date DESC
+    `;
     const [rows] = await db.query(sql, params);
     return rows;
   }
-
-  // 3. Cập nhật trạng thái đơn hàng (Fix: 2 tham số)
   static async updateStatus(orderId, status) {
     const sql = "UPDATE orders SET status = ? WHERE id = ?";
     const [result] = await db.query(sql, [status, orderId]);

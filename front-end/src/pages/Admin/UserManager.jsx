@@ -154,25 +154,20 @@ const UserManager = () => {
 
                     {/* Cột Vai trò - ĐÃ CẬP NHẬT THÀNH SELECT BOX */}
                     <td className="text-center">
-                      <select
-                        className={`form-select form-select-sm fw-bold border-0 bg-opacity-10 text-center rounded-pill ${
+                      <span
+                        className={`badge rounded-pill fw-bold px-3 py-2 ${
                           user.role_id === 1
-                            ? "bg-danger text-danger"
-                            : "bg-info text-info"
+                            ? "bg-danger bg-opacity-10 text-danger"
+                            : "bg-info bg-opacity-10 text-info"
                         }`}
-                        value={user.role_id}
-                        onChange={(e) =>
-                          handleRoleChange(user.id, e.target.value)
-                        } // Truyền id và value mới
                         style={{
-                          cursor: "pointer",
-                          width: "130px",
-                          margin: "0 auto",
+                          fontSize: "0.85rem",
+                          minWidth: "100px",
+                          display: "inline-block",
                         }}
                       >
-                        <option value="1">Admin</option>
-                        <option value="2">Khách hàng</option>
-                      </select>
+                        {user.role_id === 1 ? "Admin" : "Khách hàng"}
+                      </span>
                     </td>
 
                     <td className="text-center">

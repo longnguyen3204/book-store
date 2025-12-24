@@ -1,242 +1,80 @@
-.history-page-wrapper {
-  /* Chuyển sang màu nền kem nhạt giống Profile */
-  background-color: #f3eee9;
-  min-height: 100vh;
+/* Container chính cho phần Tabs */
+.history-tabs-scroll {
+  background-color: #fdf7f2; /* Màu nền kem nhạt như ảnh */
+  border: 1px solid #e8e2dd;
+  border-radius: 4px;
+  margin-bottom: 20px;
 }
 
-.history-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px 15px;
+.history-tabs-scroll .d-flex {
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
-.history-title {
-  font-size: 28px;
-  font-weight: 700; /* Đậm hơn để khớp style BOOKSAW */
-  margin-bottom: 15px;
-  color: #1b1b1b;
+/* Các nút Tab */
+.history-tab-btn {
+  padding: 18px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  text-transform: uppercase; /* Viết hoa toàn bộ */
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 
-/* Tabs Styling - Tone Nâu */
-.history-tabs {
+.history-tab-btn:hover {
+  color: #b36c4d;
+}
+
+.history-tab-btn.active {
+  color: #b36c4d;
+  background-color: #ffffff; /* Nền trắng cho tab đang chọn */
+  border-bottom: 2px solid #b36c4d; /* Đường kẻ dưới màu cam đất */
+}
+
+/* Thanh tìm kiếm */
+.history-search-container {
   display: flex;
-  background: #f6f0e8;
-  border-radius: 8px;
-  margin-bottom: 12px;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #e8e2dd;
+  border-radius: 4px;
   overflow: hidden;
-  border: 1px solid #eadfce;
 }
 
-.tab-item {
-  flex: 1;
-  padding: 14px 0;
-  border: none;
-  background: none;
-  font-size: 14px;
-  color: #6b6b6b;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-align: center;
-  font-weight: 600;
-}
-
-.tab-item.active {
-  color: #b36c4d;
-  background-color: #fff;
-  border-bottom: 2px solid #b36c4d;
-}
-
-/* Search Bar - Tone Nâu */
-.history-search-bar {
-  display: flex;
-  background: #fff;
-  padding: 10px 12px;
-  border-radius: 8px;
-  margin-bottom: 12px;
-  align-items: center;
-  gap: 10px;
-  border: 1px solid #eadfce;
-}
-
-.search-input-wrapper {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  border-right: 1px solid #f0e6dc;
-  padding: 6px 10px;
-}
-
-.history-prefix-link {
+.search-label-link {
+  padding: 15px 25px;
   color: #b36c4d;
   font-weight: 600;
-  cursor: pointer;
-  padding-right: 8px;
+  font-size: 15px;
+  border-right: 1px solid #eee;
   white-space: nowrap;
+  text-decoration: none;
 }
 
-.search-input-wrapper i {
-  color: #b36c4d; /* Icon màu nâu */
-}
-
-.search-input-wrapper input {
+.history-search-input {
+  flex-grow: 1;
   border: none;
+  padding: 10px 20px;
   outline: none;
-  width: 100%;
   font-size: 14px;
-  margin-left: 10px;
-  background: transparent;
+  color: #888;
 }
 
 .btn-search-order {
+  padding: 15px 30px;
+  background: transparent;
   border: none;
-  background: none;
-  color: #b36c4d; /* Chữ màu nâu */
+  border-left: 1px solid #eee;
+  color: #b36c4d;
   font-weight: 700;
-  cursor: pointer;
-  padding: 8px 12px;
-  transition: opacity 0.2s;
-  display: flex;
-  align-items: center;
-  height: 100%;
+  font-size: 13px;
+  text-transform: uppercase;
+  transition: background 0.2s;
 }
 
 .btn-search-order:hover {
-  opacity: 0.7;
-}
-
-/* Empty State */
-.history-content-card {
-  background: #fff;
-  border-radius: 12px;
-  min-height: 300px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-  border: 1px solid #f0e6dc;
-  padding: 0;
-}
-
-.empty-order-state {
-  text-align: center;
-  padding: 40px 0;
-}
-
-.empty-order-state img {
-  width: 160px;
-  margin-bottom: 12px;
-}
-
-.empty-order-state p {
-  color: #6b6b6b;
-  font-size: 15px;
-  font-weight: 500;
-}
-
-.order-list {
-  display: flex;
-  flex-direction: column;
-}
-
-.order-card {
-  padding: 14px 16px;
-  border-bottom: 1px solid #f0e6dc;
-}
-
-.order-card:last-child {
-  border-bottom: none;
-}
-
-.order-card-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
-}
-
-.order-code-status {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 600;
-}
-
-.order-code {
-  color: #333;
-}
-
-.order-status {
-  font-size: 12px;
-  color: #b36c4d;
-}
-
-.order-total {
-  font-weight: 700;
-  color: #b36c4d;
-}
-.order-total-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.btn-cancel-order {
-  border: 1px solid #e34a5a;
-  color: #e34a5a;
-  background: #fff;
-  padding: 4px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 12px;
-}
-.btn-cancel-order:hover {
-  background: #ffe7ea;
-}
-
-.order-address {
-  font-size: 13px;
-  color: #555;
-  margin: 0 0 8px 0;
-}
-
-.order-items {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.order-item-line {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.order-item-thumb .thumb-placeholder {
-  width: 70px;
-  height: 90px;
-  background: #f6f0e8;
-  border: 1px solid #eadfce;
-  border-radius: 6px;
-}
-
-.order-item-info {
-  display: flex;
-  flex: 1;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.order-item-name {
-  font-size: 14px;
-  color: #333;
-  font-weight: 600;
-}
-
-.order-item-meta {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 13px;
-  color: #666;
-}
-
-.order-item-price {
-  color: #b36c4d;
-  font-weight: 700;
+  background-color: #fdf7f2;
 }

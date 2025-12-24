@@ -36,7 +36,8 @@ export default function LoginPage({ onLogin }) {
       } else {
         // Fallback nếu không truyền onLogin: vẫn lưu localStorage và điều hướng theo role
         if (result?.token) localStorage.setItem("token", result.token);
-        if (result?.user) localStorage.setItem("user", JSON.stringify(result.user));
+        if (result?.user)
+          localStorage.setItem("user", JSON.stringify(result.user));
         targetPath = result?.user?.role_id === 1 ? "/admin" : "/";
       }
 
@@ -93,7 +94,7 @@ export default function LoginPage({ onLogin }) {
           />
 
           <div className="helper-row">
-            <a href="#" className="link">
+            <a href="/forgot_password" className="link">
               Quên mật khẩu?
             </a>
           </div>

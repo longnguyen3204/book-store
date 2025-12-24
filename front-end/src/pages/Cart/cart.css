@@ -592,7 +592,7 @@ p {
 .coupon-right p {
   font-size: 13px;
   color: #242424;
-  margin: 0;
+  margin: 5px;
   font-weight: 500;
   text-align: left; /* Căn lề trái cho nội dung giảm giá */
 }

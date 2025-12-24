@@ -11,7 +11,17 @@ export async function getBooks(params = {}) {
   }
 }
 
-export const fetchBooks = getBooks;
+export async function fetchBooks() {
+  try {
+    const response = await api.get("/books/all");
+    return response.data;
+  } catch (error) {
+    const message =
+      error.response?.data?.message || "Không tải được danh sách sách";
+    throw new Error(message);
+  }
+}
+
 export async function getBookDetail(id) {
   try {
     const response = await api.get(`/books/${id}`);
