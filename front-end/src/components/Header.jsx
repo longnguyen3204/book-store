@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { brandAssets } from "../data/content";
-import { useCart } from "../context/CartContext";
+import { Link, useLocation } from "react-router-dom";
+import { useCart } from "../pages/Cart/CartContext";
+import "./Header.css";
 
 const Header = () => {
   const { cart } = useCart();
   const [user, setUser] = useState(null);
+  const location = useLocation();
 
   useEffect(() => {
     const stored = localStorage.getItem("user");
@@ -16,7 +17,7 @@ const Header = () => {
         localStorage.removeItem("user");
       }
     }
-  }, []);
+  }, [location]); // Cập nhật lại khi chuyển trang
 
   const cartCount = cart.reduce(
     (sum, item) => sum + (item.quantity ? Number(item.quantity) : 1),
@@ -24,71 +25,61 @@ const Header = () => {
   );
 
   return (
-    <div id="header-wrap">
-      <div className="top-content py-3">
-        <div className="container-fluid">
-          <div className="row align-items-center">
-            {/* LOGO */}
-            <div className="col-md-6 d-flex align-items-center">
-              <Link to="/" className="main-logo d-block">
-                <img
-                  src="/logo.jpg"
-                  alt="logo"
-                  className="img-fluid"
-                  style={{
-                    width: "120px",
-                    borderRadius: "8px",
-                  }}
-                />
+    <header className="main-header shadow-sm">
+      <div className="container-fluid px-4">
+        <div className="header-wrapper d-flex justify-content-between align-items-center py-2">
+          {/* Cánh trái: Logo */}
+          <div className="header-left">
+            <Link
+              to="/"
+              className="main-logo d-flex align-items-center text-decoration-none"
+            >
+              <img src="/logo.jpg" alt="logo" className="logo-img" />
+              <span className="brand-name ms-2 d-none d-sm-inline">
+                BOOKSAW
+              </span>
+            </Link>
+          </div>
+
+          {/* Cánh phải: Menu */}
+          <div className="header-right">
+            <nav className="header-menu d-flex align-items-center gap-4">
+              {/* User Account */}
+              {user ? (
+                <Link to="/profile" className="menu-item user-info">
+                  <i className="icon icon-user me-2"></i>
+                  <span className="user-name">
+                    {user.fullname || user.email}
+                  </span>
+                </Link>
+              ) : (
+                <Link to="/login" className="menu-item">
+                  <i className="icon icon-user me-2"></i>
+                  <span>Đăng nhập</span>
+                </Link>
+              )}
+
+              {/* Order History */}
+              <Link to="/order-history" className="menu-item">
+                <i className="icon icon-list me-2"></i>
+                <span className="d-none d-md-inline">Lịch sử</span>
               </Link>
-            </div>
 
-            {/* RIGHT MENU */}
-            <div className="col-md-6">
-              <div className="d-flex justify-content-end align-items-center gap-3">
-                {user ? (
-                  <Link
-                    to="/profile"
-                    className="user-account for-buy d-flex align-items-center gap-2 "
-                    style={{ fontSize: "25px" }}
-                  >
-                    <i
-                      className="icon icon-user"
-                      style={{ fontSize: "25px" }}
-                    ></i>
-                    <span>{user.fullname || user.email}</span>
-                  </Link>
-                ) : (
-                  <Link
-                    to="/login"
-                    className="user-account for-buy d-flex align-items-center gap-2"
-                  >
-                    <i className="icon icon-user"></i>
-                    <span>Account</span>
-                  </Link>
-                )}
-
-                <Link
-                  to="/order-history"
-                  className="order-history for-buy d-flex align-items-center gap-2"
-                >
-                  <i className="icon icon-list"></i>
-                  <span>Lịch sử</span>
-                </Link>
-
-                <Link
-                  to="/cart"
-                  className="cart for-buy d-flex align-items-center gap-2"
-                >
-                  <i className="icon icon-clipboard"></i>
-                  <span>Cart ({cartCount})</span>
-                </Link>
-              </div>
-            </div>
+              {/* Cart */}
+              <Link to="/cart" className="menu-item cart-btn">
+                <div className="position-relative">
+                  <i className="icon icon-clipboard me-2"></i>
+                  {cartCount > 0 && (
+                    <span className="cart-badge">{cartCount}</span>
+                  )}
+                </div>
+                <span className="d-none d-md-inline">Giỏ hàng</span>
+              </Link>
+            </nav>
           </div>
         </div>
       </div>
-    </div>
+    </header>
   );
 };
 

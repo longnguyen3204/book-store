@@ -1,6 +1,6 @@
 .history-page-wrapper {
   /* Chuyển sang màu nền kem nhạt giống Profile */
-  background-color: #f7ede2; 
+  background-color: #f3eee9;
   min-height: 100vh;
 }
 
@@ -41,7 +41,7 @@
 }
 
 .tab-item.active {
-  color: #b36c4d; 
+  color: #b36c4d;
   background-color: #fff;
   border-bottom: 2px solid #b36c4d;
 }

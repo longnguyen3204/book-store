@@ -4,14 +4,33 @@ const bcrypt = require("bcryptjs");
 // 1. Xem hồ sơ cá nhân
 exports.getProfile = async (req, res) => {
   try {
-    // req.user.id có được nhờ authMiddleware
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: "Không tìm thấy user" });
 
-    // Loại bỏ mật khẩu trước khi trả về
-    const { password, ...userWithoutPass } = user;
-    res.json(userWithoutPass);
+    // Đảm bảo lấy đầy đủ các trường từ Database trả về
+    const {
+      id,
+      role_id,
+      fullname,
+      email,
+      phone_number,
+      address,
+      avatar,
+      is_locked,
+    } = user;
+
+    res.json({
+      id,
+      role_id,
+      fullname,
+      email,
+      phone_number,
+      address: address || "", // Trả về chuỗi rỗng nếu null để tránh lỗi Frontend
+      avatar,
+      is_locked,
+    });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Lỗi server" });
   }
 };

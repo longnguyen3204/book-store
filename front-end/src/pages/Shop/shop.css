@@ -2,7 +2,7 @@
 
 /* 1. Header & Breadcrumb */
 .shop-page .bg-light {
-  background-color: #f9f9f9 !important;
+  background-color: #eee9e0 !important;
   border-bottom: 1px solid #eee;
   padding: 60px 0;
 }
@@ -120,7 +120,7 @@
   .shop-page .product-style img {
     height: 300px;
   }
-  
+
   .shop-page .section-title {
     font-size: 2rem;
   }

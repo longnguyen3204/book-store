@@ -1,21 +1,74 @@
-header.fixed {
-  z-index: 9999 !important; /* Đảm bảo Header luôn nằm trên cùng */
-  pointer-events: auto !important; /* Cho phép nhận sự kiện click */
+.main-header {
+  background-color: #ffffff;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  border-bottom: 1px solid #f1f1f1;
 }
 
-.history-link-prefix {
-  color: #b36c4d;
-  font-weight: 600;
-  cursor: pointer;
-  padding-right: 8px;
-  display: inline-block;
+.logo-img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #eee;
 }
 
-.order-history-link {
+.brand-name {
+  font-weight: 800;
+  font-size: 1.2rem;
   color: #b36c4d;
-  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.menu-item {
   text-decoration: none;
+  color: #555;
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+  padding: 8px 12px;
+  border-radius: 8px;
 }
-.order-history-link:hover {
-  opacity: 0.8;
+
+.menu-item i {
+  font-size: 1.2rem;
+}
+
+.menu-item:hover {
+  color: #b36c4d;
+  background-color: #fdf5f2;
+}
+
+.user-info {
+  background-color: #fdf5f2;
+  color: #b36c4d;
+}
+
+.user-name {
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -8px;
+  right: 2px;
+  background-color: #b36c4d;
+  color: white;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: bold;
+  border: 2px solid #fff;
+}
+
+/* Fix margin cho nội dung bên dưới Header fixed */
+body {
+  padding-top: 75px;
 }

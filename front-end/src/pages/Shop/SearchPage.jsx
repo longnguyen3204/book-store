@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import HomeHeader from "../../components/HomeHeader";
-import { listProduct } from "../../config/ProductRequest";
+import { getBooks } from "../../api/bookApi";
 
 function SearchPage() {
   const location = useLocation();
@@ -9,7 +9,7 @@ function SearchPage() {
   const [books, setBooks] = useState([]);
 
   useEffect(() => {
-    listProduct().then(setBooks);
+    getBooks().then(setBooks);
   }, []);
 
   const filteredResults = useMemo(() => {
@@ -46,10 +46,7 @@ function SearchPage() {
                           alt={book.title}
                           className="product-item"
                         />
-                        <Link
-                          to={`/books/${book.id}`}
-                          className="add-to-cart"
-                        >
+                        <Link to={`/books/${book.id}`} className="add-to-cart">
                           Xem chi tiết
                         </Link>
                       </figure>

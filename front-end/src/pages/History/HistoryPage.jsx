@@ -34,7 +34,7 @@ export default function HistoryPage({ user }) {
           all: undefined,
           pending: "pending",
           processing: "processing",
-          shipping: "shipped",
+          shipping: "shipping",
           completed: "completed",
           cancelled: "cancelled",
         };
@@ -80,7 +80,7 @@ export default function HistoryPage({ user }) {
         all: undefined,
         pending: "pending",
         processing: "processing",
-        shipping: "shipped",
+        shipping: "shipping",
         completed: "completed",
         cancelled: "cancelled",
       };
@@ -145,7 +145,7 @@ export default function HistoryPage({ user }) {
                       <span className="order-total">
                         {formatCurrency(order.total_amount)}
                       </span>
-                      {["pending", "processing", "shipped"].includes(
+                      {["pending", "processing", "shipping"].includes(
                         order.status
                       ) && (
                         <button

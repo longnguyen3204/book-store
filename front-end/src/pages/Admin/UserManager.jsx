@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import userApi from "../../api/userApi"; // Đảm bảo đường dẫn đúng
+import userApi from "../../api/userApi";
 
 const UserManager = () => {
   const [users, setUsers] = useState([]);
@@ -10,7 +10,6 @@ const UserManager = () => {
     const fetchUsers = async () => {
       try {
         const res = await userApi.getAllUsers();
-        // Giả sử API trả về: { success: true, data: [...] } hoặc trực tiếp mảng
         setUsers(res.data || res);
       } catch (error) {
         console.error("Lỗi tải danh sách:", error);
@@ -21,10 +20,26 @@ const UserManager = () => {
     fetchUsers();
   }, []);
 
+  // --- HÀM CẬP NHẬT VAI TRÒ (MỚI BỔ SUNG) ---
+  const handleRoleChange = async (userId, newRoleValue) => {
+    try {
+      const roleId = parseInt(newRoleValue); // Chuyển về kiểu số
+
+      // Gọi API đã sửa ở trên
+      await userApi.updateUserRole(userId, roleId);
+
+      // Cập nhật state local
+      setUsers(
+        users.map((u) => (u.id === userId ? { ...u, role_id: roleId } : u))
+      );
+
+      alert("Cập nhật quyền người dùng thành công");
+    } catch (error) {
+      alert("Lỗi: " + error.message);
+    }
+  };
   // Hàm xử lý Khóa / Mở khóa
   const toggleStatus = async (user) => {
-    // Logic: Nếu is_locked == 1 thì đang khóa -> cần mở (gửi 0)
-    //        Nếu is_locked == 0 thì đang mở -> cần khóa (gửi 1)
     const currentLocked = user.is_locked === 1;
     const newStatus = currentLocked ? 0 : 1;
     const actionText = currentLocked ? "MỞ KHÓA" : "KHÓA";
@@ -35,10 +50,7 @@ const UserManager = () => {
       )
     ) {
       try {
-        // Gọi API cập nhật trạng thái
         await userApi.updateLockStatus(user.id, newStatus);
-
-        // Cập nhật lại state giao diện ngay lập tức
         setUsers(
           users.map((u) =>
             u.id === user.id ? { ...u, is_locked: newStatus } : u
@@ -96,24 +108,19 @@ const UserManager = () => {
                   </td>
                 </tr>
               ) : users.length > 0 ? (
-                users.map((user, index) => (
+                users.map((user) => (
                   <tr key={user.id} className="border-bottom">
-                    {/* Cột ID */}
                     <td className="text-center text-muted fw-bold">
                       {user.id}
                     </td>
 
-                    {/* Cột Thông tin cá nhân */}
                     <td className="ps-4 py-3">
                       <div className="d-flex align-items-center">
                         <img
-                          src={user.avatar || ""}
+                          src={user.avatar || "/logo.jpg"}
                           alt="avatar"
                           className="rounded-circle me-3 border"
                           style={{ width: 40, height: 40, objectFit: "cover" }}
-                          onError={(e) => {
-                            e.target.src = "";
-                          }}
                         />
                         <div>
                           <div className="fw-bold text-dark">
@@ -124,7 +131,6 @@ const UserManager = () => {
                       </div>
                     </td>
 
-                    {/* Cột Liên hệ & Địa chỉ */}
                     <td className="text-start">
                       <div className="small">
                         <i className="bi bi-telephone me-1"></i>{" "}
@@ -140,28 +146,35 @@ const UserManager = () => {
                       </div>
                     </td>
 
-                    {/* Cột Tổng đơn hàng (MỚI) */}
                     <td className="text-center">
                       <span className="badge bg-light text-dark border fs-6">
-                        {user.total_orders || 0}{" "}
-                        {/* Backend cần trả field này */}
+                        {user.total_orders || 0}
                       </span>
                     </td>
 
-                    {/* Cột Vai trò (Mapping role_id) */}
+                    {/* Cột Vai trò - ĐÃ CẬP NHẬT THÀNH SELECT BOX */}
                     <td className="text-center">
-                      {user.role_id === 1 ? (
-                        <span className="badge bg-danger bg-opacity-10 text-danger border border-danger rounded-pill">
-                          Admin
-                        </span>
-                      ) : (
-                        <span className="badge bg-info bg-opacity-10 text-info border border-info rounded-pill">
-                          Khách hàng
-                        </span>
-                      )}
+                      <select
+                        className={`form-select form-select-sm fw-bold border-0 bg-opacity-10 text-center rounded-pill ${
+                          user.role_id === 1
+                            ? "bg-danger text-danger"
+                            : "bg-info text-info"
+                        }`}
+                        value={user.role_id}
+                        onChange={(e) =>
+                          handleRoleChange(user.id, e.target.value)
+                        } // Truyền id và value mới
+                        style={{
+                          cursor: "pointer",
+                          width: "130px",
+                          margin: "0 auto",
+                        }}
+                      >
+                        <option value="1">Admin</option>
+                        <option value="2">Khách hàng</option>
+                      </select>
                     </td>
 
-                    {/* Cột Trạng thái (Mapping is_locked) */}
                     <td className="text-center">
                       {user.is_locked === 1 ? (
                         <span className="badge bg-secondary px-3 rounded-pill text-dark ">
@@ -174,13 +187,11 @@ const UserManager = () => {
                       )}
                     </td>
 
-                    {/* Cột Hành động */}
                     <td className="text-center">
                       {user.is_locked === 1 ? (
                         <button
                           className="btn btn-sm btn-success shadow-sm"
                           onClick={() => toggleStatus(user)}
-                          title="Mở khóa tài khoản"
                         >
                           <i className="bi bi-unlock-fill me-1"></i> Mở
                         </button>
@@ -188,7 +199,6 @@ const UserManager = () => {
                         <button
                           className="btn btn-sm btn-danger shadow-sm"
                           onClick={() => toggleStatus(user)}
-                          title="Khóa tài khoản"
                         >
                           <i className="bi bi-lock-fill me-1"></i> Khóa
                         </button>

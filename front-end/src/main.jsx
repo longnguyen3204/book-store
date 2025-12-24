@@ -11,15 +11,15 @@ import "./assets/css/vendor.css";
 import "./assets/css/style.css";
 import "./assets/icomoon/icomoon.css";
 import "./index.css";
-import { CartProvider } from "./context/CartContext";
+import { CartProvider } from "./pages/Cart/CartContext";
 import App from "./App.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <CartProvider>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </CartProvider>
   </StrictMode>
 );

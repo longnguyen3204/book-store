@@ -8,8 +8,9 @@ import {
   FacebookFilled,
   YoutubeFilled,
 } from "@ant-design/icons";
-import "./header.css";
-import { useCart } from "../context/CartContext";
+import logo from "../assets/images/main-logo.png";
+import "./HomeHeader.css";
+import { useCart } from "../pages/Cart/CartContext";
 
 function HomeHeader() {
   const navigate = useNavigate();
@@ -112,13 +113,17 @@ function HomeHeader() {
 
       <div className="bg-[#f3f2ec] py-2 border-b border-gray-200">
         <div className="container mx-auto px-4 flex flex-col items-center gap-5">
-          <Link to="/">
-            <img
-              src="/logo.jps"
-              alt="Logo"
-              className="h-16 w-auto object-contain hover:scale-105 transition-transform"
-            />
-          </Link>
+          <div className="header-left">
+            <Link
+              to="/"
+              className="main-logo d-flex align-items-center text-decoration-none"
+            >
+              <img src="/logo.jpg" alt="logo" className="logo-img" />
+              <span className="brand-name ms-2 d-none d-sm-inline">
+                BOOKSAW
+              </span>
+            </Link>
+          </div>
           <form className="w-full max-w-xl" onSubmit={handleSearch}>
             <Input
               prefix={

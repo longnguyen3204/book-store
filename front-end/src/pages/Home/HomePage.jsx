@@ -3,7 +3,7 @@ import Slider from "react-slick";
 import classNames from "classnames";
 import AOS from "aos";
 import { Link } from "react-router-dom";
-import { useCart } from "../../context/CartContext";
+import { useCart } from "../Cart/CartContext";
 import statisticsApi from "../../api/statisticsApi";
 
 const Arrow = ({ direction, onClick }) => (
@@ -71,7 +71,14 @@ const HomePage = ({ user }) => {
   const [isSearchOpen, setSearchOpen] = useState(false);
   const [isSticky, setSticky] = useState(false);
   const { cart, addToCart } = useCart();
-
+  const scrollToTop = (e) => {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  const handleReload = (e) => {
+    e.preventDefault();
+    window.location.reload();
+  };
   const cartCount = useMemo(
     () =>
       cart.reduce(
@@ -221,7 +228,7 @@ const HomePage = ({ user }) => {
             <div className="row">
               <div className="col-md-2">
                 <div className="main-logo">
-                  <Link to="/">
+                  <Link to="/" onClick={handleReload}>
                     <img
                       src="./logo.jpg"
                       alt="logo"
@@ -239,7 +246,11 @@ const HomePage = ({ user }) => {
                       })}
                     >
                       <li className="menu-item active">
-                        <a href="#home" className="nav-link">
+                        <a
+                          href="#home"
+                          className="nav-link"
+                          onClick={scrollToTop}
+                        >
                           Home
                         </a>
                       </li>

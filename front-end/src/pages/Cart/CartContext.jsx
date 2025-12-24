@@ -20,7 +20,9 @@ export const CartProvider = ({ children }) => {
       const isExist = prevCart.find((item) => item.id === product.id);
       if (isExist) {
         return prevCart.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
         );
       }
       return [...prevCart, { ...product, quantity: 1 }];
@@ -40,7 +42,9 @@ export const CartProvider = ({ children }) => {
   };
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, updateQuantity, removeFromCart }}>
+    <CartContext.Provider
+      value={{ cart, addToCart, updateQuantity, removeFromCart }}
+    >
       {children}
     </CartContext.Provider>
   );

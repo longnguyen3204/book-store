@@ -1,13 +1,14 @@
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate, Router } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "./App.css";
+import ScrollToTop from "./layouts/scrollToTop.js";
 
 // Import các trang phía Client
 import HomePage from "./pages/Home/HomePage";
 import LoginPage from "./pages/Login/LoginPage";
 import RegisterPage from "./pages/Register/RegisterPage";
-import DetailProduct from "./pages/Client/BookDetailPage";
-import SearchPage from "./pages/Client/SearchPage";
+import DetailProduct from "./pages/Shop/BookDetailPage";
+import SearchPage from "./pages/Shop/SearchPage";
 
 // Import các trang phía Admin
 import AdminLayout from "./layouts/AdminLayout";
@@ -18,7 +19,7 @@ import CategoryManager from "./pages/Admin/CategoryManager";
 import VoucherManager from "./pages/Admin/VoucherManager.jsx";
 
 // Sửa lại đường dẫn ProfilePage (thêm /Client/)
-import ProfilePage from "./pages/Client/Profile/ProfilePage.jsx";
+import ProfilePage from "./pages/Profile/ProfilePage.jsx";
 
 // Giữ nguyên hoặc kiểm tra lại ShopPage (đảm bảo file nằm trong src/pages/Shop/)
 import ShopPage from "./pages/Shop/ShopPage.jsx";
@@ -63,46 +64,49 @@ function App() {
   const handleBackHome = () => navigate("/");
 
   return (
-    <Routes>
-      {/* --- ROUTES CHO KHÁCH HÀNG (CLIENT) --- */}
-      <Route path="/" element={<HomePage user={user} />} />
-      <Route path="/books/:id" element={<DetailProduct />} />
-      <Route path="/search" element={<SearchPage />} />
-      <Route path="/books" element={<ShopPage />} />
-      <Route path="/cart" element={<CartPage />} />
-      <Route path="/checkout" element={<CheckoutPage />} />
-      <Route path="/order-history" element={<HistoryPage user={user} />} />
-      <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route
-        path="/profile"
-        element={
-          <ProfilePage
-            user={user}
-            setUser={setUser}
-            onBack={handleBackHome}
-            onLogout={() => {
-              handleLogout();
-              navigate("/");
-            }}
-          />
-        }
-      />
+    <>
+      <ScrollToTop />
+      <Routes>
+        {/* --- ROUTES CHO KHÁCH HÀNG (CLIENT) --- */}
+        <Route path="/" element={<HomePage user={user} />} />
+        scrollToTop
+        <Route path="/books/:id" element={<DetailProduct />} />
+        <Route path="/search" element={<SearchPage />} />
+        <Route path="/books" element={<ShopPage />} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/order-history" element={<HistoryPage user={user} />} />
+        <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route
+          path="/profile"
+          element={
+            <ProfilePage
+              user={user}
+              setUser={setUser}
+              onBack={handleBackHome}
+              onLogout={() => {
+                handleLogout();
+                navigate("/");
+              }}
+            />
+          }
+        />
+        {/* --- ROUTES CHO ADMIN --- */}
+        {/* AdminLayout sẽ bao bọc các route con bên trong */}
+        <Route path="/admin" element={<AdminLayout />}>
+          {/* Route index: Khi vào /admin sẽ mặc định hiện trang Quản lý Sách */}
+          <Route index element={<BookManager />} />
 
-      {/* --- ROUTES CHO ADMIN --- */}
-      {/* AdminLayout sẽ bao bọc các route con bên trong */}
-      <Route path="/admin" element={<AdminLayout />}>
-        {/* Route index: Khi vào /admin sẽ mặc định hiện trang Quản lý Sách */}
-        <Route index element={<BookManager />} />
-
-        {/* Các trang chức năng cụ thể */}
-        <Route path="books" element={<BookManager />} />
-        <Route path="categories" element={<CategoryManager />} />
-        <Route path="orders" element={<OrderManager />} />
-        <Route path="vouchers" element={<VoucherManager />} />
-        <Route path="users" element={<UserManager />} />
-      </Route>
-    </Routes>
+          {/* Các trang chức năng cụ thể */}
+          <Route path="books" element={<BookManager />} />
+          <Route path="categories" element={<CategoryManager />} />
+          <Route path="orders" element={<OrderManager />} />
+          <Route path="vouchers" element={<VoucherManager />} />
+          <Route path="users" element={<UserManager />} />
+        </Route>
+      </Routes>
+    </>
   );
 }
 

@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import classNames from "classnames";
-import { brandAssets } from "../../data/content.js";
 import "./shop.css";
-import { useCart } from "../../context/CartContext";
+import { useCart } from "../Cart/CartContext";
 import { getBooks } from "../../api/bookApi";
+
 const ShopPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [books, setBooks] = useState([]);
@@ -13,7 +13,7 @@ const ShopPage = () => {
   const [user, setUser] = useState(null);
   const [isSearchOpen, setSearchOpen] = useState(false);
   // Lấy hàm thêm vào giỏ hàng từ Context
-  const { cart, addToCart } = useCart(); 
+  const { cart, addToCart } = useCart();
   const cartCount = cart.reduce(
     (sum, item) => sum + (item.quantity ? Number(item.quantity) : 1),
     0
@@ -54,7 +54,7 @@ const ShopPage = () => {
     fetchBooks();
   }, []);
 
-  const filteredBooks = books.filter(book => 
+  const filteredBooks = books.filter((book) =>
     (book.title || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -80,14 +80,30 @@ const ShopPage = () => {
           <div className="container-fluid">
             <div className="row">
               <div className="col-md-6 d-flex align-items-center">
-                <Link to="/" className="main-logo">
-                  <img src={brandAssets.logo} alt="logo" />
+                <Link
+                  to="/"
+                  className="main-logo"
+                  style={{ width: "50px", height: "50px" }}
+                >
+                  <img src="./logo.jpg" alt="logo" />
                 </Link>
               </div>
               <div className="col-md-6">
-                <div className="right-element" style={{ display: "flex", gap: 20, justifyContent: "flex-end", alignItems: "center" }}>
+                <div
+                  className="right-element"
+                  style={{
+                    display: "flex",
+                    gap: 20,
+                    justifyContent: "flex-end",
+                    alignItems: "center",
+                  }}
+                >
                   {user ? (
-                    <Link to="/profile" className="user-account for-buy" style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                    <Link
+                      to="/profile"
+                      className="user-account for-buy"
+                      style={{ display: "flex", gap: 8, alignItems: "center" }}
+                    >
                       <i className="icon icon-user"></i>
                       <span>{user.fullname || user.email}</span>
                     </Link>
@@ -98,7 +114,11 @@ const ShopPage = () => {
                     </Link>
                   )}
 
-                  <Link to="/cart" className="cart for-buy" style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                  <Link
+                    to="/cart"
+                    className="cart for-buy"
+                    style={{ display: "flex", gap: 6, alignItems: "center" }}
+                  >
                     <i className="icon icon-clipboard"></i>
                     <span>Cart:({cartCount})</span>
                   </Link>
@@ -124,9 +144,11 @@ const ShopPage = () => {
         </div>
       </section>
 
-<div className="container">
+      <div className="container">
         {loading && <p className="text-center">Đang tải sách...</p>}
-        {error && !loading && <p className="text-center text-danger">{error}</p>}
+        {error && !loading && (
+          <p className="text-center text-danger">{error}</p>
+        )}
         {!loading && !error && (
           <>
             {filteredBooks.length === 0 ? (
@@ -138,11 +160,15 @@ const ShopPage = () => {
                     <div className="product-item">
                       <figure className="product-style">
                         <Link to={`/books/${book.id}`}>
-                          <img src={book.image} alt={book.title} className="product-item img-fluid" />
+                          <img
+                            src={book.image}
+                            alt={book.title}
+                            className="product-item img-fluid"
+                          />
                         </Link>
                         {/* Gọi hàm handleAddToCart khi nhấn nút */}
-                        <button 
-                          type="button" 
+                        <button
+                          type="button"
                           className="add-to-cart"
                           onClick={() => handleAddToCart(book)}
                         >
@@ -150,11 +176,18 @@ const ShopPage = () => {
                         </button>
                       </figure>
                       <figcaption className="text-center mt-3">
-                        <Link to={`/books/${book.id}`} className="text-decoration-none text-dark">
+                        <Link
+                          to={`/books/${book.id}`}
+                          className="text-decoration-none text-dark"
+                        >
                           <h3 className="fs-6 text-uppercase">{book.title}</h3>
                         </Link>
-                        <span className="text-muted d-block small">{book.author}</span>
-                        <div className="item-price text-danger fw-bold">{formatPrice(book.price)}</div>
+                        <span className="text-muted d-block small">
+                          {book.author}
+                        </span>
+                        <div className="item-price text-danger fw-bold">
+                          {formatPrice(book.price)}
+                        </div>
                       </figcaption>
                     </div>
                   </div>
