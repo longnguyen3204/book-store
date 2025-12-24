@@ -251,27 +251,27 @@ const HomePage = ({ user }) => {
                           className="nav-link"
                           onClick={scrollToTop}
                         >
-                          Home
+                          Trang chủ
                         </a>
                       </li>
                       <li className="menu-item">
                         <a href="#featured-books" className="nav-link">
-                          Featured
+                          Đầu sách nổi bật
                         </a>
                       </li>
                       <li className="menu-item">
                         <a href="#popular-books" className="nav-link">
-                          Popular
+                          Đầu sách phổ biến
                         </a>
                       </li>
                       <li className="menu-item">
                         <a href="#special-offer" className="nav-link">
-                          Offer
+                          Khuyến mãi
                         </a>
                       </li>
                       <li className="menu-item">
                         <Link to="/books" className="nav-link">
-                          Library
+                          Kho sách
                         </Link>
                       </li>
                     </ul>
@@ -328,9 +328,9 @@ const HomePage = ({ user }) => {
         <div className="container">
           <div className="section-header align-center">
             <div className="title">
-              <span>Some quality items</span>
+              <span>Các đầu sách chất lượng</span>
             </div>
-            <h2 className="section-title">Featured Books</h2>
+            <h2 className="section-title">Đầu sách nổi bật</h2>
           </div>
           <div className="product-list" data-aos="fade-up">
             <div className="row">
@@ -360,7 +360,7 @@ const HomePage = ({ user }) => {
               </div>
               <div className="col-12 col-lg-6">
                 <div className="product-entry">
-                  <h2 className="section-title divider">Best Selling Book</h2>
+                  <h2 className="section-title divider">Sách bán chạy nhất</h2>
                   <div className="products-content">
                     <div className="author-name">{bestSelling.author}</div>
                     <h3 className="item-title">{bestSelling.title}</h3>
@@ -373,7 +373,7 @@ const HomePage = ({ user }) => {
                         onClick={() => handleAddToCart(bestSelling)}
                         className="btn btn-outline-accent btn-accent-arrow"
                       >
-                        Shop It Now <i className="icon icon-ns-arrow-right"></i>
+                        Mua ngay <i className="icon icon-ns-arrow-right"></i>
                       </button>
                     </div>
                   </div>
@@ -388,7 +388,7 @@ const HomePage = ({ user }) => {
       <section id="popular-books" className="bookshelf py-5 my-5">
         <div className="container">
           <div className="section-header align-center">
-            <h2 className="section-title">Popular Books</h2>
+            <h2 className="section-title">Đầu sách phổ biến</h2>
           </div>
 
           <ul className="tabs">
@@ -421,9 +421,9 @@ const HomePage = ({ user }) => {
       <section id="special-offer" className="bookshelf pb-5 mb-5">
         <div className="section-header align-center">
           <div className="title">
-            <span>Grab your opportunity</span>
+            <span>Nắm lấy cơ hội</span>
           </div>
-          <h2 className="section-title">Books with offer</h2>
+          <h2 className="section-title">Đầu sách đang giảm giá</h2>
         </div>
         <div className="container">
           <div className="product-list" data-aos="fade-up">
@@ -473,7 +473,7 @@ const HomePage = ({ user }) => {
                 className="widget-title text-uppercase mb-4"
                 style={{ fontWeight: "700", fontSize: "16px" }}
               >
-                Quick Links
+                Liên kết nhanh
               </h5>
               <ul className="menu-list list-unstyled">
                 <li className="menu-item mb-2">
@@ -482,7 +482,7 @@ const HomePage = ({ user }) => {
                     className="text-decoration-none"
                     style={{ color: "#666" }}
                   >
-                    Home
+                    Trang chủ
                   </Link>
                 </li>
                 <li className="menu-item mb-2">
@@ -491,7 +491,7 @@ const HomePage = ({ user }) => {
                     className="text-decoration-none"
                     style={{ color: "#666" }}
                   >
-                    Library
+                    Kho sách
                   </Link>
                 </li>
                 <li className="menu-item mb-2">
@@ -500,7 +500,7 @@ const HomePage = ({ user }) => {
                     className="text-decoration-none"
                     style={{ color: "#666" }}
                   >
-                    About Us
+                    Về chúng tôi
                   </Link>
                 </li>
               </ul>
@@ -512,7 +512,7 @@ const HomePage = ({ user }) => {
                 className="widget-title text-uppercase mb-4"
                 style={{ fontWeight: "700", fontSize: "16px" }}
               >
-                Contact Info
+                Thông tin liên lạc
               </h5>
               <p style={{ fontSize: "14px", color: "#666" }}>
                 <i className="icon icon-location mr-2"></i> 123 Đường ABC, Hà
