@@ -25,35 +25,44 @@ const Header = () => {
 
   return (
     <div id="header-wrap">
-      <div className="top-content">
+      <div className="top-content py-3">
         <div className="container-fluid">
-          <div className="row">
+          <div className="row align-items-center">
+            {/* LOGO */}
             <div className="col-md-6 d-flex align-items-center">
-              <Link to="/" className="main-logo">
-                <img src={brandAssets.logo} alt="logo" />
+              <Link to="/" className="main-logo d-block">
+                <img
+                  src="/logo.jpg"
+                  alt="logo"
+                  className="img-fluid"
+                  style={{
+                    width: "120px",
+                    borderRadius: "8px",
+                  }}
+                />
               </Link>
             </div>
+
+            {/* RIGHT MENU */}
             <div className="col-md-6">
-              <div
-                className="right-element"
-                style={{
-                  display: "flex",
-                  gap: 20,
-                  justifyContent: "flex-end",
-                  alignItems: "center",
-                }}
-              >
+              <div className="d-flex justify-content-end align-items-center gap-3">
                 {user ? (
                   <Link
                     to="/profile"
-                    className="user-account for-buy"
-                    style={{ display: "flex", gap: 8, alignItems: "center" }}
+                    className="user-account for-buy d-flex align-items-center gap-2 "
+                    style={{ fontSize: "25px" }}
                   >
-                    <i className="icon icon-user"></i>
+                    <i
+                      className="icon icon-user"
+                      style={{ fontSize: "25px" }}
+                    ></i>
                     <span>{user.fullname || user.email}</span>
                   </Link>
                 ) : (
-                  <Link to="/login" className="user-account for-buy">
+                  <Link
+                    to="/login"
+                    className="user-account for-buy d-flex align-items-center gap-2"
+                  >
                     <i className="icon icon-user"></i>
                     <span>Account</span>
                   </Link>
@@ -61,8 +70,7 @@ const Header = () => {
 
                 <Link
                   to="/order-history"
-                  className="order-history for-buy"
-                  style={{ display: "flex", gap: 6, alignItems: "center" }}
+                  className="order-history for-buy d-flex align-items-center gap-2"
                 >
                   <i className="icon icon-list"></i>
                   <span>Lịch sử</span>
@@ -70,11 +78,10 @@ const Header = () => {
 
                 <Link
                   to="/cart"
-                  className="cart for-buy"
-                  style={{ display: "flex", gap: 6, alignItems: "center" }}
+                  className="cart for-buy d-flex align-items-center gap-2"
                 >
                   <i className="icon icon-clipboard"></i>
-                  <span>Cart:({cartCount})</span>
+                  <span>Cart ({cartCount})</span>
                 </Link>
               </div>
             </div>

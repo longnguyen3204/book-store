@@ -8,7 +8,6 @@ import {
   FacebookFilled,
   YoutubeFilled,
 } from "@ant-design/icons";
-import logo from "../assets/images/main-logo.png";
 import "./header.css";
 import { useCart } from "../context/CartContext";
 
@@ -115,7 +114,7 @@ function HomeHeader() {
         <div className="container mx-auto px-4 flex flex-col items-center gap-5">
           <Link to="/">
             <img
-              src={logo}
+              src="/logo.jps"
               alt="Logo"
               className="h-16 w-auto object-contain hover:scale-105 transition-transform"
             />
@@ -139,4 +138,3 @@ function HomeHeader() {
 }
 
 export default HomeHeader;
-

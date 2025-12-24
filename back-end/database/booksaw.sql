@@ -25,6 +25,7 @@ CREATE TABLE users (
     avatar VARCHAR(255),            -- Link ảnh đại diện
     is_locked BOOLEAN DEFAULT FALSE, -- Khóa tài khoản (True = khóa)
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    image_url VARCHAR(255) NOT NULL,
     FOREIGN KEY (role_id) REFERENCES roles(id)
 );
 
