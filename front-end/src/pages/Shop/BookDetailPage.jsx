@@ -60,6 +60,20 @@ function DetailProduct() {
     return { average: count ? (sum / count).toFixed(1) : 0, count, stars };
   }, [reviews]);
 
+  const formatTitle = (product) =>
+    product?.name || product?.title || "Đang cập nhật";
+  const formatAuthor = (product) => product?.author || "Nhiều tác giả";
+  const formatDescription = (product) =>
+    product?.description ||
+    product?.descriptionProduct ||
+    "Chưa có mô tả cho sách này.";
+  const mainImage = product?.imagesProduct?.[0] || product?.image || defaultImg;
+  const secondaryImage =
+    product?.imagesProduct?.[1] || product?.image || defaultImg;
+  const priceValue =
+    product?.price ?? product?.original_price ?? product?.prevPrice ?? 0;
+  const originalValue = product?.original_price || product?.prevPrice;
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -121,7 +135,7 @@ function DetailProduct() {
 
   if (loading)
     return (
-      <div className="loading-center">
+      <div className="loading-center beige-bg">
         <Spin size="large" />
       </div>
     );
@@ -129,16 +143,16 @@ function DetailProduct() {
   // Kiểm tra product tồn tại
   if (!product || Object.keys(product).length === 0)
     return (
-      <div className="error-center">
+      <div className="error-center beige-bg">
         <h2>Sản phẩm không tồn tại</h2>
       </div>
     );
 
   return (
-    <div className="detail-page">
+    <div className="detail-page beige-bg">
       <Header />
-      <div className="detail-container">
-        <Breadcrumb className="custom-breadcrumb">
+      <div className="detail-container new-detail">
+        <Breadcrumb className="detail-breadcrumb">
           <Breadcrumb.Item>
             <Link to="/">
               <HomeOutlined />
@@ -147,94 +161,98 @@ function DetailProduct() {
           <Breadcrumb.Item>
             <Link to="/books">Sách</Link>
           </Breadcrumb.Item>
-          <Breadcrumb.Item>{product.name}</Breadcrumb.Item>
+          <Breadcrumb.Item>{formatTitle(product)}</Breadcrumb.Item>
         </Breadcrumb>
 
-        <div className="product-main-card">
-          <div className="product-image-section">
-            <div className="image-wrapper">
-              <Image src={product.image || defaultImg} fallback={defaultImg} />
-            </div>
-            <div className="badge-list">
-              <Tag color="blue" icon={<CheckCircleOutlined />}>
-                Chính hãng
-              </Tag>
-              <Tag color="volcano" icon={<ThunderboltOutlined />}>
-                Giao nhanh
-              </Tag>
-            </div>
-          </div>
-
-          <div className="product-info-section">
-            <h1 className="product-name">{product.name}</h1>
-            <p className="author-name text-start">
-              Tác giả: <span>{product.author || "Nhiều tác giả"}</span>
-            </p>
-
-            <div className="rating-summary-row">
-              <Rate disabled value={Number(ratingStats.average)} />
-              <span className="count-text">
-                ({ratingStats.count} đánh giá khách quan)
-              </span>
-            </div>
-
-            {/* --- SỬA 4: Ép kiểu Number để tránh lỗi NaN --- */}
-            <div className="price-row">
-              <span className="price-current">
-                {product.price
-                  ? formatCurrency.format(Number(product.price))
-                  : "Liên hệ"}
-              </span>
-              {Number(product.original_price) > Number(product.price) && (
-                <span className="price-original">
-                  {formatCurrency.format(Number(product.original_price))}
-                </span>
-              )}
-            </div>
-
-            <Divider />
-            <div className="description-section">
-              <h3>TÓM LƯỢC NỘI DUNG</h3>
-              <p className="text-start">
-                "{product.description || "Đang cập nhật..."}"
-              </p>
-            </div>
-
-            <div className="action-group">
-              <Button
-                type="primary"
-                size="large"
-                className="btn-buy-now"
-                onClick={() => {
-                  addToCart(product);
-                  navigate("/cart");
-                }}
-              >
-                MUA NGAY
-              </Button>
-              <Button
-                size="large"
-                icon={<ShoppingCartOutlined />}
-                className="btn-add-cart"
-                onClick={() => {
-                  addToCart(product);
-                  message.success("Đã thêm vào giỏ");
-                }}
-              >
-                THÊM GIỎ HÀNG
-              </Button>
-              <Button
-                size="large"
-                icon={<HeartOutlined />}
-                className="btn-wish"
+        <div className="detail-card">
+          <div className="detail-grid">
+            <div className="detail-image-panel">
+              <Image
+                src={mainImage}
+                fallback={defaultImg}
+                className="detail-main-image"
+                preview={false}
               />
+              <div className="detail-thumbs">
+                <Image
+                  src={secondaryImage}
+                  fallback={defaultImg}
+                  preview={false}
+                />
+              </div>
+            </div>
+
+            <div className="detail-info-panel">
+              <h1 className="detail-title">{formatTitle(product)}</h1>
+              <p className="detail-author">
+                Tác giả: <span>{formatAuthor(product)}</span>
+              </p>
+
+              <div className="detail-rating-row">
+                <Rate disabled value={Number(ratingStats.average) || 0} />
+                <span className="detail-rating-count">
+                  ({ratingStats.count} nhận xét)
+                </span>
+              </div>
+
+              <div className="detail-price-row">
+                {originalValue &&
+                  Number(originalValue) > Number(priceValue) && (
+                    <span className="detail-price-old">
+                      {formatCurrency.format(originalValue)}
+                    </span>
+                  )}
+                <span className="detail-price">
+                  {formatCurrency.format(priceValue)}
+                </span>
+              </div>
+
+              <div className="detail-description-block">
+                <span className="detail-description-label">Mô tả sách</span>
+                <p className="detail-description">
+                  "{formatDescription(product)}"
+                </p>
+              </div>
+
+              <div className="detail-actions">
+                <Button
+                  type="primary"
+                  size="large"
+                  className="btn-buy-now"
+                  onClick={() => {
+                    addToCart(product);
+                    navigate("/cart");
+                  }}
+                >
+                  Mua ngay
+                </Button>
+                <Button
+                  size="large"
+                  icon={<ShoppingCartOutlined />}
+                  className="btn-add-cart"
+                  onClick={() => {
+                    addToCart(product);
+                    message.success("Đã thêm vào giỏ");
+                  }}
+                >
+                  Thêm vào giỏ
+                </Button>
+                <Button
+                  size="large"
+                  icon={<HeartOutlined />}
+                  className="btn-wish"
+                  onClick={() =>
+                    message.success("Đã thêm vào danh sách yêu thích")
+                  }
+                />
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="review-block">
+        <div className="review-block modern-review">
           <div className="review-header">
-            <h2>ĐÁNH GIÁ NGƯỜI MUA</h2>
+            <h2>Đánh giá của người mua</h2>
             {canReview && (
               <Button type="primary" ghost onClick={() => setIsModalOpen(true)}>
                 Gửi đánh giá
@@ -245,18 +263,23 @@ function DetailProduct() {
           <div className="review-content-grid">
             {/* Phần thống kê sao giữ nguyên */}
             <div className="score-overview">
-              <div className="score-big">{ratingStats.average}</div>
+              <div className="score-big">
+                {ratingStats.average || "0.0"}
+                <span className="score-total">/5</span>
+              </div>
               <Rate
                 disabled
-                value={Number(ratingStats.average)}
+                value={Number(ratingStats.average) || 0}
                 className="margin-v-10"
               />
-              <div className="review-total">{ratingStats.count} nhận xét</div>
+              <div className="review-total">
+                {ratingStats.count} lượt đánh giá
+              </div>
 
               <div className="star-bars-container">
                 {[5, 4, 3, 2, 1].map((s) => (
                   <div key={s} className="bar-item">
-                    <span className="bar-label">{s}★</span>
+                    <span className="bar-label">{s} sao</span>
                     <div className="bar-bg">
                       <div
                         className="bar-fill"
@@ -280,8 +303,7 @@ function DetailProduct() {
             <div className="comments-section">
               <List
                 dataSource={reviews}
-                // Thêm check empty để hiện thông báo nếu chưa có review
-                locale={{ emptyText: "Chưa có đánh giá nào." }}
+                locale={{ emptyText: "Chưa có đánh giá" }}
                 renderItem={(item) => (
                   <div className="comment-card-item">
                     <Avatar className="user-avatar">

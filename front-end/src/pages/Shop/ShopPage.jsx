@@ -4,6 +4,7 @@ import classNames from "classnames";
 import "./shop.css";
 import { useCart } from "../Cart/CartContext";
 import { getBooks } from "../../api/bookApi";
+import defaultAuthor from "../../assets/images/default.png";
 
 const ShopPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -41,7 +42,7 @@ const ShopPage = () => {
           title: item.name || item.title || "Đang cập nhật",
           author: item.author || "Đang cập nhật",
           price: item.price ?? item.original_price ?? 0,
-          image: item.image || brandAssets?.defaultAuthor,
+          image: item.image || defaultAuthor,
         }));
         setBooks(normalized);
       } catch (err) {
@@ -131,7 +132,7 @@ const ShopPage = () => {
       {/* Banner đầu trang */}
       <section className="py-5 bg-light mb-5">
         <div className="container text-center">
-          <h3 className="section-title">Library</h3>
+          <h3 className="section-title">Kho sách</h3>
           <div className="d-flex justify-content-center mt-3">
             <input
               type="text"
