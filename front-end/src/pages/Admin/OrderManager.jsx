@@ -15,7 +15,6 @@ const OrderManager = () => {
       const res = await orderApi.fetchOrders();
       const data = Array.isArray(res) ? res : res.data || [];
 
-      // Sắp xếp đơn mới nhất lên đầu
       const sortedOrders = data.sort((a, b) => {
         const dateA = new Date(a.createdAt || a.order_date);
         const dateB = new Date(b.createdAt || b.order_date);
@@ -30,7 +29,6 @@ const OrderManager = () => {
     }
   };
 
-  // Flow trạng thái
   const getNextStatus = (currentStatus) => {
     const statusMap = {
       pending: "processing",
@@ -40,7 +38,6 @@ const OrderManager = () => {
     return statusMap[(currentStatus || "").toLowerCase()] || null;
   };
 
-  // Xử lý chuyển trạng thái
   const handleNextStep = async (id, currentStatus) => {
     const nextStatus = getNextStatus(currentStatus);
     if (!nextStatus) return;
@@ -67,7 +64,6 @@ const OrderManager = () => {
     }
   };
 
-  // Xử lý hủy đơn
   const handleCancel = async (id) => {
     if (window.confirm("Cảnh báo: Bạn có chắc chắn muốn HỦY đơn hàng này?")) {
       try {
@@ -96,9 +92,7 @@ const OrderManager = () => {
     return Number(price).toLocaleString("vi-VN") + "đ";
   };
 
-  // [SỬA] Hiển thị Badge trạng thái chuẩn xác hơn
   const renderStatusBadge = (status) => {
-    // Mặc định là màu xám (Unknown) thay vì màu xanh (Success) để tránh hiểu nhầm
     let badgeClass = "bg-secondary";
     let icon = "❓";
     let label = "Chưa cập nhật";
@@ -132,7 +126,7 @@ const OrderManager = () => {
         label = "Đã hủy";
         break;
       default:
-        if (status) label = status; // Nếu có status lạ thì hiện tên gốc
+        if (status) label = status;
         break;
     }
 
@@ -193,7 +187,6 @@ const OrderManager = () => {
                   const currentStatus = (order.status || "").toLowerCase();
                   const nextStatus = getNextStatus(currentStatus);
 
-                  // [QUAN TRỌNG] Logic ẩn nút
                   const isFinished =
                     !currentStatus ||
                     ["completed", "complete", "cancelled"].includes(
@@ -283,7 +276,6 @@ const OrderManager = () => {
                             </button>
                           </div>
                         ) : (
-                          // [SỬA] Thêm nội dung cho badge khi đã đóng
                           <span className="badge bg-light text-secondary border px-3 py-2"></span>
                         )}
                       </td>

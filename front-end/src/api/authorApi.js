@@ -4,7 +4,6 @@ import api from "./api";
 export async function fetchAuthors() {
   try {
     const response = await api.get("/authors");
-    // Trả về mảng dữ liệu (tùy vào cấu trúc Backend trả về response.data hoặc response.data.data)
     return response.data;
   } catch (error) {
     const message =
@@ -16,7 +15,6 @@ export async function fetchAuthors() {
 // 2. Thêm tác giả mới (Dùng khi người dùng nhập tên tác giả lạ)
 export async function addAuthor(authorData) {
   try {
-    // authorData thường là { name: "Tên tác giả" }
     const response = await api.post("/authors", authorData);
     return response.data;
   } catch (error) {

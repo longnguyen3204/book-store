@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-// Đảm bảo đường dẫn import đúng
 import bannerApi from "../../api/bannerApi";
 
 const BannerManager = () => {
@@ -7,7 +6,6 @@ const BannerManager = () => {
   const [editingBannerId, setEditingBannerId] = useState(null);
   const [showForm, setShowForm] = useState(false);
 
-  // State form nhập liệu
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -16,7 +14,6 @@ const BannerManager = () => {
     image: null,
   });
 
-  // URL Server để hiển thị ảnh
   const SERVER_URL = "http://localhost:3000";
 
   useEffect(() => {
@@ -25,17 +22,15 @@ const BannerManager = () => {
 
   const loadData = async () => {
     try {
-      // Gọi API lấy tất cả banner (cho Admin)
       const response = await bannerApi.getAllBanners();
       const rawData = response.data || response;
 
       if (Array.isArray(rawData)) {
-        // CHUẨN HÓA DỮ LIỆU: Đảm bảo field khớp với Frontend
         const normalizedData = rawData.map((item) => ({
           ...item,
-          id: item.id || item._id, // Ưu tiên lấy id
-          image: item.image_url || item.image, // Map image_url từ DB sang image
-          link: item.link_url || item.link, // Map link_url từ DB sang link
+          id: item.id || item._id,
+          image: item.image_url || item.image,
+          link: item.link_url || item.link,
         }));
         setBanners(normalizedData);
       } else {
@@ -56,7 +51,6 @@ const BannerManager = () => {
     });
     setEditingBannerId(null);
 
-    // Reset input file bằng DOM để xóa tên file đã chọn cũ
     const fileInput = document.getElementById("bannerImageInput");
     if (fileInput) fileInput.value = "";
   };
@@ -74,7 +68,7 @@ const BannerManager = () => {
       description: banner.description || "",
       link: banner.link || "",
       display_order: Number(banner.display_order) || 0,
-      image: null, // Không set ảnh cũ vào input file, chỉ hiển thị ảnh preview nếu cần
+      image: null,
     });
 
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -90,7 +84,6 @@ const BannerManager = () => {
       data.append("link", formData.link.trim());
       data.append("display_order", Number(formData.display_order) || 0);
 
-      // Chỉ gửi ảnh nếu người dùng chọn file mới
       if (formData.image) {
         data.append("image", formData.image);
       }
@@ -106,7 +99,6 @@ const BannerManager = () => {
       resetForm();
       setShowForm(false);
 
-      // Load lại dữ liệu ngay lập tức
       await loadData();
     } catch (err) {
       console.error(err);
@@ -120,7 +112,6 @@ const BannerManager = () => {
       return;
     }
 
-    // Kiểm tra trạng thái an toàn (ép kiểu về số để so sánh với 1)
     const isActive = Number(banner.is_active) === 1;
     const action = isActive ? "ẨN" : "HIỆN";
 
@@ -134,11 +125,11 @@ const BannerManager = () => {
 
     try {
       if (isActive) {
-        await bannerApi.deleteBanner(banner.id); // Gọi API ẩn
+        await bannerApi.deleteBanner(banner.id);
       } else {
-        await bannerApi.restoreBanner(banner.id); // Gọi API hiện
+        await bannerApi.restoreBanner(banner.id);
       }
-      // Load lại dữ liệu ngay lập tức
+
       await loadData();
     } catch (error) {
       console.error(`Lỗi khi ${action} banner:`, error);
@@ -146,11 +137,9 @@ const BannerManager = () => {
     }
   };
 
-  // Helper xử lý đường dẫn ảnh
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "";
     if (imagePath.startsWith("http")) return imagePath;
-    // Xử lý dấu gạch chéo ngược từ Windows path
     return `${SERVER_URL}/${imagePath.replace(/\\/g, "/")}`;
   };
 
@@ -159,7 +148,6 @@ const BannerManager = () => {
       className="container-fluid py-4 bg-light"
       style={{ minHeight: "100vh" }}
     >
-      {/* HEADER */}
       <div className="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm">
         <h3 className="fw-bold text-uppercase text-primary m-0">
           QUẢN LÝ BANNER
@@ -169,7 +157,6 @@ const BannerManager = () => {
         </span>
       </div>
 
-      {/* TOOLBAR */}
       <div className="mb-3">
         <button
           className="btn btn-success shadow-sm fw-bold px-4"
@@ -182,7 +169,6 @@ const BannerManager = () => {
         </button>
       </div>
 
-      {/* FORM NHẬP LIỆU */}
       {showForm && (
         <div className="admin-card mb-4 p-4 border rounded bg-white shadow-sm border-2">
           <h4 className="fw-bold mb-4 text-dark">
@@ -284,7 +270,6 @@ const BannerManager = () => {
         </div>
       )}
 
-      {/* DANH SÁCH BANNER (TABLE) */}
       <div className="table-responsive bg-white rounded shadow-sm">
         <table className="table table-hover align-middle table-bordered mb-0 text-center">
           <thead className="bg-light text-dark fw-bold">
@@ -338,8 +323,8 @@ const BannerManager = () => {
                     <button
                       className={`btn btn-sm fw-bold ${
                         Number(banner.is_active) === 1
-                          ? "btn-outline-danger" // Nếu đang hiện -> Nút đỏ (Ẩn)
-                          : "btn-outline-success" // Nếu đang ẩn -> Nút xanh (Hiện)
+                          ? "btn-outline-danger"
+                          : "btn-outline-success"
                       }`}
                       onClick={() => handleToggleStatus(banner)}
                     >

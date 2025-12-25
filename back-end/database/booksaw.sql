@@ -205,97 +205,170 @@ CREATE TABLE reviews (
 );
 
 -- ==========================================
--- 5. DỮ LIỆU MẪU (INSERT DATA)
+-- 1. NHÓM NGƯỜI DÙNG & PHÂN QUYỀN
 -- ==========================================
 
--- 1. Thêm Quyền (Roles)
-INSERT INTO roles (id, name, description) VALUES 
-(1, 'admin', 'Quản trị viên toàn quyền'),
-(2, 'customer', 'Khách hàng mua sách');
+INSERT INTO roles (name, description) VALUES 
+('admin', 'Quản trị hệ thống'),
+('customer', 'Khách hàng mua sắm'),
+('staff', 'Nhân viên kho'),
+('editor', 'Biên tập viên nội dung'),
+('moderator', 'Người kiểm duyệt bình luận'),
+('support', 'Hỗ trợ khách hàng'),
+('manager', 'Quản lý cửa hàng'),
+('guest', 'Khách vãng lai'),
+('marketing', 'Nhân viên marketing'),
+('vip', 'Khách hàng thân thiết');
 
--- 2. Thêm Người dùng (Users)
--- Mật khẩu ở đây là hash của chuỗi: "123456"
-INSERT INTO users (role_id, fullname, email, password, phone_number, address) VALUES 
-(1, 'Admin Quản Trị', 'admin@gmail.com', '$2a$10$X.X.X.PLACEHOLDER.HASH.FOR.123456', '0901234567', 'Hà Nội'),
-(2, 'Nguyễn Văn Khách', 'khach@gmail.com', '$2a$10$X.X.X.PLACEHOLDER.HASH.FOR.123456', '0987654321', 'TP. Hồ Chí Minh');
+INSERT INTO users (role_id, fullname, email, phone_number, password, address, avatar, image_url) VALUES 
+(1, 'Nguyễn Văn Admin', 'admin@booksaw.com', '0901234567', 'hash_pass_1', 'Hà Nội', 'avt1.jpg', 'img1.jpg'),
+(2, 'Trần Thị Khách', 'khach1@gmail.com', '0912345678', 'hash_pass_2', 'TP.HCM', 'avt2.jpg', 'img2.jpg'),
+(2, 'Lê Văn Nam', 'namle@gmail.com', '0923456789', 'hash_pass_3', 'Đà Nẵng', 'avt3.jpg', 'img3.jpg'),
+(2, 'Phạm Thị Hoa', 'hoapham@gmail.com', '0934567890', 'hash_pass_4', 'Cần Thơ', 'avt4.jpg', 'img4.jpg'),
+(3, 'Hoàng Văn Kho', 'khohoang@booksaw.com', '0945678901', 'hash_pass_5', 'Hải Phòng', 'avt5.jpg', 'img5.jpg'),
+(2, 'Đặng Văn Bình', 'binhdang@gmail.com', '0956789012', 'hash_pass_6', 'Huế', 'avt6.jpg', 'img6.jpg'),
+(2, 'Bùi Thị Lan', 'lanbui@gmail.com', '0967890123', 'hash_pass_7', 'Nha Trang', 'avt7.jpg', 'img7.jpg'),
+(7, 'Lý Quản Lý', 'lymanager@booksaw.com', '0978901234', 'hash_pass_8', 'Hà Nội', 'avt8.jpg', 'img8.jpg'),
+(2, 'Vũ Văn Hùng', 'hungvu@gmail.com', '0989012345', 'hash_pass_9', 'Bình Dương', 'avt9.jpg', 'img9.jpg'),
+(10, 'Ngô VIP', 'ngovip@gmail.com', '0990123456', 'hash_pass_10', 'Vũng Tàu', 'avt10.jpg', 'img10.jpg');
 
--- 3. Thêm Nhà xuất bản (Publishers)
-INSERT INTO publishers (id, name, address, email) VALUES 
-(1, 'NXB Trẻ', '161B Lý Chính Thắng, TP.HCM', 'info@nxbtre.com.vn'),
-(2, 'NXB Kim Đồng', '55 Quang Trung, Hà Nội', 'info@nxbkimdong.com.vn'),
-(3, 'Nhã Nam', '59 Đỗ Quang, Hà Nội', 'info@nhanam.vn');
+-- ==========================================
+-- 2. NHÓM SẢN PHẨM (SÁCH & DANH MỤC)
+-- ==========================================
 
--- 4. Thêm Tác giả (Authors)
-INSERT INTO authors (id, name, bio) VALUES 
-(1, 'Nguyễn Nhật Ánh', 'Nhà văn chuyên viết cho thanh thiếu niên.'),
-(2, 'J.K. Rowling', 'Tác giả bộ truyện Harry Potter nổi tiếng.'),
-(3, 'Rosie Nguyễn', 'Tác giả sách kỹ năng, phong cách sống.'),
-(4, 'Paulo Coelho', 'Tiểu thuyết gia nổi tiếng người Brazil.');
+INSERT INTO publishers (name, address, email) VALUES 
+('NXB Trẻ', 'Hồ Chí Minh', 'nxbtr@tre.com.vn'),
+('NXB Kim Đồng', 'Hà Nội', 'info@kimdong.com.vn'),
+('NXB Giáo Dục', 'Hà Nội', 'contact@nxbgd.vn'),
+('NXB Phụ Nữ', 'Hà Nội', 'nxbphunu@gmail.com'),
+('NXB Nhã Nam', 'Hà Nội', 'book@nhanam.vn'),
+('NXB Tổng Hợp', 'TP.HCM', 'nxbth@tphcm.gov.vn'),
+('NXB Văn Học', 'Hà Nội', 'nxbvanhoc@vnn.vn'),
+('NXB Lao Động', 'Hà Nội', 'nxblaodong@gmail.com'),
+('NXB Tri Thức', 'Hà Nội', 'trithuc@nxb.vn'),
+('NXB Thế Giới', 'Hà Nội', 'thegioi@nxb.vn');
 
--- 5. Thêm Thể loại (Categories)
-INSERT INTO categories (id, name, description) VALUES 
-(1, 'Văn học', 'Các tác phẩm văn học trong và ngoài nước'),
-(2, 'Thiếu nhi', 'Sách dành cho lứa tuổi thiếu nhi'),
-(3, 'Kỹ năng sống', 'Sách phát triển bản thân'),
-(4, 'Kinh tế', 'Sách về kinh doanh và làm giàu');
+INSERT INTO authors (name, bio) VALUES 
+('Nguyễn Nhật Ánh', 'Nhà văn chuyên viết cho thanh thiếu niên'),
+('Nam Cao', 'Nhà văn hiện thực xuất sắc'),
+('Tô Hoài', 'Tác giả Dế Mèn Phiêu Lưu Ký'),
+('Haruki Murakami', 'Nhà văn nổi tiếng Nhật Bản'),
+('Dale Carnegie', 'Tác giả Đắc Nhân Tâm'),
+('J.K. Rowling', 'Tác giả Harry Potter'),
+('Paulo Coelho', 'Tác giả Nhà Giả Kim'),
+('Xuân Quỳnh', 'Nữ thi sĩ nổi tiếng'),
+('Hàn Mặc Tử', 'Nhà thơ tài năng bạc mệnh'),
+('Ngô Tất Tố', 'Tác giả Tắt Đèn');
 
--- 6. Thêm Sách (Books)
-INSERT INTO books (id, publisher_id, name, isbn, description, original_price, price, quantity, sold_count, publish_year, page_count) VALUES 
-(1, 1, 'Mắt Biếc', '978604100001', 'Một tác phẩm kinh điển về tình yêu đơn phương.', 110000, 88000, 100, 25, 2019, 300),
-(2, 2, 'Harry Potter và Hòn Đá Phù Thủy', '978604100002', 'Tập đầu tiên trong series Harry Potter.', 150000, 120000, 50, 10, 2000, 400),
-(3, 3, 'Tuổi Trẻ Đáng Giá Bao Nhiêu', '978604100003', 'Cuốn sách gối đầu giường của người trẻ.', 80000, 60000, 200, 150, 2016, 250),
-(4, 3, 'Nhà Giả Kim', '978604100004', 'Hành trình đi tìm kho báu của chàng chăn cừu.', 79000, 55000, 80, 40, 1988, 220);
+INSERT INTO categories (name, description) VALUES 
+('Văn học', 'Các tác phẩm văn học trong và ngoài nước'),
+('Kinh tế', 'Sách về quản trị, kinh doanh'),
+('Kỹ năng sống', 'Phát triển bản thân, kỹ năng mềm'),
+('Thiếu nhi', 'Truyện tranh, truyện cổ tích'),
+('Ngoại ngữ', 'Sách học tiếng Anh, Trung, Nhật'),
+('Khoa học', 'Kiến thức khoa học kỹ thuật'),
+('Lịch sử', 'Lịch sử Việt Nam và thế giới'),
+('Tâm lý', 'Sách phân tích tâm lý con người'),
+('Nấu ăn', 'Hướng dẫn ẩm thực'),
+('Giáo khoa', 'Sách phục vụ học tập nhà trường');
 
--- 7. Liên kết Sách - Tác giả (Book_Authors)
+INSERT INTO books (publisher_id, name, isbn, description, original_price, price, quantity, sold_count, view_count, publish_year, language, weight, size, page_count) VALUES 
+(1, 'Mắt Biếc', '978123', 'Truyện dài của Nguyễn Nhật Ánh', 120000, 95000, 100, 50, 1000, 2019, 'Tiếng Việt', 0.5, '13x20', 300),
+(5, 'Nhà Giả Kim', '978456', 'Hành trình đi tìm vận mệnh', 80, 69000, 200, 150, 5000, 2020, 'Tiếng Việt', 0.3, '13x20', 200),
+(5, 'Rừng Na Uy', '978789', 'Tác phẩm của Murakami', 150000, 135000, 50, 20, 800, 2018, 'Tiếng Việt', 0.4, '14x21', 450),
+(2, 'Dế Mèn Phiêu Lưu Ký', '978001', 'Truyện thiếu nhi kinh điển', 60000, 45000, 300, 200, 3000, 2021, 'Tiếng Việt', 0.2, '13x19', 150),
+(8, 'Đắc Nhân Tâm', '978002', 'Sách kỹ năng hay nhất', 90000, 75000, 500, 450, 10000, 2022, 'Tiếng Việt', 0.4, '14x20', 320),
+(1, 'Cho Tôi Xin Một Vé Đi Tuổi Thơ', '978003', 'Ký ức tuổi thơ', 110000, 88000, 150, 80, 2500, 2017, 'Tiếng Việt', 0.3, '13x20', 250),
+(10, 'Harry Potter Tập 1', '978004', 'Phù thủy và pháp sư', 250000, 220000, 100, 90, 4000, 2015, 'Tiếng Việt', 0.7, '15x23', 400),
+(3, 'Toán Lớp 1', '978005', 'Sách giáo khoa tiểu học', 20000, 20000, 1000, 900, 15000, 2023, 'Tiếng Việt', 0.2, '17x24', 80),
+(4, 'Tắt Đèn', '978006', 'Phê phán xã hội cũ', 55000, 40000, 60, 30, 1200, 2010, 'Tiếng Việt', 0.3, '13x19', 180),
+(7, 'Số Đỏ', '978007', 'Tiểu thuyết trào phúng', 75000, 60000, 80, 45, 1800, 2012, 'Tiếng Việt', 0.3, '13x20', 220);
+
 INSERT INTO book_authors (book_id, author_id) VALUES 
-(1, 1), -- Mắt Biếc - Nguyễn Nhật Ánh
-(2, 2), -- Harry Potter - J.K. Rowling
-(3, 3), -- Tuổi Trẻ... - Rosie Nguyễn
-(4, 4); -- Nhà Giả Kim - Paulo Coelho
+(1, 1), (2, 7), (3, 4), (4, 3), (5, 5), (6, 1), (7, 6), (8, 3), (9, 10), (10, 2);
 
--- 8. Liên kết Sách - Thể loại (Book_Categories)
 INSERT INTO book_categories (book_id, category_id) VALUES 
-(1, 1), (1, 3), -- Mắt Biếc thuộc Văn học & Kỹ năng (VD thế)
-(2, 1), (2, 2), -- Harry Potter thuộc Văn học & Thiếu nhi
-(3, 3),
-(4, 1);
+(1, 1), (2, 3), (3, 1), (4, 4), (5, 3), (6, 1), (7, 4), (8, 10), (9, 1), (10, 1);
 
--- 9. Thêm Ảnh sách (Book_Images)
--- (Đây là link ảnh giả định, bạn có thể thay bằng link thật trên mạng)
 INSERT INTO book_images (book_id, image_url, is_thumbnail) VALUES 
-(1, 'https://upload.wikimedia.org/wikipedia/vi/thumb/a/a8/Mat_biec.jpg/220px-Mat_biec.jpg', TRUE),
-(2, 'https://upload.wikimedia.org/wikipedia/vi/a/a9/Harry_Potter_va_Hon_da_Phu_thuy.jpg', TRUE),
-(3, 'https://cdn0.fahasa.com/media/catalog/product/t/u/tuoi-tre-dang-gia-bao-nhieu-u.jpg', TRUE),
-(4, 'https://cdn0.fahasa.com/media/catalog/product/n/h/nha-gia-kim.jpg', TRUE);
+(1, 'matbiec.jpg', TRUE), (2, 'nhagiakim.jpg', TRUE), (3, 'rungnauy.jpg', TRUE), (4, 'demen.jpg', TRUE), (5, 'dacnhantam.jpg', TRUE),
+(6, 'tuoitho.jpg', TRUE), (7, 'hp1.jpg', TRUE), (8, 'toan1.jpg', TRUE), (9, 'tatden.jpg', TRUE), (10, 'sodo.jpg', TRUE);
 
--- 10. Thêm Banner & Voucher
-INSERT INTO banners (title, image_url, display_order) VALUES 
-('Siêu Sale Tháng 11', 'https://example.com/banner1.jpg', 1),
-('Sách Mới Về', 'https://example.com/banner2.jpg', 2);
+-- ==========================================
+-- 3. NHÓM MARKETING (BANNER & VOUCHER)
+-- ==========================================
 
-INSERT INTO vouchers (code, discount_type, discount_value, min_order_value) VALUES 
-('WELCOME', 'fixed', 20000, 100000), -- Giảm 20k cho đơn từ 100k
-('SALE10', 'percent', 10, 200000);   -- Giảm 10% cho đơn từ 200k
+INSERT INTO banners (title, description, image_url, link_url, display_order) VALUES 
+('Sale Hè', 'Giảm giá 50%', 'banner1.jpg', '/sale', 1),
+('Sách Mới', 'Ra mắt sách mới', 'banner2.jpg', '/new', 2),
+('Combo Hot', 'Mua 2 tặng 1', 'banner3.jpg', '/combo', 3),
+('Thiếu Nhi', 'Thế giới cho bé', 'banner4.jpg', '/kids', 4),
+('Flash Sale', 'Chỉ hôm nay', 'banner5.jpg', '/flash', 5),
+('Tác giả mới', 'Giao lưu tác giả', 'banner6.jpg', '/event', 6),
+('App Member', 'Tải app nhận quà', 'banner7.jpg', '/app', 7),
+('Tết Sale', 'Quà tết ý nghĩa', 'banner8.jpg', '/tet', 8),
+('Giảm 20k', 'Cho đơn đầu tiên', 'banner9.jpg', '/first', 9),
+('Free Ship', 'Đơn từ 200k', 'banner10.jpg', '/ship', 10);
 
--- 11. Thêm Phương thức thanh toán
-INSERT INTO payment_methods (id, name, description) VALUES 
-(1, 'COD', 'Thanh toán khi nhận hàng'),
-(2, 'Banking', 'Chuyển khoản ngân hàng'),
-(3, 'Momo', 'Ví điện tử Momo');
+INSERT INTO vouchers (code, discount_type, discount_value, min_order_value, quantity, start_date, end_date) VALUES 
+('GIAY10', 'percent', 10, 100000, 100, '2025-01-01', '2025-12-31'),
+('GIAM50K', 'fixed', 50000, 500000, 50, '2025-01-01', '2025-06-01'),
+('NEWBIE', 'percent', 20, 0, 1000, '2025-01-01', '2025-12-31'),
+('HESANG', 'percent', 15, 200000, 200, '2025-05-01', '2025-08-31'),
+('TET2025', 'fixed', 100000, 1000000, 30, '2025-01-01', '2025-02-15'),
+('FREESHIP', 'fixed', 30000, 150000, 500, '2025-01-01', '2025-12-31'),
+('VIP10', 'percent', 30, 0, 100, '2025-01-01', '2025-12-31'),
+('SACHHAY', 'percent', 5, 50000, 300, '2025-01-01', '2025-12-31'),
+('LASTDAY', 'percent', 40, 300000, 20, '2025-12-30', '2025-12-31'),
+('BOOKSAW', 'fixed', 25000, 200000, 100, '2025-01-01', '2025-12-31');
 
--- 12. Thêm Đơn hàng mẫu (Orders)
--- Khách hàng ID 2 mua hàng
-INSERT INTO orders (id, user_id, payment_method_id, total_amount, status, shipping_address) VALUES 
-(1, 2, 1, 140000, 'delivered', 'Số 10, Đường ABC, TP.HCM'), -- Đơn đã giao
-(2, 2, 3, 120000, 'pending', 'Số 10, Đường ABC, TP.HCM');   -- Đơn đang chờ
+-- ==========================================
+-- 4. NHÓM ĐƠN HÀNG & ĐÁNH GIÁ
+-- ==========================================
 
--- 13. Thêm Chi tiết đơn hàng (Order_Details)
--- Đơn hàng 1 mua: Mắt Biếc (88k) + Nhà Giả Kim (55k) ~ 143k (giả sử voucher giảm còn 140k)
+INSERT INTO carts (user_id) VALUES 
+(1), (2), (3), (4), (5), (6), (7), (8), (9), (10);
+
+INSERT INTO cart_items (cart_id, book_id, quantity) VALUES 
+(1, 1, 2), (2, 2, 1), (3, 3, 1), (4, 4, 5), (5, 5, 1),
+(6, 6, 2), (7, 7, 1), (8, 8, 3), (9, 9, 1), (10, 10, 1);
+
+INSERT INTO payment_methods (name, description) VALUES 
+('COD', 'Thanh toán khi nhận hàng'),
+('Banking', 'Chuyển khoản ngân hàng'),
+('Momo', 'Ví điện tử Momo'),
+('ZaloPay', 'Ví điện tử ZaloPay'),
+('ShopeePay', 'Ví điện tử ShopeePay'),
+('VNPay', 'Cổng thanh toán VNPay'),
+('Visa', 'Thẻ tín dụng Visa'),
+('MasterCard', 'Thẻ tín dụng MasterCard'),
+('Paypal', 'Thanh toán quốc tế'),
+('Cash', 'Tiền mặt tại quầy');
+
+INSERT INTO orders (user_id, payment_method_id, voucher_id, total_amount, status, shipping_address) VALUES 
+(2, 1, 1, 150000, 'completed', 'TP.HCM'),
+(3, 2, NULL, 300000, 'processing', 'Hà Nội'),
+(4, 3, 3, 250000, 'pending', 'Đà Nẵng'),
+(6, 1, NULL, 90000, 'cancelled', 'Cần Thơ'),
+(7, 2, 2, 450000, 'shipping', 'Hải Phòng'),
+(9, 3, NULL, 120000, 'completed', 'Huế'),
+(10, 1, NULL, 600000, 'completed', 'Vũng Tàu'),
+(2, 6, 6, 220000, 'completed', 'TP.HCM'),
+(3, 5, NULL, 85000, 'pending', 'Hà Nội'),
+(4, 1, NULL, 135000, 'completed', 'Đà Nẵng');
+
 INSERT INTO order_details (order_id, book_id, quantity, price) VALUES 
-(1, 1, 1, 88000),
-(1, 4, 1, 55000),
-(2, 2, 1, 120000); -- Đơn 2 mua Harry Potter
+(1, 1, 1, 95000), (1, 2, 1, 69000), (2, 3, 2, 135000), (3, 5, 3, 75000), (4, 4, 2, 45000),
+(5, 7, 2, 220000), (6, 6, 1, 88000), (7, 10, 10, 60000), (8, 9, 5, 40000), (9, 8, 4, 20000);
 
--- 14. Thêm Đánh giá (Reviews)
 INSERT INTO reviews (user_id, book_id, rating, comment) VALUES 
-(2, 1, 5, 'Sách rất hay, bìa đẹp, giao hàng nhanh!');
+(2, 1, 5, 'Sách rất hay, giao nhanh'),
+(3, 1, 4, 'Nội dung cảm động'),
+(4, 2, 5, 'Rất ý nghĩa'),
+(6, 3, 3, 'Hơi khó hiểu'),
+(7, 4, 5, 'Tuổi thơ ùa về'),
+(9, 5, 4, 'Sách bổ ích'),
+(10, 7, 5, 'Fan Harry Potter không nên bỏ qua'),
+(2, 8, 2, 'Sách hơi cũ'),
+(3, 10, 5, 'Tuyệt vời'),
+(4, 9, 4, 'Chất lượng giấy tốt');

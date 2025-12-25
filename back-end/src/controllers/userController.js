@@ -7,7 +7,6 @@ exports.getProfile = async (req, res) => {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: "Không tìm thấy user" });
 
-    // Đảm bảo lấy đầy đủ các trường từ Database trả về
     const {
       id,
       role_id,
@@ -25,7 +24,7 @@ exports.getProfile = async (req, res) => {
       fullname,
       email,
       phone_number,
-      address: address || "", // Trả về chuỗi rỗng nếu null để tránh lỗi Frontend
+      address: address || "",
       avatar,
       is_locked,
     });
@@ -41,7 +40,7 @@ exports.getAllUsers = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Lấy danh sách user thành công",
-      data: users, // Trả về mảng user
+      data: users,
     });
   } catch (error) {
     console.error("Error getting users:", error);
@@ -74,14 +73,12 @@ exports.changePassword = async (req, res) => {
     const { currentPassword, newPassword } = req.body;
     const userId = req.user.id;
 
-    // Lấy thông tin user (Đảm bảo model User có hàm findById)
     const user = await User.findById(userId);
 
     if (!user) {
       return res.status(404).json({ message: "Người dùng không tồn tại!" });
     }
 
-    // So sánh mật khẩu
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Mật khẩu hiện tại không đúng!" });
@@ -91,7 +88,6 @@ exports.changePassword = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-    // Cập nhật DB
     await User.updatePassword(userId, hashedPassword);
 
     res.json({ message: "Đổi mật khẩu thành công!" });
@@ -103,8 +99,8 @@ exports.changePassword = async (req, res) => {
 //  Khóa hoặc Mở khóa tài khoản
 exports.updateLockStatus = async (req, res) => {
   try {
-    const { id } = req.params; // Lấy ID user từ URL
-    const { status } = req.body; // Lấy trạng thái từ body (1: khóa, 0: mở)
+    const { id } = req.params;
+    const { status } = req.body;
 
     // Kiểm tra dữ liệu đầu vào
     if (status !== 0 && status !== 1) {
@@ -138,7 +134,6 @@ exports.updateUserRole = async (req, res) => {
     const { id } = req.params;
     const { role_id } = req.body;
 
-    // Kiểm tra đầu vào
     if (!role_id) {
       return res.status(400).json({
         success: false,
@@ -146,10 +141,8 @@ exports.updateUserRole = async (req, res) => {
       });
     }
 
-    // Gọi hàm updateRole từ Model User
     const result = await User.updateRole(id, role_id);
 
-    // Kiểm tra xem có dòng nào được cập nhật không (check affectedRows)
     if (result.affectedRows === 0) {
       return res.status(404).json({
         success: false,
@@ -175,19 +168,15 @@ exports.sendResetPin = async (req, res) => {
   try {
     const { email } = req.body;
 
-    // 1. Tạo chuỗi 6 số ngẫu nhiên
     const pin = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // 2. Lưu tạm vào object để đối chiếu (key là email)
     tempPinStore[email] = pin;
 
-    // 3. IN RA TERMINAL NHƯ YÊU CẦU
-    console.log("\n" + "=".repeat(40));
-    console.log(`🔑 MÃ PIN QUÊN MẬT KHẨU CHO: ${email}`);
-    console.log(`👉 MÃ PIN: [ ${pin} ]`);
+    console.log(` MÃ PIN QUÊN MẬT KHẨU CHO: ${email}`);
+    console.log(` MÃ PIN: [ ${pin} ]`);
     console.log("=".repeat(40) + "\n");
 
-    res.json({ message: "Mã PIN đã được in ra Terminal của Server!" });
+    res.json({ message: "Mã PIN đã được in ra " });
   } catch (error) {
     res.status(500).json({ message: "Lỗi hệ thống" });
   }

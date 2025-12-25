@@ -53,7 +53,6 @@ class Voucher {
     return await db.query(sql, [id]);
   }
 
-  // HÀM RESTORE Ở ĐÂY
   static async restore(id) {
     const sql = `UPDATE vouchers SET is_active = 1 WHERE id = ?`;
     return await db.query(sql, [id]);

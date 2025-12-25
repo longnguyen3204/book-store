@@ -3,7 +3,6 @@ import api from "./api";
 // 1. Lấy tất cả banner
 export async function getAllBanners() {
   try {
-    // Gọi đúng: /api/banner/hero-slides
     const response = await api.get("/banner/hero-slides");
     return response.data;
   } catch (error) {
@@ -14,7 +13,6 @@ export async function getAllBanners() {
 // 2. Lấy chi tiết một banner
 export async function getBannerDetail(id) {
   try {
-    // Gọi đúng: /api/banner/:id
     const response = await api.get(`/banner/${id}`);
     return response.data;
   } catch (error) {
@@ -27,7 +25,6 @@ export async function getBannerDetail(id) {
 // 3. Tạo mới banner
 export async function createBanner(bannerData) {
   try {
-    // Gọi đúng: /api/banner (Method POST)
     const response = await api.post("/banner", bannerData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
@@ -40,8 +37,6 @@ export async function createBanner(bannerData) {
 // 4. Cập nhật banner
 export async function updateBanner(bannerId, bannerData) {
   try {
-    // SỬA LỖI: Thêm /banner vào trước /update
-    // Gọi đúng: /api/banner/update/:id
     const response = await api.put(`/banner/update/${bannerId}`, bannerData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
@@ -56,8 +51,6 @@ export async function updateBanner(bannerId, bannerData) {
 // 5. Xóa (Ẩn) banner
 export async function deleteBanner(bannerId) {
   try {
-    // SỬA LỖI: Thêm /banner vào trước id
-    // Gọi đúng: /api/banner/:id
     const response = await api.delete(`/banner/${bannerId}`);
     return response.data;
   } catch (error) {
@@ -69,8 +62,6 @@ export async function deleteBanner(bannerId) {
 // 6. Khôi phục (Hiện) banner
 export async function restoreBanner(bannerId) {
   try {
-    // SỬA LỖI: Thêm /banner vào trước id
-    // Gọi đúng: /api/banner/:id/restore
     const response = await api.put(`/banner/${bannerId}/restore`);
     return response.data;
   } catch (error) {

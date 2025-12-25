@@ -5,7 +5,6 @@ const UserManager = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Lấy danh sách user khi component mount
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -20,15 +19,12 @@ const UserManager = () => {
     fetchUsers();
   }, []);
 
-  // --- HÀM CẬP NHẬT VAI TRÒ (MỚI BỔ SUNG) ---
   const handleRoleChange = async (userId, newRoleValue) => {
     try {
-      const roleId = parseInt(newRoleValue); // Chuyển về kiểu số
+      const roleId = parseInt(newRoleValue);
 
-      // Gọi API đã sửa ở trên
       await userApi.updateUserRole(userId, roleId);
 
-      // Cập nhật state local
       setUsers(
         users.map((u) => (u.id === userId ? { ...u, role_id: roleId } : u))
       );
@@ -38,7 +34,6 @@ const UserManager = () => {
       alert("Lỗi: " + error.message);
     }
   };
-  // Hàm xử lý Khóa / Mở khóa
   const toggleStatus = async (user) => {
     const currentLocked = user.is_locked === 1;
     const newStatus = currentLocked ? 0 : 1;
@@ -67,7 +62,6 @@ const UserManager = () => {
       className="container-fluid py-4 bg-light"
       style={{ minHeight: "100vh" }}
     >
-      {/* --- HEADER --- */}
       <div className="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded shadow-sm">
         <h3 className="fw-bold text-uppercase text-primary m-0">
           <i className="bi bi-people-fill me-2"></i>Quản lý Khách hàng
@@ -77,7 +71,6 @@ const UserManager = () => {
         </span>
       </div>
 
-      {/* --- TABLE --- */}
       <div className="card border-0 shadow-sm rounded-3 overflow-hidden">
         <div className="table-responsive">
           <table className="table table-hover table-bordered align-middle mb-0">
@@ -152,7 +145,6 @@ const UserManager = () => {
                       </span>
                     </td>
 
-                    {/* Cột Vai trò - ĐÃ CẬP NHẬT THÀNH SELECT BOX */}
                     <td className="text-center">
                       <span
                         className={`badge rounded-pill fw-bold px-3 py-2 ${

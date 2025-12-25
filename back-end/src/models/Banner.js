@@ -14,15 +14,8 @@ class BannerModel {
   }
 
   static async createBanner(data) {
-    const {
-      title,
-      description, // <--- Đã khai báo
-      link,
-      display_order,
-      image,
-    } = data;
+    const { title, description, link, display_order, image } = data;
 
-    // Check trùng tên
     const [existingBanner] = await db.query(
       "SELECT id FROM banners WHERE LOWER(title) = LOWER(?) LIMIT 1",
       [title.trim()]
@@ -48,7 +41,7 @@ class BannerModel {
 
     const [result] = await db.query(sql, [
       title.trim(),
-      description || null, // Lưu description
+      description || null,
       link || null,
       display_order || 0,
       finalPath,
@@ -57,19 +50,10 @@ class BannerModel {
     return result;
   }
 
-  // --- CẬP NHẬT (FIX LỖI DESCRIPTION) ---
+  //CẬP NHẬT
   static async updateBanner(id, data) {
-    // 1. Lấy dữ liệu từ Controller gửi sang
-    const {
-      title,
-      description, // Đã có cột này trong DB nên lấy thoải mái
-      link,
-      display_order,
-      image,
-    } = data;
+    const { title, description, link, display_order, image } = data;
 
-    // 2. CHECK TRÙNG TÊN (Trừ chính nó ra)
-    // Đảm bảo không đặt tên trùng với banner khác
     const [existingBanner] = await db.query(
       "SELECT id FROM banners WHERE LOWER(title) = LOWER(?) AND id != ? LIMIT 1",
       [title.trim(), id]
@@ -79,8 +63,6 @@ class BannerModel {
       throw new Error("Tiêu đề banner này đã trùng với một banner khác!");
     }
 
-    // 3. CẬP NHẬT THÔNG TIN CƠ BẢN
-    // SQL cập nhật title, description, link_url, display_order
     const sql = `
       UPDATE banners 
       SET title = ?, 
@@ -92,29 +74,25 @@ class BannerModel {
 
     await db.query(sql, [
       title.trim(),
-      description || null, // Nếu rỗng thì lưu null
+      description || null,
       link || null,
       display_order || 0,
       id,
     ]);
 
-    // 4. CẬP NHẬT ẢNH (Chỉ chạy khi Controller gửi link ảnh sang)
+    // 4. CẬP NHẬT ẢNH
     if (image) {
-      // Chuẩn hóa đường dẫn (Windows \ -> Web /)
       const normalizedPath = image.replace(/\\/g, "/");
 
       let relativePath = normalizedPath;
-      // Cắt lấy phần sau chữ "uploads/"
       if (normalizedPath.includes("uploads/")) {
         relativePath = normalizedPath.substring(
           normalizedPath.indexOf("uploads/")
         );
       }
 
-      // Nối domain localhost (hoặc domain thật của bạn)
       const finalPath = `http://localhost:3000/${relativePath}`;
 
-      // Update cột image_url
       await db.query("UPDATE banners SET image_url = ? WHERE id = ?", [
         finalPath,
         id,

@@ -4,12 +4,10 @@ import { useCart } from "./CartContext";
 import Header from "../../components/Header";
 import "./cart.css";
 
-// IMPORT API
 import bookApi from "../../api/bookApi";
 import orderApi from "../../api/orderApi";
 import voucherApi from "../../api/voucherApi";
 
-// IMPORT ICONS & UI LIBRARY
 import { DeleteOutlined, PlusOutlined, MinusOutlined } from "@ant-design/icons";
 import { message } from "antd";
 
@@ -18,7 +16,6 @@ export default function Cart() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // 1. Lấy thông tin User từ LocalStorage
   const user = useMemo(() => {
     try {
       const stored = localStorage.getItem("user");
@@ -28,7 +25,6 @@ export default function Cart() {
     }
   }, []);
 
-  // Format tiền tệ VNĐ
   const currencyFormatter = useMemo(
     () =>
       new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }),
@@ -43,7 +39,6 @@ export default function Cart() {
     return num.toString();
   };
 
-  // Helper parse giá
   const parsePrice = (val) => {
     if (typeof val === "number") return val;
     if (typeof val === "string") {
@@ -53,16 +48,13 @@ export default function Cart() {
     return 0;
   };
 
-  // --- STATE QUẢN LÝ ---
   const [dbVouchers, setDbVouchers] = useState([]);
   const [selectedVoucher, setSelectedVoucher] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
   const [recommendedProducts, setRecommendedProducts] = useState([]);
 
-  // State lưu danh sách sách gốc để check tồn kho realtime
   const [allBooks, setAllBooks] = useState([]);
 
-  // 2. Xử lý địa chỉ
   const [selectedAddress, setSelectedAddress] = useState(() => {
     if (location.state?.savedAddress) return location.state.savedAddress;
     if (user && user.address) {
@@ -78,7 +70,6 @@ export default function Cart() {
     return null;
   });
 
-  // 3. Fetch dữ liệu
   useEffect(() => {
     const fetchDbData = async () => {
       try {
@@ -93,22 +84,18 @@ export default function Cart() {
             id: item.id,
             title: item.name || item.title || "Đang cập nhật",
             author: item.author || "Nhiều tác giả",
-            stock: item.stock || item.quantity || 0, // Lưu rõ đây là STOCK
+            stock: item.stock || item.quantity || 0,
             price: item.price ?? 0,
             image:
               item.image || item.thumbnail || "https://via.placeholder.com/150",
           })
         );
 
-        // Lưu danh sách gốc để tra cứu
         setAllBooks(normalizedBooks);
-
-        // Random lấy sản phẩm
         setRecommendedProducts(
           [...normalizedBooks].sort(() => Math.random() - 0.5)
         );
 
-        // Set Voucher
         setDbVouchers(Array.isArray(vouchersRes) ? vouchersRes : []);
       } catch (error) {
         console.error("Lỗi tải dữ liệu:", error);
@@ -117,7 +104,6 @@ export default function Cart() {
     fetchDbData();
   }, []);
 
-  // 4. Tính toán tiền nong
   const subTotal = useMemo(() => {
     return cart.reduce((sum, item) => {
       if (!selectedIds.includes(String(item.id))) return sum;
@@ -139,7 +125,6 @@ export default function Cart() {
     [subTotal, discountAmount]
   );
 
-  // 5. Xử lý chọn Voucher
   const handleSelectVoucher = (voucher) => {
     if (selectedVoucher?.id === voucher.id) {
       setSelectedVoucher(null);
@@ -156,7 +141,6 @@ export default function Cart() {
     }
   };
 
-  // 6. Xử lý đặt hàng
   const handlePlaceOrder = async () => {
     if (!user) {
       message.warning("Vui lòng đăng nhập để mua hàng");
@@ -262,7 +246,6 @@ export default function Cart() {
                     <span className="shop-name">BOOKSAW STORE</span>
                   </div>
                   {cart.map((item) => {
-                    // TÌM SÁCH TRONG KHO ĐỂ LẤY STOCK CHÍNH XÁC
                     const currentBook = allBooks.find((b) => b.id === item.id);
                     const stockAvailable = currentBook
                       ? currentBook.stock
@@ -312,7 +295,7 @@ export default function Cart() {
                                   Math.max(0, item.quantity - 1)
                                 )
                               }
-                              disabled={item.quantity < 1} // Disable nút trừ khi < 1
+                              disabled={item.quantity < 1}
                               style={{ opacity: item.quantity < 1 ? 0.5 : 1 }}
                             >
                               <MinusOutlined />
@@ -323,7 +306,7 @@ export default function Cart() {
                               value={item.quantity}
                               onChange={(e) => {
                                 const val = parseInt(e.target.value);
-                                // Validate nhập tay: phải là số, > 0 và <= tồn kho
+
                                 if (
                                   !isNaN(val) &&
                                   val >= 0 &&
@@ -340,7 +323,7 @@ export default function Cart() {
                                   updateQuantity(item.id, item.quantity + 1);
                                 }
                               }}
-                              disabled={item.quantity >= stockAvailable} // Disable nút cộng khi max kho
+                              disabled={item.quantity >= stockAvailable}
                               style={{
                                 opacity:
                                   item.quantity >= stockAvailable ? 0.5 : 1,
@@ -371,7 +354,6 @@ export default function Cart() {
               </>
             )}
 
-            {/* SẢN PHẨM CÓ THỂ THÍCH*/}
             <div className="white-card recommendation-section mt-4">
               <h3 className="section-label">Sản phẩm có thể bạn thích</h3>
               <div className="recommendation-grid">
@@ -391,7 +373,7 @@ export default function Cart() {
                     >
                       <div className="rec-img-wrapper">
                         <img
-                          src={book.image}
+                          src={`${book.image}`}
                           alt={book.title}
                           onError={(e) =>
                             (e.target.src = "https://via.placeholder.com/150")
@@ -415,7 +397,7 @@ export default function Cart() {
                             addToCart({
                               ...book,
                               quantity: 1,
-                              stock: realStock, // Truyền đúng tồn kho vào
+                              stock: realStock,
                             });
                             message.success("Đã thêm vào giỏ hàng");
                           } else {
@@ -461,7 +443,6 @@ export default function Cart() {
               )}
             </div>
 
-            {/* Box Voucher */}
             <div className="white-card coupon-section mt-3">
               <span className="coupon-title">
                 Mã Giảm Giá ({dbVouchers.length})
@@ -502,7 +483,6 @@ export default function Cart() {
               </div>
             </div>
 
-            {/* Box Tổng tiền */}
             <div className="white-card summary-box mt-3">
               <div className="summary-line d-flex justify-content-between">
                 <span>Tạm tính</span>

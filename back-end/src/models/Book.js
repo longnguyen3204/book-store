@@ -1,7 +1,5 @@
 const db = require("../config/db");
-
 class Book {
-  // Lấy ảnh: ưu tiên ảnh trong DB, nếu không có thì dùng ảnh tĩnh trong public/images theo id (harrypotter.jpg cho id=2)
   static thumbnailSql = `
         SELECT image_url 
         FROM book_images 
@@ -31,7 +29,7 @@ class Book {
     LEFT JOIN book_categories bc ON b.id = bc.book_id
     LEFT JOIN categories c ON bc.category_id = c.id
     GROUP BY b.id 
-    ORDER BY b.id DESC`; // Sắp xếp sách mới nhất lên đầu
+    ORDER BY b.id DESC`;
 
     const [rows] = await db.query(sql);
     return rows;
@@ -89,7 +87,6 @@ class Book {
     return rows;
   }
 
-  // Tìm sách theo tác giả, nhà xuất bản, năm xuất bản, thể loại
   static async search(filters) {
     const { author, publisher, publish_year, category, category_id, sort } =
       filters;
@@ -224,11 +221,8 @@ class Book {
       );
     }
 
-    // --- SỬA TẠI ĐÂY: CHUẨN HÓA ĐƯỜNG DẪN TRƯỚC KHI LƯU ---
     if (image) {
-      const normalizedPath = image.replace(/\\/g, "/"); // Chuyển \ thành /
-
-      // 3. Nối thêm địa chỉ localhost
+      const normalizedPath = image.replace(/\\/g, "/");
       const finalPath = `http://localhost:3000/${normalizedPath.substring(
         normalizedPath.indexOf("uploads/")
       )}`;
@@ -243,11 +237,11 @@ class Book {
 
   static async updateBookInfo(id, data) {
     const {
-      publisher_id, // Nếu frontend không gửi, cái này sẽ là undefined
+      publisher_id,
       category_id,
       author_id,
       name,
-      isbn, // Nếu frontend không gửi, cái này sẽ là undefined
+      isbn,
       description,
       original_price,
       price,
@@ -258,7 +252,6 @@ class Book {
       image,
     } = data;
 
-    // 1. SỬA LỖI CHECK TRÙNG TÊN: Loại trừ ID hiện tại (AND id != ?)
     const [existingBook] = await db.query(
       "SELECT id FROM books WHERE LOWER(name) = LOWER(?) AND id != ? LIMIT 1",
       [name.trim(), id]
@@ -270,7 +263,6 @@ class Book {
       );
     }
 
-    // 2. Cập nhật bảng books
     const sql = `UPDATE books SET 
                   publisher_id = ?, 
                   name = ?, 
@@ -284,9 +276,9 @@ class Book {
                 WHERE id = ?`;
 
     await db.query(sql, [
-      publisher_id || null, // Nếu không có thì set null để tránh lỗi
+      publisher_id || null,
       name.trim(),
-      isbn || null, // Nếu không có thì set null
+      isbn || null,
       description,
       original_price,
       price,
@@ -296,7 +288,6 @@ class Book {
       id,
     ]);
 
-    // 3. Cập nhật Thể loại
     if (category_id) {
       await db.query("DELETE FROM book_categories WHERE book_id = ?", [id]);
       await db.query(
@@ -305,7 +296,6 @@ class Book {
       );
     }
 
-    // 4. Cập nhật Tác giả
     if (author_id) {
       await db.query("DELETE FROM book_authors WHERE book_id = ?", [id]);
       await db.query(
@@ -314,9 +304,8 @@ class Book {
       );
     }
 
-    // 5. Cập nhật Ảnh (Chỉ chạy khi có upload ảnh mới)
     if (image) {
-      const normalizedPath = image.replace(/\\/g, "/"); // Chuyển \ thành /
+      const normalizedPath = image.replace(/\\/g, "/");
       let relativePath = normalizedPath;
       if (normalizedPath.includes("uploads/")) {
         relativePath = normalizedPath.substring(
@@ -326,19 +315,18 @@ class Book {
 
       const finalPath = `http://localhost:3000/${relativePath}`;
 
-      // Set ảnh cũ thành không phải thumbnail
       await db.query(
         "UPDATE book_images SET is_thumbnail = 0 WHERE book_id = ?",
         [id]
       );
 
-      // Thêm ảnh mới làm thumbnail
       await db.query(
         "INSERT INTO book_images (book_id, image_url, is_thumbnail) VALUES (?, ?, 1)",
         [id, finalPath]
       );
     }
   }
+
   static async delBook(id) {
     const sql = `UPDATE books SET is_active = 0 WHERE id = ?`;
     const [result] = await db.query(sql, [id]);

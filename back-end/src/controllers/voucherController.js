@@ -42,7 +42,6 @@ exports.updateVoucher = async (req, res) => {
     const { id } = req.params;
     const data = req.body;
 
-    // Đảm bảo mã code luôn viết hoa nếu có thay đổi
     if (data.code) data.code = data.code.toUpperCase();
 
     await Voucher.update(id, data);

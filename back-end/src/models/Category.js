@@ -6,7 +6,7 @@ class Category {
     const [rows] = await db.query("SELECT * FROM categories WHERE id = ?", [
       id,
     ]);
-    return rows[0]; // Trả về Category tìm thấy, hoặc undefined nếu không có
+    return rows[0];
   }
 
   // Hàm lấy tất cả các thể loại
@@ -32,7 +32,6 @@ class Category {
 
     const sql = `INSERT INTO categories (name, description) VALUES (?, ?)`;
 
-    // Thực thi lệnh insert
     const [result] = await db.query(sql, [name, description]);
 
     // result.insertId chính là ID của dòng vừa tạo
@@ -52,7 +51,6 @@ class Category {
 
   // Hàm xóa thể loại
   static async delCategory(id) {
-    // Đảm bảo có dấu ngoặc vuông [result]
     const [result] = await db.query(
       "UPDATE categories SET is_activity = 0 WHERE id = ?",
       [id]

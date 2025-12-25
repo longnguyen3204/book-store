@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import categoryApi from "../../api/categoryApi";
 
 const CategoryManager = () => {
-  // --- GIỮ NGUYÊN LOGIC CỦA BẠN ---
   const [categories, setCategories] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -20,7 +19,6 @@ const CategoryManager = () => {
     try {
       setLoading(true);
       const res = await categoryApi.fetchCategories();
-      // Đảm bảo lấy đúng mảng dữ liệu từ phản hồi
       setCategories(Array.isArray(res) ? res : res.data || []);
     } catch (error) {
       console.error("Lỗi tải danh mục:", error);
@@ -66,7 +64,6 @@ const CategoryManager = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Bạn chắc chắn muốn xóa thể loại này?")) {
       try {
-        // Gọi API xóa mềm (Backend thực hiện UPDATE is_active = 0)
         await categoryApi.delCategory(id);
         loadCategories();
       } catch (error) {
@@ -74,15 +71,12 @@ const CategoryManager = () => {
       }
     }
   };
-  // --- KẾT THÚC LOGIC ---
 
-  // --- PHẦN GIAO DIỆN MỚI (LAYOUT ĐỒNG BỘ) ---
   return (
     <div
       className="container-fluid py-4 bg-light"
       style={{ minHeight: "100vh" }}
     >
-      {/* HEADER BLOCK */}
       <div className="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded shadow-sm">
         <h3 className="fw-bold text-uppercase text-primary m-0">
           <i className="bi bi-grid-fill me-2"></i>Quản lý Danh mục
@@ -93,7 +87,6 @@ const CategoryManager = () => {
       </div>
 
       <div className="row g-4">
-        {/* --- CỘT TRÁI: FORM NHẬP LIỆU (CARD TRẮNG) --- */}
         <div className="col-md-4">
           <div className="card border-0 shadow-sm rounded-3 h-100">
             <div className="card-header bg-white border-bottom py-3">
@@ -154,7 +147,6 @@ const CategoryManager = () => {
           </div>
         </div>
 
-        {/* --- CỘT PHẢI: BẢNG DANH SÁCH (CARD TRẮNG) --- */}
         <div className="col-md-8">
           <div className="card border-0 shadow-sm rounded-3 h-100 overflow-hidden">
             <div className="table-responsive">

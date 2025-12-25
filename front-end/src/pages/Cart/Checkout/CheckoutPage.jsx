@@ -28,9 +28,7 @@ const CheckoutPage = () => {
           phone: profile.phone_number || prev.phone || "",
           address: profile.address || prev.address || "",
         }));
-      } catch (e) {
-        // nếu không lấy được profile, giữ form rỗng để người dùng nhập
-      }
+      } catch (e) {}
     };
     fetchProfile();
   }, []);
@@ -59,7 +57,6 @@ const CheckoutPage = () => {
         phone_number: formData.phone,
         address: fullAddress,
       });
-      // Lưu địa chỉ vào localStorage cho dropdown địa chỉ
       const storedList = (() => {
         try {
           return JSON.parse(localStorage.getItem(addressKey)) || [];
@@ -100,11 +97,9 @@ const CheckoutPage = () => {
     <div className="checkout-bg">
       <Header />
       <div className="checkout-container">
-        {/* Header Header logo giống Tiki */}
         <div className="checkout-header-step">
           <span className="step-title">Địa chỉ giao hàng</span>
           <div className="hotline-box">
-            {/* Thay thế ảnh cũ bằng icon Ant Design */}
             <PhoneOutlined className="hotline-icon-antd" />
             <div>
               <p className="hotline-num">1900-6035</p>

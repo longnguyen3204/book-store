@@ -25,7 +25,6 @@ exports.getHistory = async (req, res) => {
         order.items.push({
           book_id: row.book_id,
           book_name: row.book_name,
-          // QUAN TRỌNG: Thêm dòng này để truyền ảnh từ DB ra Frontend
           book_image: row.book_image,
           quantity: row.quantity,
           price: Number(row.price),
@@ -45,7 +44,7 @@ exports.updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
-    await Order.updateStatus(id, status.toLowerCase()); // Fix: chỉ 2 tham số
+    await Order.updateStatus(id, status.toLowerCase());
     res.json({ message: "Cập nhật thành công" });
   } catch (error) {
     res.status(500).json({ message: "Lỗi cập nhật" });
@@ -66,7 +65,7 @@ exports.cancelOrder = async (req, res) => {
       return res.status(400).json({ message: "Không thể hủy đơn này" });
     }
 
-    await Order.updateStatus(orderId, "cancelled"); // Fix: bỏ req.user.id thừa
+    await Order.updateStatus(orderId, "cancelled");
     res.json({ message: "Đã hủy đơn hàng", order_id: orderId });
   } catch (error) {
     res.status(500).json({ message: "Lỗi server" });
@@ -143,7 +142,7 @@ exports.placeOrder = async (req, res) => {
 };
 exports.getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.getAllOrders(); // Gọi từ Model Order
+    const orders = await Order.getAllOrders();
     res.json(orders);
   } catch (error) {
     console.error("Lỗi getAllOrders:", error);

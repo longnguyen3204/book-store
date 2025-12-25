@@ -25,13 +25,10 @@ import CategoryManager from "./pages/Admin/CategoryManager";
 import VoucherManager from "./pages/Admin/VoucherManager.jsx";
 import BannerManager from "./pages/Admin/BannerManager.jsx";
 
-// Sửa lại đường dẫn ProfilePage (thêm /Client/)
-
 function App() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
-  // Giữ nguyên logic kiểm tra đăng nhập
   useEffect(() => {
     const stored = localStorage.getItem("user");
     if (stored) {
@@ -52,7 +49,6 @@ function App() {
       setUser(result.user);
     }
     const roleId = result?.user?.role_id;
-    // Nếu là admin (role_id = 1) thì chuyển hướng vào trang admin, ngược lại về trang chủ
     return roleId === 1 ? "/admin" : "/";
   };
 
@@ -68,7 +64,7 @@ function App() {
     <>
       <ScrollToTop />
       <Routes>
-        {/* --- ROUTES CHO KHÁCH HÀNG (CLIENT) --- */}
+        {/* --- ROUTES CHO KHÁCH HÀNG  --- */}
         <Route path="/" element={<HomePage user={user} />} />
 
         <Route path="/books/:id" element={<DetailProduct />} />
@@ -118,7 +114,6 @@ function App() {
           }
         />
         {/* --- ROUTES CHO ADMIN --- */}
-        {/* AdminLayout sẽ bao bọc các route con bên trong */}
         <Route
           path="/admin"
           element={
@@ -137,7 +132,6 @@ function App() {
             }
           />
 
-          {/* Các trang chức năng cụ thể */}
           <Route
             path="books"
             element={

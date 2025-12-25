@@ -18,7 +18,7 @@ const RegisterPage = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    fullname: "",
+    name: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -37,9 +37,9 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { fullname, email, password, confirmPassword } = formData;
-
-    if (!fullname || !email || !password || !confirmPassword) {
+    const { name, email, password, confirmPassword } = formData;
+    console.log(formData);
+    if (!name || !email || !password || !confirmPassword) {
       setError("Vui lòng điền đầy đủ thông tin.");
       return;
     }
@@ -56,11 +56,11 @@ const RegisterPage = () => {
 
     try {
       setIsLoading(true);
-      await authApi.register({ 
-        fullname: formData.fullname, // Khớp với Backend
-        email: formData.email, 
-        password: formData.password 
-          });
+      await authApi.register({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      });
 
       alert("Đăng ký thành công! Vui lòng đăng nhập.");
       navigate("/login");
@@ -81,7 +81,9 @@ const RegisterPage = () => {
       <div className="register-container">
         <div className="login-header">
           <div className="brand-mark">
-            <span className="book-icon" aria-hidden="true">📚</span>
+            <span className="book-icon" aria-hidden="true">
+              📚
+            </span>
             <span className="brand-name">BOOKSAW</span>
           </div>
           <h2 className="register-title">Đăng Ký</h2>
@@ -90,7 +92,9 @@ const RegisterPage = () => {
         {error && <div className="error-message">{error}</div>}
 
         <form onSubmit={handleSubmit} className="login-form">
-          <label className="form-label" htmlFor="name">Họ và tên</label>
+          <label className="form-label" htmlFor="name">
+            Họ và tên
+          </label>
           <input
             type="text"
             id="name"
@@ -101,7 +105,9 @@ const RegisterPage = () => {
             onChange={handleChange}
           />
 
-          <label className="form-label" htmlFor="email">Email</label>
+          <label className="form-label" htmlFor="email">
+            Email
+          </label>
           <input
             type="email"
             id="email"
@@ -112,7 +118,9 @@ const RegisterPage = () => {
             onChange={handleChange}
           />
 
-          <label className="form-label" htmlFor="password">Mật khẩu</label>
+          <label className="form-label" htmlFor="password">
+            Mật khẩu
+          </label>
           <input
             type="password"
             id="password"
@@ -123,7 +131,9 @@ const RegisterPage = () => {
             onChange={handleChange}
           />
 
-          <label className="form-label" htmlFor="confirmPassword">Nhập lại mật khẩu</label>
+          <label className="form-label" htmlFor="confirmPassword">
+            Nhập lại mật khẩu
+          </label>
           <input
             type="password"
             id="confirmPassword"

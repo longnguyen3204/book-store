@@ -1,10 +1,9 @@
 import React from "react";
-import { Link } from "react-router-dom"; // Sử dụng Link nếu dùng React Router
+import { Link } from "react-router-dom";
 
 export default function MainLayout({ children }) {
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Header */}
       <header className="sticky top-0 z-50 bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link
@@ -45,10 +44,8 @@ export default function MainLayout({ children }) {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="flex-grow">{children}</main>
 
-      {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 border-b border-gray-800 pb-8">

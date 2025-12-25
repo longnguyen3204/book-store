@@ -58,7 +58,6 @@ const ProductCard = ({
 );
 
 const HomePage = ({ user }) => {
-  // --- States lưu trữ dữ liệu API ---
   const [heroSlides, setHeroSlides] = useState([]);
   const [featuredBooks, setFeaturedBooks] = useState([]);
   const [popularBooksData, setPopularBooksData] = useState({});
@@ -88,7 +87,6 @@ const HomePage = ({ user }) => {
     [cart]
   );
 
-  // --- Gọi API khi Mount ---
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -107,7 +105,6 @@ const HomePage = ({ user }) => {
         setBestSelling(best);
         setSpecialOffers(offers);
 
-        // Set tab mặc định là category đầu tiên nhận được
         const categories = Object.keys(popular);
         if (categories.length > 0) setActiveTab(categories[0]);
       } catch (error) {
@@ -121,7 +118,6 @@ const HomePage = ({ user }) => {
     AOS.init({ duration: 1200, once: true });
   }, []);
 
-  // --- Logic phụ trợ (Scroll, Click...) ---
   useEffect(() => {
     const onScroll = () => setSticky(window.scrollY >= 200);
     window.addEventListener("scroll", onScroll);
@@ -163,7 +159,6 @@ const HomePage = ({ user }) => {
 
   return (
     <div className="app">
-      {/* HEADER SECTION */}
       <div id="header-wrap" className={isSearchOpen ? "show" : ""}>
         <div className="top-content">
           <div className="container-fluid">
@@ -283,7 +278,6 @@ const HomePage = ({ user }) => {
         </header>
       </div>
 
-      {/* Thay thế phần BILLBOARD SECTION trong file của bạn */}
       <section id="billboard">
         <div className="container">
           <div className="row">
@@ -297,7 +291,6 @@ const HomePage = ({ user }) => {
                     <div className="slider-item" key={index}>
                       <div className="banner-content">
                         <h2 className="banner-title">{slide.title}</h2>
-                        {/* Bỏ hiển thị description ở đây vì DB không có */}
                         <div className="btn-wrap">
                           <Link
                             to={slide.link || "/books"}
@@ -323,7 +316,6 @@ const HomePage = ({ user }) => {
         </div>
       </section>
 
-      {/* FEATURED BOOKS SECTION */}
       <section id="featured-books" className="py-5 my-5">
         <div className="container">
           <div className="section-header align-center">
@@ -344,7 +336,6 @@ const HomePage = ({ user }) => {
         </div>
       </section>
 
-      {/* BEST SELLING SECTION */}
       {bestSelling && (
         <section id="best-selling" className="leaf-pattern-overlay">
           <div className="container">
@@ -361,7 +352,7 @@ const HomePage = ({ user }) => {
               <div className="col-12 col-lg-6">
                 <div className="product-entry">
                   <h2 className="section-title divider">Sách bán chạy nhất</h2>
-                  <div className="products-content">
+                  <div className="products-content ">
                     <div className="author-name">{bestSelling.author}</div>
                     <h3 className="item-title">{bestSelling.title}</h3>
                     <p>{bestSelling.description}</p>
@@ -384,7 +375,6 @@ const HomePage = ({ user }) => {
         </section>
       )}
 
-      {/* POPULAR BOOKS (TABS) SECTION */}
       <section id="popular-books" className="bookshelf py-5 my-5">
         <div className="container">
           <div className="section-header align-center">
@@ -417,7 +407,6 @@ const HomePage = ({ user }) => {
         </div>
       </section>
 
-      {/* SPECIAL OFFER SECTION */}
       <section id="special-offer" className="bookshelf pb-5 mb-5">
         <div className="section-header align-center">
           <div className="title">
@@ -443,7 +432,6 @@ const HomePage = ({ user }) => {
       >
         <div className="container">
           <div className="row d-flex justify-content-between">
-            {/* CỘT GIỚI THIỆU */}
             <div className="col-md-4">
               <div className="col-md-8 text-center">
                 <img
@@ -453,7 +441,7 @@ const HomePage = ({ user }) => {
                     width: "120px",
                     height: "auto",
                     marginBottom: "20px",
-                    borderRadius: "8px", // Tạo góc bo nhẹ nếu logo có nền trắng
+                    borderRadius: "8px",
                   }}
                   className="footer-logo algin-center"
                 />
@@ -467,7 +455,6 @@ const HomePage = ({ user }) => {
               </div>
             </div>
 
-            {/* CỘT LIÊN KẾT NHANH */}
             <div className="col-md-4 text-center">
               <h5
                 className="widget-title text-uppercase mb-4"
@@ -506,7 +493,6 @@ const HomePage = ({ user }) => {
               </ul>
             </div>
 
-            {/* CỘT LIÊN HỆ (Bổ sung để cân bằng giao diện) */}
             <div className="col-md-4 text-center">
               <h5
                 className="widget-title text-uppercase mb-4"

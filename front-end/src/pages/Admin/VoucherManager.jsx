@@ -46,7 +46,6 @@ const VoucherManager = () => {
     setEditingVoucherId(voucher.id);
     setShowForm(true);
 
-    // Chuyển đổi định dạng ngày để hiển thị trong input datetime-local (YYYY-MM-DDThh:mm)
     const formatDate = (dateStr) => {
       if (!dateStr) return "";
       const d = new Date(dateStr);
@@ -89,7 +88,6 @@ const VoucherManager = () => {
       className="container-fluid py-4 bg-light"
       style={{ minHeight: "100vh" }}
     >
-      {/* 1. THANH TIÊU ĐỀ */}
       <div className="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm">
         <h3 className="fw-bold text-uppercase text-primary m-0">
           <i className="bi bi-ticket-perforated me-2"></i> QUẢN LÝ VOUCHER
@@ -99,7 +97,6 @@ const VoucherManager = () => {
         </span>
       </div>
 
-      {/* 2. NÚT BẤM THÊM MỚI */}
       <div className="mb-3">
         <button
           className="btn btn-success shadow-sm fw-bold px-4"
@@ -120,7 +117,6 @@ const VoucherManager = () => {
         </button>
       </div>
 
-      {/* 3. FORM NHẬP LIỆU */}
       {showForm && (
         <div className="admin-card mb-4 p-4 border rounded bg-white shadow-sm border-2">
           <h4 className="fw-bold mb-4 text-dark text-uppercase">
@@ -241,7 +237,6 @@ const VoucherManager = () => {
         </div>
       )}
 
-      {/* 4. BẢNG DỮ LIỆU */}
       <div className="table-responsive bg-white rounded shadow-sm">
         <table className="table table-hover align-middle text-center table-bordered mb-0">
           <thead className="bg-light text-dark fw-bold text-uppercase small">

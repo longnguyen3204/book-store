@@ -34,7 +34,6 @@ export default function LoginPage({ onLogin }) {
       if (onLogin) {
         targetPath = (await onLogin(result)) || "/";
       } else {
-        // Fallback nếu không truyền onLogin: vẫn lưu localStorage và điều hướng theo role
         if (result?.token) localStorage.setItem("token", result.token);
         if (result?.user)
           localStorage.setItem("user", JSON.stringify(result.user));

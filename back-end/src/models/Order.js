@@ -22,7 +22,7 @@ class Order {
             LEFT JOIN order_details od ON o.id = od.order_id
             LEFT JOIN books b ON od.book_id = b.id
             GROUP BY o.id
-            ORDER BY o.order_date DESC
+            ORDER BY o.order_date ASC
         `;
     const [rows] = await db.query(sql);
     return rows;

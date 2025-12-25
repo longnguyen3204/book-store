@@ -13,7 +13,6 @@ const ShopPage = () => {
   const [error, setError] = useState("");
   const [user, setUser] = useState(null);
   const [isSearchOpen, setSearchOpen] = useState(false);
-  // Lấy hàm thêm vào giỏ hàng từ Context
   const { cart, addToCart } = useCart();
   const cartCount = cart.reduce(
     (sum, item) => sum + (item.quantity ? Number(item.quantity) : 1),
@@ -30,7 +29,6 @@ const ShopPage = () => {
       }
     }
   }, []);
-  // Lấy sách từ API
   useEffect(() => {
     const fetchBooks = async () => {
       setLoading(true);
@@ -130,7 +128,6 @@ const ShopPage = () => {
           </div>
         </div>
       </div>
-      {/* Banner đầu trang */}
       <section className="py-5 bg-light mb-5">
         <div className="container text-center">
           <h3 className="section-title">Kho sách</h3>
@@ -168,7 +165,6 @@ const ShopPage = () => {
                             className="product-item img-fluid"
                           />
                         </Link>
-                        {/* Gọi hàm handleAddToCart khi nhấn nút */}
                         <button
                           type="button"
                           className="add-to-cart"

@@ -1,7 +1,7 @@
 const db = require("../config/db");
 
 class statistics {
-  // 1. Lấy Banner (Bảng 'banners' không có cột description)
+  // 1. Lấy Banner
   static async getActiveBanners() {
     const sql = `
         SELECT 

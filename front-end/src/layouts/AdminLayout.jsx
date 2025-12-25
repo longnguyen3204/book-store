@@ -33,7 +33,6 @@ const AdminLayout = () => {
         isSidebarOpen ? "sidebar-open" : "sidebar-closed"
       } ${isSidebarOpen ? "sidebar-mobile-open" : ""}`}
     >
-      {/* 1. SIDEBAR */}
       <aside className="admin-sidebar">
         <div className="admin-sidebar-header">
           <h3>ADMIN PANEL</h3>
@@ -43,7 +42,6 @@ const AdminLayout = () => {
         </div>
 
         <nav className="admin-nav">
-          {/* PHẦN TRANG CHỦ MỚI THÊM */}
           <Link
             to="/"
             className="admin-nav-link home-link"
@@ -105,7 +103,6 @@ const AdminLayout = () => {
         </button>
       </aside>
 
-      {/* 2. MAIN AREA */}
       <div className="admin-main">
         <header className="admin-top-header">
           <button className="menu-toggle-btn" onClick={toggleSidebar}>

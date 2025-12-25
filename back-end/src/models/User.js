@@ -6,7 +6,7 @@ class User {
     const [rows] = await db.query("SELECT * FROM users WHERE email = ?", [
       email,
     ]);
-    return rows[0]; // Trả về user đầu tiên tìm thấy, hoặc undefined nếu không có
+    return rows[0];
   }
 
   // Hàm tạo user mới
@@ -14,25 +14,24 @@ class User {
     const { role_id, fullname, email, password, phone_number } = userInfo;
     const sql = `INSERT INTO users (role_id, fullname, email, password, phone_number) VALUES (?, ?, ?, ?, ?)`;
 
-    // Thực thi lệnh insert
     const [result] = await db.query(sql, [
       role_id,
       fullname,
       email,
       password,
-      phone_number || null, // Xử lý null ngay tại đây hoặc truyền từ controller
+      phone_number || null,
     ]);
 
     return result;
   }
 
-  // 3. Tìm user theo ID (Dùng cho xem Profile - vì Token lưu ID chứ không lưu email)
+  // 3. Tìm user theo ID
   static async findById(id) {
     const [rows] = await db.query("SELECT * FROM users WHERE id = ?", [id]);
     return rows[0];
   }
 
-  // 4. Cập nhật thông tin cá nhân (Không đụng đến password/email)
+  // 4. Cập nhật thông tin cá nhân
   static async updateProfile(id, data) {
     const { fullname, phone_number, address, avatar } = data;
     const sql = `UPDATE users SET fullname = ?, phone_number = ?, address = ?, avatar = ? WHERE id = ?`;

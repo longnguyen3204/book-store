@@ -17,7 +17,7 @@ const Header = () => {
         localStorage.removeItem("user");
       }
     }
-  }, [location]); // Cập nhật lại khi chuyển trang
+  }, [location]);
 
   const cartCount = cart.reduce(
     (sum, item) => sum + (item.quantity ? Number(item.quantity) : 1),
@@ -28,7 +28,6 @@ const Header = () => {
     <header className="main-header shadow-sm">
       <div className="container-fluid px-4">
         <div className="header-wrapper d-flex justify-content-between align-items-center py-2">
-          {/* Cánh trái: Logo */}
           <div className="header-left">
             <Link
               to="/"
@@ -41,10 +40,8 @@ const Header = () => {
             </Link>
           </div>
 
-          {/* Cánh phải: Menu */}
           <div className="header-right">
             <nav className="header-menu d-flex align-items-center gap-4">
-              {/* User Account */}
               {user ? (
                 <Link to="/profile" className="menu-item user-info">
                   <i className="icon icon-user me-2"></i>
@@ -59,13 +56,11 @@ const Header = () => {
                 </Link>
               )}
 
-              {/* Order History */}
               <Link to="/order-history" className="menu-item">
                 <i className="icon icon-list me-2"></i>
                 <span className="d-none d-md-inline">Lịch sử</span>
               </Link>
 
-              {/* Cart */}
               <Link to="/cart" className="menu-item cart-btn">
                 <div className="position-relative">
                   <i className="icon icon-clipboard me-2"></i>

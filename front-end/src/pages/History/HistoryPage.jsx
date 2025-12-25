@@ -111,7 +111,6 @@ export default function HistoryPage({ user }) {
             <ShoppingOutlined className="me-2" /> Lịch sử mua hàng
           </h4>
 
-          {/* Tab Menu */}
           <div className="history-tabs-scroll mb-4">
             <div className="d-flex bg-white shadow-sm rounded">
               {tabs.map((tab) => (
@@ -128,7 +127,6 @@ export default function HistoryPage({ user }) {
             </div>
           </div>
 
-          {/* Search Bar */}
           <div className="input-group mb-4 shadow-sm rounded overflow-hidden">
             <span className="input-group-text bg-white border-0 ps-3">
               <SearchOutlined className="text-muted" />
@@ -142,7 +140,6 @@ export default function HistoryPage({ user }) {
             />
           </div>
 
-          {/* Order List */}
           <div className="order-list-container">
             {loading ? (
               <div className="text-center py-5 bg-white rounded">
@@ -160,7 +157,6 @@ export default function HistoryPage({ user }) {
                     key={order.order_id}
                     className="card border-0 shadow-sm mb-4 order-card"
                   >
-                    {/* Card Header */}
                     <div className="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
                       <div>
                         <span className="fw-bold me-3">
@@ -182,7 +178,6 @@ export default function HistoryPage({ user }) {
                       </Tag>
                     </div>
 
-                    {/* Receiver Info */}
                     <div className="card-body bg-light-gray border-bottom py-2 px-3">
                       <div className="row small text-muted">
                         <div className="col-md-4">
@@ -200,7 +195,6 @@ export default function HistoryPage({ user }) {
                       </div>
                     </div>
 
-                    {/* Book Items */}
                     <div className="card-body p-3">
                       {(order.items || []).map((item, idx) => (
                         <div
@@ -243,7 +237,6 @@ export default function HistoryPage({ user }) {
                       ))}
                     </div>
 
-                    {/* Card Footer */}
                     <div className="card-footer bg-white p-3 d-flex justify-content-between align-items-center">
                       <div>
                         <span className="text-muted me-2">

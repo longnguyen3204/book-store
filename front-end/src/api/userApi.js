@@ -71,7 +71,6 @@ export async function changePassword(data) {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
 
-    // Gửi request tới endpoint đổi mật khẩu (khớp với route Backend bạn đã tạo)
     const response = await api.put("/users/change-password", data, { headers });
     return response.data;
   } catch (error) {
@@ -81,7 +80,6 @@ export async function changePassword(data) {
 }
 export async function sendResetPin(data) {
   try {
-    // data bao gồm { email }
     const response = await api.post("/users/send-reset-pin", data);
     return response.data;
   } catch (error) {
@@ -93,7 +91,6 @@ export async function sendResetPin(data) {
 // 8. Xác thực mã PIN
 export async function verifyPin(data) {
   try {
-    // data bao gồm { email, pin }
     const response = await api.post("/users/verify-pin", data);
     return response.data;
   } catch (error) {
@@ -105,7 +102,6 @@ export async function verifyPin(data) {
 // 9. Đặt lại mật khẩu mới
 export async function resetPassword(data) {
   try {
-    // data bao gồm { email, pin, newPassword }
     const response = await api.post("/users/reset-password", data);
     return response.data;
   } catch (error) {

@@ -5,11 +5,8 @@ const roleMiddleware = require("../middlewares/roleMiddleware");
 const authMiddleware = require("../middlewares/authMiddleware");
 const upload = require("../middlewares/imageMiddleware");
 
-// Routes
 router.get("/", bookController.getBooks);
-
 router.get("/all", bookController.getAll);
-
 router.get("/:id", bookController.getBookDetail);
 
 router.post(

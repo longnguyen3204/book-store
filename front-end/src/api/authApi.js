@@ -5,7 +5,6 @@ export async function login(credentials) {
     const response = await api.post("/auth/login", credentials);
     return response.data;
   } catch (error) {
-    // axios trả lỗi vào error.response
     const message = error.response?.data?.message || "Đăng nhập thất bại";
     throw new Error(message);
   }
@@ -13,7 +12,6 @@ export async function login(credentials) {
 
 export async function register(payload) {
   try {
-    // Backend expect: fullname, email, password, phone_number (optional)
     const body = {
       fullname: payload.name,
       email: payload.email,

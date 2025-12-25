@@ -21,7 +21,6 @@ export default function UserAccount({ user: propUser, onLogout }) {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Dùng state nội bộ để quản lý thông tin User thực tế từ API
   const [currentUser, setCurrentUser] = useState(propUser || {});
   const [isEditingAddress, setIsEditingAddress] = useState(false);
   const [addressInput, setAddressInput] = useState("");
@@ -39,13 +38,12 @@ export default function UserAccount({ user: propUser, onLogout }) {
   const [orders, setOrders] = useState([]);
   const [orderLoading, setOrderLoading] = useState(false);
 
-  // 1. Lấy dữ liệu Profile mới nhất từ Server khi load trang
   useEffect(() => {
     const fetchUserData = async () => {
       setLoading(true);
       try {
         const res = await userApi.getProfile();
-        const data = res.data || res; // Tùy cấu trúc API trả về
+        const data = res.data || res;
         setCurrentUser(data);
         setFormData({
           fullname: data.fullname || "",
@@ -53,7 +51,6 @@ export default function UserAccount({ user: propUser, onLogout }) {
           phone_number: data.phone_number || "",
           address: data.address || "",
         });
-        // Cập nhật lại localStorage để đồng bộ toàn app
         localStorage.setItem("user", JSON.stringify(data));
       } catch (err) {
         console.error("Không thể lấy thông tin mới nhất");
@@ -64,7 +61,6 @@ export default function UserAccount({ user: propUser, onLogout }) {
     fetchUserData();
   }, []);
 
-  // 2. Lấy lịch sử đơn hàng
   useEffect(() => {
     if (activeTab === "orders") {
       const fetchHistory = async () => {
@@ -93,7 +89,6 @@ export default function UserAccount({ user: propUser, onLogout }) {
       message.success("Cập nhật hồ sơ thành công!");
       setIsEditing(false);
 
-      // Sau khi lưu, cập nhật lại state hiển thị
       const updatedData = { ...currentUser, ...formData };
       setCurrentUser(updatedData);
       localStorage.setItem("user", JSON.stringify(updatedData));
@@ -128,19 +123,16 @@ export default function UserAccount({ user: propUser, onLogout }) {
   const handlePasswordChange = async (e) => {
     e.preventDefault();
 
-    // 1. Kiểm tra khớp mật khẩu
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       return message.error("Mật khẩu xác nhận không khớp!");
     }
 
-    // 2. Kiểm tra độ dài mật khẩu
     if (passwordData.newPassword.length < 6) {
       return message.error("Mật khẩu mới phải từ 6 ký tự trở lên!");
     }
 
     try {
       setLoading(true);
-      // ĐỔI KEY: từ oldPassword sang currentPassword để khớp Backend
       await userApi.changePassword({
         currentPassword: passwordData.oldPassword,
         newPassword: passwordData.newPassword,
@@ -148,14 +140,12 @@ export default function UserAccount({ user: propUser, onLogout }) {
 
       message.success("Đổi mật khẩu thành công!");
 
-      // Reset form
       setPasswordData({
         oldPassword: "",
         newPassword: "",
         confirmPassword: "",
       });
     } catch (error) {
-      // Hiển thị thông báo lỗi chi tiết từ Server nếu có
       const serverMsg =
         error.response?.data?.message || "Mật khẩu hiện tại không đúng!";
       message.error(serverMsg);
@@ -167,7 +157,6 @@ export default function UserAccount({ user: propUser, onLogout }) {
     e.preventDefault();
     try {
       setLoading(true);
-      // Tận dụng API updateProfile sẵn có
       await userApi.updateProfile({
         ...currentUser,
         address: addressInput,
@@ -176,7 +165,6 @@ export default function UserAccount({ user: propUser, onLogout }) {
       message.success("Cập nhật địa chỉ thành công!");
       setIsEditingAddress(false);
 
-      // Cập nhật lại state local và localStorage
       const updatedData = { ...currentUser, address: addressInput };
       setCurrentUser(updatedData);
       localStorage.setItem("user", JSON.stringify(updatedData));

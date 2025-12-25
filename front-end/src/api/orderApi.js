@@ -32,7 +32,6 @@ export async function createOrder(payload) {
   };
 
   try {
-    // Payload cần chứa: { items, shipping_address, total_amount, payment_method_id, voucher_id, note }
     const res = await api.post("/orders", payload, { headers });
     return res.data;
   } catch (error) {
@@ -70,8 +69,6 @@ export async function cancelOrder(orderId) {
   };
 
   try {
-    // API Route: PUT /orders/:id/status (với body status: 'cancelled')
-    // Hoặc giữ nguyên POST /orders/:id/cancel tùy theo Backend của bạn
     const res = await api.post(`/orders/${orderId}/cancel`, {}, { headers });
     return res.data;
   } catch (error) {

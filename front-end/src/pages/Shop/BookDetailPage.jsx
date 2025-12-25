@@ -33,7 +33,6 @@ import "./review.css";
 function DetailProduct() {
   const { id } = useParams();
   const navigate = useNavigate();
-  // const location = useLocation(); // Không dùng thì bỏ đi cho gọn
   const { addToCart } = useCart();
 
   const [product, setProduct] = useState(null);
@@ -56,7 +55,6 @@ function DetailProduct() {
       acc[curr.rating] = (acc[curr.rating] || 0) + 1;
       return acc;
     }, {});
-    // Fix lỗi chia cho 0 nếu count = 0 (dù đã check length ở trên nhưng thêm cho chắc)
     return { average: count ? (sum / count).toFixed(1) : 0, count, stars };
   }, [reviews]);
 
@@ -140,7 +138,6 @@ function DetailProduct() {
       </div>
     );
 
-  // Kiểm tra product tồn tại
   if (!product || Object.keys(product).length === 0)
     return (
       <div className="error-center beige-bg">
@@ -261,7 +258,6 @@ function DetailProduct() {
           </div>
 
           <div className="review-content-grid">
-            {/* Phần thống kê sao giữ nguyên */}
             <div className="score-overview">
               <div className="score-big">
                 {ratingStats.average || "0.0"}
@@ -307,7 +303,6 @@ function DetailProduct() {
                 renderItem={(item) => (
                   <div className="comment-card-item">
                     <Avatar className="user-avatar">
-                      {/* Thêm optional chaining ?. để tránh lỗi nếu user_name null */}
                       {item.user_name ? item.user_name[0].toUpperCase() : "U"}
                     </Avatar>
                     <div className="comment-body">

@@ -26,7 +26,7 @@ export async function getFeaturedBooks() {
 export async function getPopularBooks() {
   try {
     const response = await api.get("/statistics/popular-tabs");
-    return response.data; // Trả về object dạng { business: [], technology: [], ... }
+    return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || "Lỗi tải sách phổ biến");
   }

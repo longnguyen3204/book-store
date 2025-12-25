@@ -98,7 +98,6 @@ const BookManager = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // 1. Xử lý Thể loại
       let targetCategoryId = null;
       const inputCatName = (formData.categoryName || "").trim();
       const existingCategory = categories.find(
@@ -114,7 +113,6 @@ const BookManager = () => {
         setCategories(updatedCats);
       }
 
-      // 2. Xử lý Tác giả (Sửa y hệt Category)
       let targetAuthorId = null;
       const inputAuthorName = (formData.author || "").trim();
       const existingAuthor = authors.find(
@@ -161,7 +159,6 @@ const BookManager = () => {
     }
   };
   const handleToggleStatus = async (book) => {
-    // Hỏi xác nhận trước khi thực hiện (tùy chọn)
     const action = book.is_active ? "ẩn" : "hiện";
     if (
       !window.confirm(
@@ -173,12 +170,11 @@ const BookManager = () => {
 
     try {
       if (book.is_active) {
-        await bookApi.deleteBook(book.id); // Gọi API ẩn
+        await bookApi.deleteBook(book.id);
       } else {
-        await bookApi.restoreBook(book.id); // Gọi API hiện
+        await bookApi.restoreBook(book.id);
       }
 
-      // Load lại dữ liệu ngay lập tức
       await loadData();
     } catch (error) {
       console.error(`Lỗi khi ${action} sách:`, error);
@@ -395,7 +391,7 @@ const BookManager = () => {
                         }}
                         onError={(e) => {
                           e.target.style.display = "none";
-                        }} // Ẩn nếu ảnh lỗi đường dẫn
+                        }}
                       />
                     )}
                     <span>{book.name}</span>
@@ -403,7 +399,6 @@ const BookManager = () => {
                 </td>
                 <td className="text-start">{book.description}</td>
                 <td className="text-start">{book.author}</td>
-                {/* ... (Giữ nguyên tất cả các thẻ <td> phía sau) */}
                 <td className=" text-center">
                   <span className="badge bg-info text-dark ">
                     {book.category_name || getCategoryName(book)}

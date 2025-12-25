@@ -86,7 +86,6 @@ export default function ForgotPass() {
             isVerified ? handleResetPassword : (e) => e.preventDefault()
           }
         >
-          {/* HÀNG EMAIL + NÚT GỬI MÃ */}
           <div className="input-group">
             <label>Địa chỉ Email</label>
             <div className="input-row">
@@ -111,7 +110,6 @@ export default function ForgotPass() {
             )}
           </div>
 
-          {/* HÀNG MÃ PIN (NẰM DƯỚI EMAIL) */}
           <div className="input-group">
             <label>Mã PIN xác thực</label>
             <div className="input-row">
@@ -127,7 +125,6 @@ export default function ForgotPass() {
             </div>
           </div>
 
-          {/* NÚT XÁC NHẬN MÃ (ẨN ĐI KHI ĐÃ XÁC THỰC) */}
           {!isVerified && (
             <button
               type="button"
@@ -139,7 +136,6 @@ export default function ForgotPass() {
             </button>
           )}
 
-          {/* PHẦN NHẬP MẬT KHẨU MỚI (HIỆN KHI ĐÃ XÁC THỰC) */}
           {isVerified && (
             <div className="password-reveal-section">
               <div className="input-group">

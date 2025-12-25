@@ -3,7 +3,6 @@ const path = require("path");
 
 const storage = multer.diskStorage({
   destination: (req, file, callback) => {
-    // Đảm bảo thư mục ../uploads/ đã tồn tại
     const destination = path.join(__dirname, "../../uploads");
     callback(null, destination);
   },
@@ -24,7 +23,7 @@ const fileFilter = (req, file, callback) => {
 const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 }, // Giới hạn 5MB cho an toàn
+  limits: { fileSize: 5 * 1024 * 1024 }, // Giới hạn 5MB
 });
 
 module.exports = upload;
