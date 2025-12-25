@@ -23,6 +23,7 @@ import OrderManager from "./pages/Admin/OrderManager";
 import UserManager from "./pages/Admin/UserManager";
 import CategoryManager from "./pages/Admin/CategoryManager";
 import VoucherManager from "./pages/Admin/VoucherManager.jsx";
+import BannerManager from "./pages/Admin/BannerManager.jsx";
 
 // Sửa lại đường dẫn ProfilePage (thêm /Client/)
 
@@ -69,7 +70,7 @@ function App() {
       <Routes>
         {/* --- ROUTES CHO KHÁCH HÀNG (CLIENT) --- */}
         <Route path="/" element={<HomePage user={user} />} />
-        scrollToTop
+
         <Route path="/books/:id" element={<DetailProduct />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/books" element={<ShopPage />} />
@@ -166,6 +167,14 @@ function App() {
             element={
               <PrivateRoute>
                 <VoucherManager />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="banner"
+            element={
+              <PrivateRoute>
+                <BannerManager />
               </PrivateRoute>
             }
           />

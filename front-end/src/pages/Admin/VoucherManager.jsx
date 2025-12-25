@@ -284,7 +284,7 @@ const VoucherManager = () => {
                   {voucher.is_active ? (
                     <span className="badge bg-success">HOẠT ĐỘNG</span>
                   ) : (
-                    <span className="badge bg-secondary">ĐÃ ẨN</span>
+                    <span className="badge bg-secondary text-black">ĐÃ ẨN</span>
                   )}
                 </td>
                 <td className="text-center">

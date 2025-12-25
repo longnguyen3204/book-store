@@ -8,6 +8,14 @@ exports.getAllVouchers = async (req, res) => {
     res.status(500).json({ message: "Lỗi lấy danh sách voucher" });
   }
 };
+exports.getActive = async (req, res) => {
+  try {
+    const vouchers = await Voucher.getActive();
+    res.json(vouchers);
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi lấy danh sách voucher" });
+  }
+};
 
 exports.addVoucher = async (req, res) => {
   try {

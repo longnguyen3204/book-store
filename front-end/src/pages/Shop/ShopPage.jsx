@@ -41,6 +41,7 @@ const ShopPage = () => {
           id: item.id,
           title: item.name || item.title || "Đang cập nhật",
           author: item.author || "Đang cập nhật",
+          stock: item.stock || item.quantity || 0,
           price: item.price ?? item.original_price ?? 0,
           image: item.image || defaultAuthor,
         }));

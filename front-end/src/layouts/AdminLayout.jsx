@@ -85,6 +85,13 @@ const AdminLayout = () => {
             Voucher
           </Link>
           <Link
+            to="/admin/banner"
+            className={`admin-nav-link ${isActive("/admin/banner")}`}
+            onClick={() => window.innerWidth < 768 && setIsSidebarOpen(false)}
+          >
+            banner
+          </Link>
+          <Link
             to="/admin/users"
             className={`admin-nav-link ${isActive("/admin/users")}`}
             onClick={() => window.innerWidth < 768 && setIsSidebarOpen(false)}

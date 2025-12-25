@@ -43,7 +43,7 @@ export default function Cart() {
     return num.toString();
   };
 
-  // Helper parse giá (xử lý trường hợp giá là string "100.000" hoặc number)
+  // Helper parse giá
   const parsePrice = (val) => {
     if (typeof val === "number") return val;
     if (typeof val === "string") {
@@ -56,21 +56,20 @@ export default function Cart() {
   // --- STATE QUẢN LÝ ---
   const [dbVouchers, setDbVouchers] = useState([]);
   const [selectedVoucher, setSelectedVoucher] = useState(null);
-  const [selectedIds, setSelectedIds] = useState([]); // ID các sản phẩm được tích chọn
+  const [selectedIds, setSelectedIds] = useState([]);
   const [recommendedProducts, setRecommendedProducts] = useState([]);
 
-  // 2. Xử lý địa chỉ: Ưu tiên lấy từ Checkout truyền về -> Nếu không có thì lấy từ User Profile
-  const [selectedAddress, setSelectedAddress] = useState(() => {
-    // Trường hợp 1: Vừa điền form ở Checkout quay lại
-    if (location.state?.savedAddress) return location.state.savedAddress;
+  // State lưu danh sách sách gốc để check tồn kho realtime
+  const [allBooks, setAllBooks] = useState([]);
 
-    // Trường hợp 2: Lấy từ database user (nếu có)
+  // 2. Xử lý địa chỉ
+  const [selectedAddress, setSelectedAddress] = useState(() => {
+    if (location.state?.savedAddress) return location.state.savedAddress;
     if (user && user.address) {
       return {
         fullName: user.fullname || "Khách hàng",
         phone: user.phone_number || "",
-        address: user.address, // Chuỗi địa chỉ từ DB
-        // Các trường phụ có thể để trống nếu DB lưu full string
+        address: user.address,
         ward: "",
         district: "",
         province: "",
@@ -79,30 +78,35 @@ export default function Cart() {
     return null;
   });
 
-  // 3. Fetch dữ liệu từ Database (Sách đề xuất & Voucher)
+  // 3. Fetch dữ liệu
   useEffect(() => {
     const fetchDbData = async () => {
       try {
         const [booksRes, vouchersRes] = await Promise.all([
           bookApi.getBooks(),
-          voucherApi.fetchVouchers(),
+          voucherApi.getActive(),
         ]);
 
-        // Xử lý danh sách sách để hiển thị "Có thể bạn sẽ thích"
         const rawBooks = booksRes.data || booksRes;
         const normalizedBooks = (Array.isArray(rawBooks) ? rawBooks : []).map(
           (item) => ({
             id: item.id,
             title: item.name || item.title || "Đang cập nhật",
             author: item.author || "Nhiều tác giả",
+            stock: item.stock || item.quantity || 0, // Lưu rõ đây là STOCK
             price: item.price ?? 0,
             image:
               item.image || item.thumbnail || "https://via.placeholder.com/150",
           })
         );
 
-        // Random lấy 4 sản phẩm
-        setRecommendedProducts(normalizedBooks.sort(() => Math.random() - 0.5));
+        // Lưu danh sách gốc để tra cứu
+        setAllBooks(normalizedBooks);
+
+        // Random lấy sản phẩm
+        setRecommendedProducts(
+          [...normalizedBooks].sort(() => Math.random() - 0.5)
+        );
 
         // Set Voucher
         setDbVouchers(Array.isArray(vouchersRes) ? vouchersRes : []);
@@ -124,7 +128,6 @@ export default function Cart() {
   const discountAmount = useMemo(() => {
     if (!selectedVoucher || subTotal < (selectedVoucher.min_order_value || 0))
       return 0;
-    // Nếu giá trị <= 100 thì tính theo %, ngược lại là tiền mặt
     if (selectedVoucher.discount_value <= 100) {
       return (subTotal * Number(selectedVoucher.discount_value)) / 100;
     }
@@ -139,7 +142,7 @@ export default function Cart() {
   // 5. Xử lý chọn Voucher
   const handleSelectVoucher = (voucher) => {
     if (selectedVoucher?.id === voucher.id) {
-      setSelectedVoucher(null); // Bỏ chọn
+      setSelectedVoucher(null);
     } else {
       if (subTotal < (voucher.min_order_value || 0)) {
         message.warning(
@@ -166,21 +169,18 @@ export default function Cart() {
     }
     if (!selectedAddress) {
       message.error("Vui lòng cập nhật địa chỉ giao hàng");
-      navigate("/checkout"); // Chuyển sang trang nhập địa chỉ
+      navigate("/checkout");
       return;
     }
 
-    // Chuẩn bị Items
     const items = cart
       .filter((i) => selectedIds.includes(String(i.id)))
       .map((i) => ({
         book_id: i.id,
-        quantity: i.quantity || 1,
+        quantity: i.quantity || 0,
         price: parsePrice(i.price),
       }));
 
-    // Chuẩn bị chuỗi địa chỉ
-    // Nếu selectedAddress là object từ Checkout thì gộp lại, nếu là string từ DB thì giữ nguyên
     let shippingStr = "";
     if (typeof selectedAddress === "string") {
       shippingStr = selectedAddress;
@@ -198,15 +198,12 @@ export default function Cart() {
         items,
         shipping_address: shippingStr,
         total_amount: finalTotal,
-        payment_method_id: 1, // Mặc định COD
+        payment_method_id: 1,
         voucher_id: selectedVoucher ? selectedVoucher.id : null,
       });
 
       message.success("Đặt hàng thành công!");
-
-      // Xóa các sản phẩm đã mua khỏi giỏ
       selectedIds.forEach((id) => removeFromCart(Number(id)));
-
       navigate("/order-history");
     } catch (err) {
       message.error(err.message || "Đặt hàng thất bại, vui lòng thử lại");
@@ -227,9 +224,7 @@ export default function Cart() {
         </h2>
 
         <div className="cart-flex-layout">
-          {/* CỘT TRÁI: DANH SÁCH SẢN PHẨM & ĐỀ XUẤT */}
           <div className="cart-left-section">
-            {/* Nếu giỏ hàng trống */}
             {cart.length === 0 ? (
               <div className="white-card empty-state-card text-center py-5">
                 <p>Giỏ hàng của bạn đang trống.</p>
@@ -242,7 +237,6 @@ export default function Cart() {
               </div>
             ) : (
               <>
-                {/* Header Bảng Giỏ hàng */}
                 <div className="white-card select-all-bar">
                   <label className="custom-checkbox">
                     <input
@@ -263,91 +257,116 @@ export default function Cart() {
                   </span>
                 </div>
 
-                {/* Danh sách Items */}
                 <div className="white-card shop-group">
                   <div className="shop-header">
                     <span className="shop-name">BOOKSAW STORE</span>
                   </div>
-                  {cart.map((item) => (
-                    <div key={item.id} className="cart-item-row">
-                      <div className="item-details">
-                        <label className="custom-checkbox">
-                          <input
-                            type="checkbox"
-                            checked={selectedIds.includes(String(item.id))}
-                            onChange={(e) => {
-                              const id = String(item.id);
-                              setSelectedIds((prev) =>
-                                e.target.checked
-                                  ? [...prev, id]
-                                  : prev.filter((x) => x !== id)
-                              );
-                            }}
+                  {cart.map((item) => {
+                    // TÌM SÁCH TRONG KHO ĐỂ LẤY STOCK CHÍNH XÁC
+                    const currentBook = allBooks.find((b) => b.id === item.id);
+                    const stockAvailable = currentBook
+                      ? currentBook.stock
+                      : item.stock || 0;
+
+                    return (
+                      <div key={item.id} className="cart-item-row">
+                        <div className="item-details">
+                          <label className="custom-checkbox">
+                            <input
+                              type="checkbox"
+                              checked={selectedIds.includes(String(item.id))}
+                              onChange={(e) => {
+                                const id = String(item.id);
+                                setSelectedIds((prev) =>
+                                  e.target.checked
+                                    ? [...prev, id]
+                                    : prev.filter((x) => x !== id)
+                                );
+                              }}
+                            />
+                            <span className="checkmark"></span>
+                          </label>
+                          <img
+                            src={item.image}
+                            alt={item.title}
+                            className="item-thumb"
                           />
-                          <span className="checkmark"></span>
-                        </label>
-                        <img
-                          src={item.image}
-                          alt={item.title}
-                          className="item-thumb"
-                        />
-                        <div className="item-text">
-                          <p className="item-title-link">{item.title}</p>
-                          <p className="item-subtitle">
-                            Tác giả: {item.author}
-                          </p>
+                          <div className="item-text">
+                            <p className="item-title-link">{item.title}</p>
+                            <p className="item-subtitle">
+                              Tác giả: {item.author}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="item-unit-price">
+                          {currencyFormatter.format(parsePrice(item.price))}
+                        </div>
+
+                        <div className="item-quantity-control">
+                          <div className="qty-stepper">
+                            <button
+                              onClick={() =>
+                                updateQuantity(
+                                  item.id,
+                                  Math.max(0, item.quantity - 1)
+                                )
+                              }
+                              disabled={item.quantity < 1} // Disable nút trừ khi < 1
+                              style={{ opacity: item.quantity < 1 ? 0.5 : 1 }}
+                            >
+                              <MinusOutlined />
+                            </button>
+
+                            <input
+                              type="number"
+                              value={item.quantity}
+                              onChange={(e) => {
+                                const val = parseInt(e.target.value);
+                                // Validate nhập tay: phải là số, > 0 và <= tồn kho
+                                if (
+                                  !isNaN(val) &&
+                                  val >= 0 &&
+                                  val <= stockAvailable
+                                ) {
+                                  updateQuantity(item.id, val);
+                                }
+                              }}
+                            />
+
+                            <button
+                              onClick={() => {
+                                if (item.quantity < stockAvailable) {
+                                  updateQuantity(item.id, item.quantity + 1);
+                                }
+                              }}
+                              disabled={item.quantity >= stockAvailable} // Disable nút cộng khi max kho
+                              style={{
+                                opacity:
+                                  item.quantity >= stockAvailable ? 0.5 : 1,
+                              }}
+                            >
+                              <PlusOutlined />
+                            </button>
+                          </div>
+                          <small>Số lượng còn lại: {stockAvailable}</small>
+                        </div>
+
+                        <div className="item-subtotal text-danger fw-bold">
+                          {currencyFormatter.format(
+                            parsePrice(item.price) * item.quantity
+                          )}
+                        </div>
+
+                        <div className="item-action">
+                          <DeleteOutlined
+                            className="btn-remove-item"
+                            onClick={() => removeFromCart(item.id)}
+                          />
                         </div>
                       </div>
-
-                      <div className="item-unit-price">
-                        {currencyFormatter.format(parsePrice(item.price))}
-                      </div>
-
-                      <div className="item-quantity-control">
-                        <div className="qty-stepper">
-                          <button
-                            onClick={() =>
-                              updateQuantity(
-                                item.id,
-                                Math.max(1, item.quantity - 1)
-                              )
-                            }
-                          >
-                            <MinusOutlined />
-                          </button>
-                          <input
-                            type="number"
-                            value={item.quantity}
-                            onChange={(e) => {
-                              const val = parseInt(e.target.value);
-                              if (!isNaN(val) && val > 0)
-                                updateQuantity(item.id, val);
-                            }}
-                          />
-                          <button
-                            onClick={() =>
-                              updateQuantity(item.id, item.quantity + 1)
-                            }
-                          >
-                            <PlusOutlined />
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="item-subtotal text-danger fw-bold">
-                        {currencyFormatter.format(
-                          parsePrice(item.price) * item.quantity
-                        )}
-                      </div>
-
-                      <div className="item-action">
-                        <DeleteOutlined
-                          className="btn-remove-item"
-                          onClick={() => removeFromCart(item.id)}
-                        />
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </>
             )}
@@ -356,43 +375,64 @@ export default function Cart() {
             <div className="white-card recommendation-section mt-4">
               <h3 className="section-label">Sản phẩm có thể bạn thích</h3>
               <div className="recommendation-grid">
-                {recommendedProducts.map((book) => (
-                  <div
-                    key={book.id}
-                    className="rec-item"
-                    onClick={() => navigate(`/books/${book.id}`)}
-                  >
-                    <div className="rec-img-wrapper">
-                      <img
-                        src={book.image}
-                        alt={book.title}
-                        onError={(e) =>
-                          (e.target.src = "https://via.placeholder.com/150")
-                        }
-                      />
-                    </div>
-                    <p className="rec-title">{book.title}</p>
-                    <div className="rec-price">
-                      {currencyFormatter.format(book.price)}
-                    </div>
-                    <button
-                      className="btn-add-rec"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        addToCart({ ...book, quantity: 1 });
-                      }}
+                {recommendedProducts.map((book) => {
+                  const currentBookInStock = allBooks.find(
+                    (b) => b.id === book.id
+                  );
+                  const realStock = currentBookInStock
+                    ? currentBookInStock.stock
+                    : book.stock || 0;
+
+                  return (
+                    <div
+                      key={book.id}
+                      className="rec-item"
+                      onClick={() => navigate(`/books/${book.id}`)}
                     >
-                      Thêm vào giỏ
-                    </button>
-                  </div>
-                ))}
+                      <div className="rec-img-wrapper">
+                        <img
+                          src={book.image}
+                          alt={book.title}
+                          onError={(e) =>
+                            (e.target.src = "https://via.placeholder.com/150")
+                          }
+                        />
+                      </div>
+                      <p className="rec-title">{book.title}</p>
+                      <div className="rec-price">
+                        {currencyFormatter.format(book.price)}
+                      </div>
+                      <button
+                        className="btn-add-rec"
+                        disabled={realStock <= 0}
+                        style={{
+                          opacity: realStock <= 0 ? 0.5 : 1,
+                          cursor: realStock <= 0 ? "not-allowed" : "pointer",
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (realStock > 0) {
+                            addToCart({
+                              ...book,
+                              quantity: 1,
+                              stock: realStock, // Truyền đúng tồn kho vào
+                            });
+                            message.success("Đã thêm vào giỏ hàng");
+                          } else {
+                            message.error("Sản phẩm đã hết hàng");
+                          }
+                        }}
+                      >
+                        {realStock <= 0 ? "Hết hàng" : "Thêm vào giỏ"}
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
 
-          {/* CỘT PHẢI: THANH TOÁN & ĐỊA CHỈ */}
           <div className="cart-right-section">
-            {/* Box Địa chỉ */}
             <div className="white-card address-summary">
               <div className="address-summary-header">
                 <span className="address-title">📍 Địa Chỉ Nhận Hàng</span>

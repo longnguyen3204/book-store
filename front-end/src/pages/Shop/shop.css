@@ -44,77 +44,114 @@
   box-shadow: none;
 }
 
-/* 3. Product Grid Customization */
+/* --- 3. Product Grid Customization (Updated for Slide Up Effect) --- */
+
+/* Container tổng thể cho mỗi ô sản phẩm */
 .shop-page .product-item {
-  margin-bottom: 30px;
-  transition: transform 0.3s ease;
+  background-color: #f9f9f9; /* Màu nền xám nhạt chuẩn mẫu */
+  padding: 30px 15px; /* Khoảng cách lề thoáng */
+  text-align: center; /* Căn giữa nội dung */
+  transition: all 0.3s ease;
+  height: 100%; /* Để các ô bằng nhau */
+  position: relative;
 }
 
+/* Phần chứa hình ảnh & nút bấm */
 .shop-page .product-style {
   position: relative;
-  overflow: hidden;
-  background: #f1f1f1;
-  margin-bottom: 15px;
+  overflow: hidden; /* QUAN TRỌNG: Để che nút khi nó trượt xuống */
+  margin-bottom: 20px;
+  height: 260px; /* Chiều cao cố định vùng ảnh */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
 }
 
+/* Hình ảnh sản phẩm */
 .shop-page .product-style img {
-  width: 100%;
-  height: 380px; /* Cố định chiều cao để lưới đều nhau */
-  object-fit: cover;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* Giữ nguyên tỉ lệ ảnh, không bị méo */
   transition: transform 0.5s ease;
 }
 
-/* Hiệu ứng phóng to ảnh khi hover */
+/* Hiệu ứng zoom nhẹ ảnh khi hover vào ô sản phẩm */
 .shop-page .product-item:hover .product-style img {
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
-/* Nút Add to Cart hiện lên khi hover */
+/* --- NÚT ADD TO CART (MÀU ĐEN TRƯỢT LÊN) --- */
 .shop-page .add-to-cart {
   position: absolute;
-  bottom: -50px;
+  bottom: 0;
   left: 0;
   width: 100%;
-  background: #222;
-  color: #fff;
+  background-color: #000; /* Nền đen */
+  color: #fff; /* Chữ trắng */
   border: none;
-  padding: 12px;
+  padding: 12px 0;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  font-weight: 700;
   font-size: 0.8rem;
-  transition: bottom 0.3s ease;
+  letter-spacing: 1px;
+  cursor: pointer;
+  z-index: 10;
+
+  /* Trạng thái mặc định: Dịch chuyển xuống 100% chiều cao của chính nó (ẩn đi) */
+  transform: translateY(100%);
+  transition: transform 0.3s ease-in-out;
 }
 
-.shop-page .product-item:hover .add-to-cart {
-  bottom: 0;
+/* Khi hover vào vùng ảnh (.product-style) thì nút trượt lên vị trí gốc */
+.shop-page .product-style:hover .add-to-cart {
+  transform: translateY(0);
 }
 
+/* Style cho nút khi hover chuột vào nút */
 .shop-page .add-to-cart:hover {
-  background: #c5a992;
+  background-color: #333; /* Đổi màu nhẹ khi bấm */
 }
 
-/* 4. Typography cho sản phẩm */
+/* Style khi hết hàng */
+.shop-page .add-to-cart:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+}
+
+/* --- 4. Typography (Updated) --- */
+/* Tên sách: Viết hoa, đậm */
 .shop-page figcaption h3 {
-  font-size: 1rem;
-  font-weight: 600;
-  margin: 10px 0 5px;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin: 0 0 5px;
   color: #333;
-  white-space: nowrap;
+  line-height: 1.4;
+
+  /* Giới hạn 2 dòng để giao diện thẳng hàng */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis; /* Cắt ngắn tên sách nếu quá dài */
+  height: 40px;
 }
 
+/* Tên tác giả: Nghiêng, màu xám */
 .shop-page figcaption .text-muted {
   font-style: italic;
-  font-size: 0.85rem;
+  font-size: 13px;
+  color: #777;
+  display: block;
+  margin-bottom: 10px;
 }
 
+/* Giá tiền: Màu đỏ, đậm */
 .shop-page figcaption .item-price {
-  font-size: 1.1rem;
-  color: #c5a992;
-  margin-top: 5px;
+  font-size: 16px;
+  color: #dc3545;
+  font-weight: bold;
 }
-
 /* 5. Responsive Adjustment */
 @media (max-width: 768px) {
   .shop-page .product-style img {

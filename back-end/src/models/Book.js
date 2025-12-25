@@ -83,7 +83,7 @@ class Book {
     LEFT JOIN authors a ON ba.author_id = a.id
     LEFT JOIN book_categories bc ON b.id = bc.book_id
     LEFT JOIN categories c ON bc.category_id = c.id
-   WHERE b.is_active = 1
+   WHERE b.is_active = 1 AND b.quantity > 0
     GROUP BY b.id; `;
     const [rows] = await db.query(sql);
     return rows;
@@ -317,9 +317,6 @@ class Book {
     // 5. Cập nhật Ảnh (Chỉ chạy khi có upload ảnh mới)
     if (image) {
       const normalizedPath = image.replace(/\\/g, "/"); // Chuyển \ thành /
-
-      // Xử lý cắt chuỗi để lấy từ 'uploads/...'
-      // Đề phòng trường hợp path không chứa 'uploads/' (ví dụ ảnh online)
       let relativePath = normalizedPath;
       if (normalizedPath.includes("uploads/")) {
         relativePath = normalizedPath.substring(

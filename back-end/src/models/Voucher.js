@@ -10,6 +10,13 @@ class Voucher {
     const [rows] = await db.query(sql);
     return rows;
   }
+  static async getActive() {
+    const sql = `SELECT v.*, COUNT(o.id) as used_count FROM vouchers v
+    LEFT JOIN orders o ON v.id = o.voucher_id WHERE v.is_active = 1 
+    GROUP BY v.id ORDER BY v.id DESC `;
+    const [rows] = await db.query(sql);
+    return rows;
+  }
 
   static async findById(id) {
     const [rows] = await db.query("SELECT * FROM vouchers WHERE id = ?", [id]);

@@ -95,7 +95,6 @@ CREATE TABLE book_categories (
     FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE,
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
 );
-
 -- Bảng Hình ảnh sách (1 sách nhiều ảnh)
 CREATE TABLE book_images (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -113,6 +112,7 @@ CREATE TABLE book_images (
 CREATE TABLE banners (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(100),
+    description TEXT,
     image_url VARCHAR(255) NOT NULL,
     link_url VARCHAR(255),          -- Bấm vào thì nhảy đi đâu
     display_order INT DEFAULT 0,    -- Thứ tự hiển thị

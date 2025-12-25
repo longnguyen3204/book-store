@@ -35,6 +35,7 @@ app.use("/api/orders", require("./src/routes/orderRoutes")); // Đường dẫn 
 app.use("/api/authors", require("./src/routes/authorRoutes")); // Đường dẫn cho Tác giả
 app.use("/api/vouchers", require("./src/routes/voucherRoutes"));
 app.use("/api/reviews", require("./src/routes/reviewsRoutes"));
+app.use("/api/banner", require("./src/routes/bannerRoutes"));
 app.use("/api/statistics", require("./src/routes/statisticsRoutes"));
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

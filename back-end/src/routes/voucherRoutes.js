@@ -4,7 +4,8 @@ const voucherController = require("../controllers/voucherController");
 const authMiddleware = require("../middlewares/authMiddleware");
 const roleMiddleware = require("../middlewares/roleMiddleware");
 
-router.get("/", authMiddleware, voucherController.getAllVouchers);
+router.get("/", authMiddleware, voucherController.getActive);
+router.get("/all", roleMiddleware, voucherController.getAllVouchers);
 router.post("/", roleMiddleware, voucherController.addVoucher);
 router.put("/:id", roleMiddleware, voucherController.updateVoucher); // Cập nhật thông tin
 router.delete("/:id", roleMiddleware, voucherController.deleteVoucher);
